@@ -23,6 +23,7 @@
 # certificates and private keys
 *.key
 *.crt
+*.csr
 *.pfx
 *.p12
 my-certificate.crt
