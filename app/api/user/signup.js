@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       );
 
       // Başarıyla kayıt olduktan sonra, istemciye başarı durumunu döndür
-      return res.status(200).json({ email });
+      return res.status(200).json({ _id: user._id, email: user.email });
     } catch (error) {
       console.error("Signup error:", error.message);
       return res.status(400).json({ error: error.message });

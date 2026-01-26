@@ -15,11 +15,21 @@ interface RedditPost {
   url: string;
 }
 
+interface TrendingCoin {
+  id: string;
+  name: string;
+  symbol: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+}
+
 interface HeroContentProps {
   newsArticles: NewsArticle[];
   displayNfts: NftInfo[];
   nftFallbackImg: string;
   redditPosts: RedditPost[] | null;
+  trendingCoins: TrendingCoin[];
 }
 
 export default function HeroContent({
@@ -27,6 +37,7 @@ export default function HeroContent({
   displayNfts,
   nftFallbackImg,
   redditPosts,
+  trendingCoins,
 }: HeroContentProps) {
   const trendingRef = useRef<HTMLDivElement>(null);
   const newsRef = useRef<HTMLDivElement>(null);
@@ -51,14 +62,17 @@ export default function HeroContent({
                 placeholder="Email/Phone number"
                 className="w-full sm:w-[300px] h-[44px] sm:h-[40px] rounded-[10px] border-2 border-emerald-500/50 placeholder-gray-500 bg-[#000000] px-4 transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:shadow-lg focus:shadow-emerald-900/50"
               />
-              <button className="text-black font-bold bg-emerald-500 hover:bg-emerald-400 border-b-4 rounded-md border-b-emerald-700 px-6 py-2 sm:py-1.5 text-sm sm:text-xs transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105">
+              <Link 
+                href="/signup"
+                className="text-black font-bold bg-emerald-500 hover:bg-emerald-400 border-b-4 rounded-md border-b-emerald-700 px-6 py-2 sm:py-1.5 text-sm sm:text-xs transition-all duration-200 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 text-center"
+              >
                 Sign Up
-              </button>
+              </Link>
             </div>
 
             <div
               ref={nftRef}
-              className="text-sm w-full lg:w-[560px] rounded-[20px] bg-gray-950 border border-gray-800 mt-6 sm:mt-10 overflow-hidden relative p-4 sm:p-6 shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/40 transition-all duration-300 hover:border-emerald-500/30"
+              className="text-sm w-full lg:w-[560px] rounded-[20px] bg-gray-950 border border-gray-800 mt-6 sm:mt-10 lg:mt-[72px] overflow-hidden relative p-4 sm:p-6 shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/40 transition-all duration-300 hover:border-emerald-500/30"
             >
               <div className="flex items-center justify-between mb-4">
                 <p className="text-[16px] font-semibold">NFT's</p>
@@ -122,7 +136,7 @@ export default function HeroContent({
                   View All
                 </Link>
               </div>
-              <TrendingCard />
+              <TrendingCard initialData={trendingCoins} />
             </div>
 
             <div

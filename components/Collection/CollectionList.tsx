@@ -22,7 +22,7 @@ const CollectionList: React.FC<{ initialData: CollectionItemProps[] }> = ({ init
           {items.map((item, index) => (
             <tr key={index} className="border-gray-700 hover:bg-gray-800 transition-all">
               <td className="px-4 py-2 text-left flex items-center">
-                <StarToggle index={index} />
+                <StarToggle coinId={item.collection.collection} />
                 <span className="text-left">{index + 1}</span>
               </td>
               <td className="px-4 py-4 text-left flex items-center">

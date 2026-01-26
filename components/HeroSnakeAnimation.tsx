@@ -386,7 +386,7 @@ function SnakeCanvas({ targetRef, isActive, opacity, position, color }: SnakeCan
         width: bounds.width + padding * 2,
         height: bounds.height + padding * 2,
         pointerEvents: 'none',
-        zIndex: 50,
+        zIndex: 5,
       }}
     />
   );

@@ -2,8 +2,11 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  favorites: { type: [String], default: [] }, // Favori coin ID'leri
+  lastActivity: { type: Date, default: Date.now }, // Son aktivite zamanı
 });
 
 // Şifreyi hashleme
@@ -15,8 +18,8 @@ userSchema.pre("save", async function (next) {
 });
 
 // Kullanıcı kaydı
-userSchema.statics.signup = async function (email, password) {
-  const user = new this({ email, password });
+userSchema.statics.signup = async function (name, email, password) {
+  const user = new this({ name, email, password });
   await user.save();
   return user;
 };

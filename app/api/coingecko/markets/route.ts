@@ -18,18 +18,24 @@ export async function GET(req: NextRequest) {
   const page = Number(search.get('page') ?? 1);
   const sparkline = search.get('sparkline') ?? 'false';
   const priceChangePercentage = search.get('price_change_percentage') ?? '';
+  const ids = search.get('ids') ?? ''; // Support filtering by coin IDs
 
   const sanitizedPerPage = Math.min(Math.max(perPage, 1), 100); // Allow up to 100
   const sanitizedPage = Math.max(page, 1);
 
   let url = `${COINGECKO_BASE}/coins/markets?vs_currency=${encodeURIComponent(vsCurrency)}&order=${encodeURIComponent(order)}&per_page=${sanitizedPerPage}&page=${sanitizedPage}&sparkline=${encodeURIComponent(sparkline)}`;
   
+  // Add coin IDs filter if provided (for favorites)
+  if (ids) {
+    url += `&ids=${encodeURIComponent(ids)}`;
+  }
+  
   // Add price change percentage if requested (e.g., "7d,30d")
   if (priceChangePercentage) {
     url += `&price_change_percentage=${encodeURIComponent(priceChangePercentage)}`;
   }
   
-  const cacheKey = `markets_${vsCurrency}_${order}_${sanitizedPerPage}_${sanitizedPage}_${priceChangePercentage}`;
+  const cacheKey = `markets_${vsCurrency}_${order}_${sanitizedPerPage}_${sanitizedPage}_${priceChangePercentage}_${ids}`;
 
   try {
     const upstream = await fetch(url, {

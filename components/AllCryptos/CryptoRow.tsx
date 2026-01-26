@@ -86,7 +86,7 @@ export default function CryptoRow({ id, symbol, name, image, price, change24h, v
         {/* Star Icon - Fixed Width Column */}
         <div className="flex-shrink-0 w-6 flex items-center justify-center ml-3">
           <button
-            onClick={() => onToggleFavorite?.(symbol)}
+            onClick={() => onToggleFavorite?.(id)}
             className="p-1 hover:bg-gray-800 rounded transition"
           >
             {isFavorite ? (

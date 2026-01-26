@@ -14,11 +14,20 @@ interface Crypto {
   price_change_percentage_24h: number;
 }
 
-export default function TrendingCard() {
-  const [cryptos, setCryptos] = useState<Crypto[]>([]);
-  const [loading, setLoading] = useState(true);
+interface TrendingCardProps {
+  initialData?: Crypto[];
+}
+
+export default function TrendingCard({ initialData }: TrendingCardProps) {
+  const [cryptos, setCryptos] = useState<Crypto[]>(initialData || []);
+  const [loading, setLoading] = useState(!initialData || initialData.length === 0);
 
   useEffect(() => {
+    // If we have initial data from SSR, don't fetch again
+    if (initialData && initialData.length > 0) {
+      return;
+    }
+
     const fetchTrendingCryptos = async () => {
       try {
         const data = await cachedFetch(
@@ -36,7 +45,7 @@ export default function TrendingCard() {
     };
 
     fetchTrendingCryptos();
-  }, []);
+  }, [initialData]);
 
   if (loading) {
     return (
