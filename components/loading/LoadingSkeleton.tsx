@@ -16,26 +16,37 @@ const shimmerStyle = `
 export const HeroSkeleton = () => (
   <div className="bg-black text-white">
     <style>{shimmerStyle}</style>
-    <section className="flex justify-between h-lvh bg-black">
-      <div className="w-full flex justify-between max-w-section mx-auto">
-        <div className="pt-[90px] w-full pr-8">
-          <div className="skeleton h-16 w-1/2 rounded mb-6" />
-          <div className="skeleton h-24 w-2/3 rounded mb-6" />
-          <div className="skeleton h-6 w-1/3 rounded mb-3" />
-          <div className="skeleton h-6 w-1/4 rounded mb-8" />
-          <div className="flex gap-4">
-            <div className="skeleton h-10 w-[300px] rounded-[10px]" />
-            <div className="skeleton h-10 w-24 rounded-md" />
+    <section className="flex justify-between min-h-screen lg:h-lvh bg-black">
+      <div className="w-full flex flex-col lg:flex-row justify-between max-w-section mx-auto px-4 sm:px-6 lg:px-0">
+        {/* Left Side */}
+        <div className="pt-20 sm:pt-[90px] w-full lg:w-1/2">
+          {/* Title */}
+          <div className="skeleton h-12 sm:h-16 w-3/4 rounded mb-4" />
+          {/* Typed animation area */}
+          <div className="skeleton h-16 sm:h-24 w-full rounded mb-4" />
+          {/* Subtitle */}
+          <div className="skeleton h-5 w-2/3 rounded mb-2" />
+          <div className="skeleton h-6 w-24 rounded mb-6" />
+          {/* Input + Button */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div className="skeleton h-11 w-full sm:w-[300px] rounded-[10px]" />
+            <div className="skeleton h-11 w-24 rounded-md" />
           </div>
-          <div className="mt-12">
-            <div className="skeleton h-8 w-1/3 rounded mb-4" />
-            <div className="skeleton h-40 w-full rounded" />
-          </div>
+          {/* NFT Card */}
+          <div className="skeleton w-full lg:w-[560px] h-[200px] rounded-[20px] mt-6 sm:mt-10 lg:mt-[72px]" />
         </div>
-        <div className="w-[542px] mt-[75px]">
-          <div className="w-[542px] h-[211px] rounded-[20px] bg-[#0d131d] skeleton" />
-          <div className="w-[542px] h-[181px] rounded-[20px] bg-[#0d131d] skeleton mt-24" />
-          <div className="w-[542px] h-[170px] rounded-[20px] bg-[#0d131d] skeleton mt-8" />
+        
+        {/* Right Side */}
+        <div className="flex flex-col gap-4 sm:gap-6 mt-6 lg:mt-12 pb-8 lg:pb-0 w-full lg:w-auto">
+          {/* Trending Card */}
+          <div className="skeleton w-full lg:w-[542px] h-[160px] rounded-[20px]" />
+          {/* Reddit Card */}
+          <div className="skeleton w-full lg:w-[542px] h-[140px] rounded-[20px]" />
+          {/* Stats & Actions Cards */}
+          <div className="flex gap-4">
+            <div className="skeleton flex-1 lg:w-[260px] h-[120px] rounded-[20px]" />
+            <div className="skeleton flex-1 lg:w-[260px] h-[120px] rounded-[20px]" />
+          </div>
         </div>
       </div>
     </section>

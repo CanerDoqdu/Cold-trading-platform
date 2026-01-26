@@ -143,7 +143,7 @@ const WhyCold = () => {
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full border-2 border-emerald-400/60 animate-[scanRing_2s_ease-in-out_infinite] z-30" />
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full border-2 border-emerald-400/30 animate-[scanRing_2s_ease-in-out_infinite_0.5s] z-30" />
                 {/* Scan line */}
-                <div className="absolute left-4 right-4 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-[scanVertical_2s_ease-in-out_infinite] z-40 rounded-full shadow-lg shadow-emerald-400/50" />
+                <div className="absolute left-4 right-4 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-[scanVertical_2s_ease-in-out_infinite] z-20 rounded-full shadow-lg shadow-emerald-400/50" />
                 {/* Icons floating */}
                 <Image
                   src="/images/secure-parts/Icon_1.png"

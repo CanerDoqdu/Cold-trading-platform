@@ -4,11 +4,9 @@ import Image from "next/image";
 import EmailIcon from "@/public/icons/Email-username.svg";
 import PasswordIcon from "@/public/icons/password.svg";
 import { useLogin } from "@/hooks/UseLogin";
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const Login = () => {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, error, isLoading } = useLogin();
@@ -21,9 +19,7 @@ const Login = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await login(email, password);
-    if (!error) {
-      router.push('/');
-    }
+    // Redirect is handled inside useLogin hook on success
   };
 
   return (
@@ -31,7 +27,7 @@ const Login = () => {
       {/* Logo - Top Left - Link to Homepage */}
       <Link 
         href="/" 
-        className="absolute top-6 left-12 z-50 flex items-center gap-2 group"
+        className={`absolute top-6 left-12 z-50 flex items-center gap-2 group transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}
       >
         <Image 
           src="/images/Group.svg" 
@@ -91,7 +87,7 @@ const Login = () => {
 
             {/* Character */}
             <div 
-              className={`relative w-[260px] h-[350px] z-20 transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
+              className={`relative w-[280px] h-[380px] z-20 transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
             >
               <Image src="/images/auth-parts/Character.png" alt="Character" fill className="object-contain object-bottom" />
             </div>
@@ -152,6 +148,11 @@ const Login = () => {
         </div>
       </div>
 
+      {/* Subtle Divider */}
+      <div className="hidden lg:block absolute left-1/2 xl:left-[55%] top-0 h-full w-px">
+        <div className="h-full w-full bg-gradient-to-b from-transparent via-gray-700/30 to-transparent" />
+      </div>
+
       {/* Right Side - Login Form */}
       <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center px-6 py-12">
         <div className={`w-full max-w-[420px] transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
@@ -184,7 +185,7 @@ const Login = () => {
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-500 focus:bg-gray-800 transition-all"
+                  className="w-full pl-12 pr-4 py-3.5 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-gray-400 focus:bg-gray-800 transition-all"
                   required
                 />
               </div>
@@ -205,7 +206,7 @@ const Login = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-emerald-500 focus:bg-gray-800 transition-all"
+                  className="w-full pl-12 pr-4 py-3.5 bg-gray-800/50 border border-gray-600 rounded-lg text-white placeholder:text-gray-500 focus:outline-none focus:border-gray-400 focus:bg-gray-800 transition-all"
                   required
                 />
               </div>

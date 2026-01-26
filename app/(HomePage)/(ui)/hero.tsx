@@ -13,14 +13,27 @@ import { WebSocketProvider } from "@/components/WebSocketContext";
 import Image from "next/image";
 import Link from "next/link";
 import { getRedditData } from '@/components/redditapi/redditApi';
-import TrendingCard from "@/components/AllCryptos/TrendingCard";
 import HeroContent from "./HeroContent";
+
+// Fetch trending coins for SSR
+async function fetchTrendingCoins() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/coingecko/markets?vs_currency=usd&order=market_cap_desc&per_page=3&sparkline=false`, {
+      next: { revalidate: 180 } // 3 min cache
+    });
+    if (!res.ok) return [];
+    return res.json();
+  } catch {
+    return [];
+  }
+}
 
 const Hero = async () => {
   const coinSymbols = ["BTC", "ETH", "SOL"];
 
-  // Fetch all data simultaneously
-  const [coinInfos, initialPrices, cryptoChanges, newsArticles, nftInfos, redditPosts] =
+  // Fetch all data simultaneously including trending
+  const [coinInfos, initialPrices, cryptoChanges, newsArticles, nftInfos, redditPosts, trendingCoins] =
     await Promise.all([
       fetchgeneralinfo(coinSymbols),
       getCryptoPrices(),
@@ -28,6 +41,7 @@ const Hero = async () => {
       fetchNews(),
       fetchNftInfo(),
       getRedditData(),
+      fetchTrendingCoins(),
     ]);
 
   // Filter out NFTs with missing or non-renderable images to avoid broken thumbnails
@@ -56,6 +70,7 @@ const Hero = async () => {
         displayNfts={displayNfts}
         nftFallbackImg={nftFallbackImg}
         redditPosts={redditPosts}
+        trendingCoins={trendingCoins}
       />
     </WebSocketProvider>
   );

@@ -14,15 +14,93 @@ interface Bounds {
   h: number;
 }
 
-// Map distance along rectangle perimeter (clockwise from top-left)
-function pointOnPerimeter(x: number, y: number, w: number, h: number, distance: number): Point {
-  const perimeter = 2 * (w + h);
+// Map distance along rectangle perimeter with rounded corners (clockwise from top-left)
+function pointOnPerimeter(x: number, y: number, w: number, h: number, distance: number, borderRadius: number = 12): Point {
+  const r = Math.min(borderRadius, Math.min(w, h) / 2);
+  
+  // Lengths of each segment
+  const topStraight = w - 2 * r;
+  const rightStraight = h - 2 * r;
+  const bottomStraight = w - 2 * r;
+  const leftStraight = h - 2 * r;
+  const cornerArc = (Math.PI / 2) * r; // Quarter circle arc length
+  
+  const perimeter = topStraight + rightStraight + bottomStraight + leftStraight + 4 * cornerArc;
   const d = ((distance % perimeter) + perimeter) % perimeter;
+  
+  let accumulated = 0;
+  
+  // Top straight (left to right)
+  if (d <= accumulated + topStraight) {
+    return { x: x + r + (d - accumulated), y };
+  }
+  accumulated += topStraight;
+  
+  // Top-right corner
+  if (d <= accumulated + cornerArc) {
+    const angle = -Math.PI / 2 + ((d - accumulated) / r);
+    return { 
+      x: x + w - r + Math.cos(angle) * r, 
+      y: y + r + Math.sin(angle) * r 
+    };
+  }
+  accumulated += cornerArc;
+  
+  // Right straight (top to bottom)
+  if (d <= accumulated + rightStraight) {
+    return { x: x + w, y: y + r + (d - accumulated) };
+  }
+  accumulated += rightStraight;
+  
+  // Bottom-right corner
+  if (d <= accumulated + cornerArc) {
+    const angle = 0 + ((d - accumulated) / r);
+    return { 
+      x: x + w - r + Math.cos(angle) * r, 
+      y: y + h - r + Math.sin(angle) * r 
+    };
+  }
+  accumulated += cornerArc;
+  
+  // Bottom straight (right to left)
+  if (d <= accumulated + bottomStraight) {
+    return { x: x + w - r - (d - accumulated), y: y + h };
+  }
+  accumulated += bottomStraight;
+  
+  // Bottom-left corner
+  if (d <= accumulated + cornerArc) {
+    const angle = Math.PI / 2 + ((d - accumulated) / r);
+    return { 
+      x: x + r + Math.cos(angle) * r, 
+      y: y + h - r + Math.sin(angle) * r 
+    };
+  }
+  accumulated += cornerArc;
+  
+  // Left straight (bottom to top)
+  if (d <= accumulated + leftStraight) {
+    return { x, y: y + h - r - (d - accumulated) };
+  }
+  accumulated += leftStraight;
+  
+  // Top-left corner
+  const angle = Math.PI + ((d - accumulated) / r);
+  return { 
+    x: x + r + Math.cos(angle) * r, 
+    y: y + r + Math.sin(angle) * r 
+  };
+}
 
-  if (d <= w) return { x: x + d, y };
-  if (d <= w + h) return { x: x + w, y: y + (d - w) };
-  if (d <= 2 * w + h) return { x: x + w - (d - w - h), y: y + h };
-  return { x, y: y + h - (d - 2 * w - h) };
+// Calculate perimeter with rounded corners
+function getPerimeter(w: number, h: number, borderRadius: number = 12): number {
+  const r = Math.min(borderRadius, Math.min(w, h) / 2);
+  const topStraight = w - 2 * r;
+  const rightStraight = h - 2 * r;
+  const bottomStraight = w - 2 * r;
+  const leftStraight = h - 2 * r;
+  const cornerArc = (Math.PI / 2) * r;
+  return topStraight + rightStraight + bottomStraight + leftStraight + 4 * cornerArc;
 }
 
 interface PurpleSnakeAnimationProps {
@@ -30,9 +108,10 @@ interface PurpleSnakeAnimationProps {
   trendingRef?: React.RefObject<HTMLDivElement>;
   newsRef?: React.RefObject<HTMLDivElement>;
   nftRef?: React.RefObject<HTMLDivElement>;
+  dualSnakes?: boolean; // Yin-yang style dual snakes
 }
 
-export default function PurpleSnakeAnimation({ children, trendingRef, newsRef, nftRef }: PurpleSnakeAnimationProps) {
+export default function PurpleSnakeAnimation({ children, trendingRef, newsRef, nftRef, dualSnakes = false }: PurpleSnakeAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [canvasSize, setCanvasSize] = useState({ w: 0, h: 0 });
@@ -61,9 +140,9 @@ export default function PurpleSnakeAnimation({ children, trendingRef, newsRef, n
   const ANIMATION_TIME = 6; // 6 seconds per section
   const FADE_DURATION = 1.0; // 1 second for fade (increased for smoother effect)
   const SECTION_COLOR: Record<'trending' | 'news' | 'nft', string> = {
-    trending: '#a855f7',
-    news: '#22d3ee',
-    nft: '#f59e0b',
+    trending: '#10b981', // emerald-500
+    news: '#34d399',     // emerald-400
+    nft: '#059669',      // emerald-600
   };
 
   // Setup canvas
@@ -214,7 +293,8 @@ export default function PurpleSnakeAnimation({ children, trendingRef, newsRef, n
         return;
       }
 
-      const perimeter = 2 * (activeBounds.w + activeBounds.h);
+      const borderRadius = 12; // Match the rounded-lg border radius
+      const perimeter = getPerimeter(activeBounds.w, activeBounds.h, borderRadius);
 
       // Update position for animate phase only
       if (isMultiSection && animationPhase === 'animate') {
@@ -224,42 +304,75 @@ export default function PurpleSnakeAnimation({ children, trendingRef, newsRef, n
         snakeStateRef.current.position = (snakeStateRef.current.position + snakeStateRef.current.speed * deltaTime) % perimeter;
       }
 
-      // Draw snake
-      const headPos = snakeStateRef.current.position;
-      const tailPos = isMultiSection 
-        ? Math.max(0, headPos - snakeStateRef.current.length)
-        : (headPos - snakeStateRef.current.length + perimeter) % perimeter;
+      // Function to draw a single snake
+      const drawSnake = (positionOffset: number, colorKey: 'trending' | 'news' | 'nft' = currentSection) => {
+        const headPos = (snakeStateRef.current.position + positionOffset) % perimeter;
+        const snakeLength = dualSnakes ? 150 : snakeStateRef.current.length; // Shorter snakes for dual mode
+        const tailPos = isMultiSection 
+          ? Math.max(0, headPos - snakeLength)
+          : (headPos - snakeLength + perimeter) % perimeter;
 
-      ctx.beginPath();
-      const samples = 25;
-
-      for (let i = 0; i <= samples; i++) {
-        const ratio = i / samples;
-        let currentPos;
+        const actualLength = isMultiSection 
+          ? headPos - tailPos 
+          : snakeLength;
         
-        if (isMultiSection) {
-          currentPos = tailPos + snakeStateRef.current.length * ratio;
-        } else {
-          currentPos = (tailPos + snakeStateRef.current.length * ratio) % perimeter;
-        }
-        
-        const point = pointOnPerimeter(activeBounds.x, activeBounds.y, activeBounds.w, activeBounds.h, currentPos);
+        const samples = 60; // More samples for smooth rounded corners
+        const fadeLength = 0.12; // Fade first/last 12% of the snake
 
-        if (i === 0) {
-          ctx.moveTo(point.x, point.y);
-        } else {
-          ctx.lineTo(point.x, point.y);
+        // Draw snake segments with varying opacity for soft head/tail
+        for (let i = 0; i < samples; i++) {
+          const ratio1 = i / samples;
+          const ratio2 = (i + 1) / samples;
+          
+          let currentPos1, currentPos2;
+          
+          if (isMultiSection) {
+            currentPos1 = tailPos + actualLength * ratio1;
+            currentPos2 = tailPos + actualLength * ratio2;
+            if (currentPos1 > headPos) break;
+          } else {
+            currentPos1 = (tailPos + actualLength * ratio1) % perimeter;
+            currentPos2 = (tailPos + actualLength * ratio2) % perimeter;
+          }
+          
+          const point1 = pointOnPerimeter(activeBounds.x, activeBounds.y, activeBounds.w, activeBounds.h, currentPos1, borderRadius);
+          const point2 = pointOnPerimeter(activeBounds.x, activeBounds.y, activeBounds.w, activeBounds.h, isMultiSection ? Math.min(currentPos2, headPos) : currentPos2, borderRadius);
+
+          // Calculate opacity for this segment (fade at head and tail)
+          let segmentAlpha = 1;
+          if (ratio1 < fadeLength) {
+            // Tail fade - ease in
+            segmentAlpha = ratio1 / fadeLength;
+            segmentAlpha = segmentAlpha * segmentAlpha; // Quadratic easing
+          } else if (ratio1 > 1 - fadeLength) {
+            // Head fade - ease out
+            segmentAlpha = (1 - ratio1) / fadeLength;
+            segmentAlpha = segmentAlpha * segmentAlpha; // Quadratic easing
+          }
+
+          ctx.beginPath();
+          ctx.moveTo(point1.x, point1.y);
+          ctx.lineTo(point2.x, point2.y);
+          
+          ctx.strokeStyle = SECTION_COLOR[colorKey];
+          ctx.lineWidth = 2.5;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = SECTION_COLOR[colorKey];
+          ctx.globalAlpha = opacity * segmentAlpha * 0.9;
+          ctx.stroke();
         }
+      };
+
+      // Draw snake(s)
+      if (dualSnakes) {
+        // Yin-yang style: two snakes 180 degrees apart
+        drawSnake(0, 'trending');
+        drawSnake(perimeter / 2, 'news'); // Second snake uses different color
+      } else {
+        drawSnake(0);
       }
-
-      ctx.strokeStyle = SECTION_COLOR[currentSection];
-      ctx.lineWidth = 3.5;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.shadowBlur = 15;
-      ctx.shadowColor = '#a855f7';
-      ctx.globalAlpha = opacity * 0.95;
-      ctx.stroke();
 
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
@@ -275,7 +388,7 @@ export default function PurpleSnakeAnimation({ children, trendingRef, newsRef, n
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [canvasSize, isMultiSection, animationPhase, currentSection, opacity]);
+  }, [canvasSize, isMultiSection, animationPhase, currentSection, opacity, dualSnakes]);
 
   return (
     <div 
@@ -292,7 +405,7 @@ export default function PurpleSnakeAnimation({ children, trendingRef, newsRef, n
             width: '100%',
             height: '100%',
             pointerEvents: 'none',
-            zIndex: 10,
+            zIndex: 5, // Lower than navbar dropdown (z-50)
           }}
         />
         {children}

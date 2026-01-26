@@ -1,11 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    unoptimized: true,
     dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment', // or 'inline' based on your use case
+    contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
-    qualities: [60, 75, 90],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 72, 96, 128, 256],
+    formats: ['image/avif', 'image/webp'],
+    qualities: [60, 75, 85],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days cache
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
 };
 

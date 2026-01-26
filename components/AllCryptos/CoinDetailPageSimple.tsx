@@ -128,11 +128,55 @@ export default function CoinDetailPageSimple({ coinId }: { coinId: string }) {
       <div className="min-h-screen bg-black p-6">
         <div className="max-w-6xl mx-auto">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 w-48 bg-gray-800 rounded"></div>
+            {/* Header section */}
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gray-800 rounded-full"></div>
+              <div className="space-y-2">
+                <div className="h-6 w-32 bg-gray-800 rounded"></div>
+                <div className="h-4 w-20 bg-gray-800 rounded"></div>
+              </div>
+              <div className="ml-auto">
+                <div className="h-10 w-10 bg-gray-800 rounded-lg"></div>
+              </div>
+            </div>
+            
+            {/* Price section */}
+            <div className="flex items-baseline gap-4">
+              <div className="h-10 w-48 bg-gray-800 rounded"></div>
+              <div className="h-6 w-24 bg-gray-800 rounded"></div>
+            </div>
+            
+            {/* Chart */}
             <div className="h-64 bg-gray-800 rounded-xl"></div>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="h-48 bg-gray-800 rounded-xl"></div>
-              <div className="h-48 bg-gray-800 rounded-xl"></div>
+            
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 bg-gray-900 rounded-xl space-y-2">
+                <div className="h-4 w-20 bg-gray-800 rounded"></div>
+                <div className="h-6 w-24 bg-gray-800 rounded"></div>
+              </div>
+              <div className="p-4 bg-gray-900 rounded-xl space-y-2">
+                <div className="h-4 w-20 bg-gray-800 rounded"></div>
+                <div className="h-6 w-24 bg-gray-800 rounded"></div>
+              </div>
+              <div className="p-4 bg-gray-900 rounded-xl space-y-2">
+                <div className="h-4 w-20 bg-gray-800 rounded"></div>
+                <div className="h-6 w-24 bg-gray-800 rounded"></div>
+              </div>
+              <div className="p-4 bg-gray-900 rounded-xl space-y-2">
+                <div className="h-4 w-20 bg-gray-800 rounded"></div>
+                <div className="h-6 w-24 bg-gray-800 rounded"></div>
+              </div>
+            </div>
+            
+            {/* Description section */}
+            <div className="bg-gray-900 rounded-xl p-6 space-y-3">
+              <div className="h-6 w-32 bg-gray-800 rounded"></div>
+              <div className="space-y-2">
+                <div className="h-4 w-full bg-gray-800 rounded"></div>
+                <div className="h-4 w-full bg-gray-800 rounded"></div>
+                <div className="h-4 w-3/4 bg-gray-800 rounded"></div>
+              </div>
             </div>
           </div>
         </div>
