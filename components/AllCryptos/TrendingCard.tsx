@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cachedFetch } from '@/lib/apiCache';
+import { useWebSocket } from '@/components/WebSocketContext';
 
 interface Crypto {
   id: string;
@@ -21,6 +22,7 @@ interface TrendingCardProps {
 export default function TrendingCard({ initialData }: TrendingCardProps) {
   const [cryptos, setCryptos] = useState<Crypto[]>(initialData || []);
   const [loading, setLoading] = useState(!initialData || initialData.length === 0);
+  const { prices } = useWebSocket();
 
   useEffect(() => {
     // If we have initial data from SSR, don't fetch again
@@ -85,7 +87,15 @@ export default function TrendingCard({ initialData }: TrendingCardProps) {
 
             {/* Right Group: Price + Change */}
             <div className="flex items-center gap-2 text-right whitespace-nowrap ml-2">
-              <div className="text-white font-bold text-xs">${crypto.current_price?.toFixed(2) || 'N/A'}</div>
+              <div className="text-white font-bold text-xs">
+                ${(() => {
+                  const wsPrice = prices[crypto.symbol.toUpperCase()];
+                  if (wsPrice) {
+                    return parseFloat(wsPrice).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                  }
+                  return crypto.current_price?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || 'N/A';
+                })()}
+              </div>
               <div className={`font-semibold text-xs ${crypto.price_change_percentage_24h >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                 {crypto.price_change_percentage_24h >= 0 ? '+' : ''}
                 {crypto.price_change_percentage_24h?.toFixed(2) || '0'}%

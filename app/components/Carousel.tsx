@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { fetchgeneralinfo, CoinInfo } from "../../components/CryptoGeneralInfo";
 import ScrollerAnimation from "@/components/CarouselAnimation";
 // prettier-ignore
@@ -37,15 +38,19 @@ const Scroller: React.FC = async () => {
         <div key={rowIndex} className={`scroller row${rowIndex + 1}`}>
           <ul className="tag-list scroller__inner">
             {rowCoins.map((coin, index) => (
-              <Link key={index} href={`/markets/${coin.Symbol?.toLowerCase() || coin.Name?.toLowerCase() || ''}`}>
-                <li
-                  className="coin-box flex items-center justify-end bg-gray-100 rounded-lg min-h-[48px] hover:bg-gray-200 transition cursor-pointer"
-                  style={{ width: "auto", padding: "0 8px" }}
-                >
-                  <img
+              <li
+                key={index}
+                className="coin-box flex items-center justify-end bg-gray-100 rounded-lg min-h-[48px] hover:bg-gray-200 transition cursor-pointer"
+                style={{ width: "auto", padding: "0 8px" }}
+              >
+                <Link href={`/markets/${coin.Name?.toLowerCase() || ''}`} className="flex items-center w-full">
+                  <Image
                     src={coin.ImageUrl}
-                    alt={coin.FullName}
+                    alt={`${coin.FullName} logo`}
+                    width={30}
+                    height={30}
                     className="w-[30px] h-[30px] object-contain rounded-full"
+                    loading="lazy"
                   />
                   <span
                     className="text-right flex-grow truncate ml-1 mr-2"
@@ -57,8 +62,8 @@ const Scroller: React.FC = async () => {
                   >
                     {coin.FullName}
                   </span>
-                </li>
-              </Link>
+                </Link>
+              </li>
             ))}
           </ul>
         </div>

@@ -2,13 +2,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { Coin } from "@/types/coin";
 
 interface ScrollerAnimationProps {
-  coinData: Coin[];
+  coinData?: unknown[];
 }
 
-const ScrollerAnimation: React.FC<ScrollerAnimationProps> = ({ coinData }) => {
+const ScrollerAnimation: React.FC<ScrollerAnimationProps> = () => {
   useEffect(() => {
     const scrollers = document.querySelectorAll<HTMLDivElement>(".scroller");
 
@@ -30,6 +29,18 @@ const ScrollerAnimation: React.FC<ScrollerAnimationProps> = ({ coinData }) => {
             scrollerContent.forEach((item) => {
               const duplicatedItem = item.cloneNode(true) as HTMLElement;
               duplicatedItem.setAttribute("aria-hidden", "true");
+              // Make all focusable elements inside the clone not focusable
+              const focusableElements = duplicatedItem.querySelectorAll('a, button, input, [tabindex]');
+              focusableElements.forEach((el) => {
+                el.setAttribute('tabindex', '-1');
+              });
+              // Also handle if the item itself is a link
+              if (duplicatedItem.tagName === 'A' || duplicatedItem.tagName === 'LI') {
+                const links = duplicatedItem.querySelectorAll('a');
+                links.forEach((link) => {
+                  link.setAttribute('tabindex', '-1');
+                });
+              }
               scrollerInner?.appendChild(duplicatedItem);
             });
           });
@@ -39,7 +50,7 @@ const ScrollerAnimation: React.FC<ScrollerAnimationProps> = ({ coinData }) => {
         scrollers[0].setAttribute("data-initialized", "true");
       }
     }
-  }, [coinData]);
+  }, []);
 
   return null; // Görsel içerik üretmiyoruz, sadece animasyonu uyguluyoruz.
 };

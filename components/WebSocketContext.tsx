@@ -1,11 +1,12 @@
 "use client";
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from "react";
 
 // WebSocketContextType tipini genişletiyoruz
 interface WebSocketContextType {
   prices: { [key: string]: string | null };
-  marketCapData: any[]; // Market cap verisi için state
+  marketCapData: any[];
   setPrice: (coin: string, price: string) => void;
+  isConnected: boolean;
 }
 
 // WebSocketProviderProps tipini oluşturuyoruz, children özelliğini dahil ediyoruz
@@ -26,26 +27,41 @@ export const useWebSocket = () => {
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
   const [prices, setPrices] = useState<{ [key: string]: string | null }>({});
   const [marketCapData, setMarketCapData] = useState<any[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
+  const mountedRef = useRef(true);
 
-  // HANDLING API KEYS I WILL CHANGE THE ALL API KEYS WITH NEW ONES
-  useEffect(() => {
+  const connect = useCallback(() => {
+    // Prevent connection if already connected or connecting
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      return;
+    }
+
     const apiKey = process.env.NEXT_PUBLIC_CRYPTOCOMPARE;
     if (!apiKey) {
       console.error("API Key is missing!");
       return;
     }
 
-    const socket = new WebSocket(`wss://streamer.cryptocompare.com/v2?api_key=${apiKey}`);
+    const socket = new WebSocket(
+      `wss://streamer.cryptocompare.com/v2?api_key=${apiKey}`
+    );
 
     socket.onopen = () => {
-      const coinsToSubscribe = ["BTC", "ETH", "SOL", "ADA", "XRP", "DOGE"].map(
+      if (!mountedRef.current) {
+        socket.close();
+        return;
+      }
+      console.log("WebSocket connected");
+      setIsConnected(true);
+      const coinsToSubscribe = ["BTC", "ETH", "SOL"].map(
         (coin) => `5~CCCAGG~${coin}~USD`
       );
       socket.send(JSON.stringify({ action: "SubAdd", subs: coinsToSubscribe }));
     };
 
     socket.onmessage = (event) => {
+      if (!mountedRef.current) return;
       const data = JSON.parse(event.data);
       if (data.TYPE === "5" && data.PRICE) {
         const price = data.PRICE.toFixed(2);
@@ -54,12 +70,39 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
       }
     };
 
-    setWs(socket);
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    socket.onclose = () => {
+      if (!mountedRef.current) return;
+      console.log("WebSocket closed");
+      setIsConnected(false);
+      wsRef.current = null;
+    };
+
+    wsRef.current = socket;
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    
+    // Small delay to avoid Strict Mode issues
+    const timer = setTimeout(() => {
+      if (mountedRef.current) {
+        connect();
+      }
+    }, 100);
 
     return () => {
-      socket.close();
+      mountedRef.current = false;
+      clearTimeout(timer);
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
     };
-  }, []);
+  }, [connect]);
 
   useEffect(() => {
     const fetchMarketCapData = async () => {
@@ -69,7 +112,6 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         );
         const result = await response.json();
         if (result.Message === "Success") {
-          // Market cap verisini güncelle (coin Name, FullName ve totalVolume24h)
           const parsedData = result.Data.map((coin: any) => ({
             Name: coin.CoinInfo.Name,
             FullName: coin.CoinInfo.FullName,
@@ -84,12 +126,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
   
     fetchMarketCapData();
   }, []);
+
   const setPrice = (coin: string, price: string) => {
     setPrices((prevPrices) => ({ ...prevPrices, [coin]: price }));
   };
 
   return (
-    <WebSocketContext.Provider value={{ prices, marketCapData, setPrice }}>
+    <WebSocketContext.Provider value={{ prices, marketCapData, setPrice, isConnected }}>
       {children}
     </WebSocketContext.Provider>
   );

@@ -92,10 +92,10 @@ const config = {
           '100%': { transform: 'translateX(-50%) scale(1.3)', opacity: '0' },
         },
         'scanVertical': {
-          '0%': { top: '20%', opacity: '0' },
+          '0%': { transform: 'translateY(0)', opacity: '0' },
           '20%': { opacity: '1' },
           '80%': { opacity: '1' },
-          '100%': { top: '60%', opacity: '0' },
+          '100%': { transform: 'translateY(100px)', opacity: '0' },
         },
         'border-reverse': {
           '0%': {

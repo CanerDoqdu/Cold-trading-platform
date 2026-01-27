@@ -1,6 +1,5 @@
 import Navbar from '@/components/AllCryptos/Navbar';
 import TrendingCard from '@/components/AllCryptos/TrendingCard';
-import Tabs from '@/components/AllCryptos/Tabs';
 import CryptoTable from '@/components/AllCryptos/CryptoTable';
 import PurpleSnakeAnimation from '@/components/AllCryptos/PurpleSnakeAnimation';
 
@@ -25,11 +24,6 @@ export default function AllCryptolistingsPage() {
                 <TrendingCard />
               </div>
             </PurpleSnakeAnimation>
-          </div>
-
-          {/* Tabs */}
-          <div className="mb-8">
-            <Tabs />
           </div>
 
           {/* Crypto Table - Has single snake animation */}

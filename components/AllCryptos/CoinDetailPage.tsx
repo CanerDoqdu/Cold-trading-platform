@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { cachedFetch, apiCache } from '@/lib/apiCache';
+import { useRecentViews } from '@/hooks/useRecentViews';
 
 interface CoinDetail {
   id: string;
@@ -73,6 +74,7 @@ const normalizeOhlcDays = (days: number) => {
 
 export default function CoinDetailPage({ coinId }: { coinId: string }) {
   const router = useRouter();
+  const { addRecentView } = useRecentViews();
   const [coin, setCoin] = useState<CoinDetail | null>(null);
   const [trending, setTrending] = useState<TrendingCoin[]>([]);
   const [chartData, setChartData] = useState<{prices: number[], dates: string[]}>({ prices: [], dates: [] });
@@ -103,7 +105,7 @@ export default function CoinDetailPage({ coinId }: { coinId: string }) {
         const ohlcTargetDays = days === 1 ? 1 : days * 3;
         const ohlcDays = normalizeOhlcDays(ohlcTargetDays);
         
-        let coinData = null;
+        let coinData: any = null;
         let trendingData: TrendingCoin[] = [];
         let rawChartData: { prices: [number, number][] } = { prices: [] };
         let rawOhlcData: number[][] = [];
@@ -136,6 +138,16 @@ export default function CoinDetailPage({ coinId }: { coinId: string }) {
         // STEP 2: Show coin data immediately - don't wait for charts
         setCoin(coinData);
         setLoading(false);
+        
+        // Add to recent views
+        if (coinData.id && coinData.name && coinData.symbol && coinData.image?.large) {
+          addRecentView({
+            id: coinData.id,
+            name: coinData.name,
+            symbol: coinData.symbol,
+            image: coinData.image.large
+          });
+        }
 
         // STEP 3: Load trending (uses global cache, usually instant)
         try {

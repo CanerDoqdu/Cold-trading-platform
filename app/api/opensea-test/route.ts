@@ -6,7 +6,7 @@ export async function GET() {
     const collections = await getCollectionsData(0, 3);
     const first = collections?.[0];
     const id = (first?.slug as string) || (first?.name as string);
-    let stats = null;
+    let stats: any = null;
     if (id) {
       try {
         stats = await getStatsData(id);

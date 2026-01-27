@@ -101,20 +101,22 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
 
   return (
     <NeonSnakeAnimation>
-      <div className="space-y-4">
+      <div className="space-y-2">
         {/* Table Header */}
-        <div className="hidden lg:grid gap-4 px-6 py-4 border-b border-gray-700/30" style={{ gridTemplateColumns: '60px 30px 1fr 140px 110px 140px 140px' }}>
-          <div className="text-xs font-semibold text-gray-400 uppercase">Rank</div>
+        <div className="hidden lg:grid gap-4 px-6 py-4 bg-gray-900/50 border-b border-white/10 sticky top-0 z-10" style={{ gridTemplateColumns: '60px 30px 1fr 140px 110px 140px 140px' }}>
+          <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+            Rank
+          </div>
         <div></div>
-        <div className="text-xs font-semibold text-gray-400 uppercase">Collection</div>
-        <div className="text-xs font-semibold text-gray-400 uppercase text-right">Floor Price</div>
-        <div className="text-xs font-semibold text-gray-400 uppercase text-right">24h Change</div>
-        <div className="text-xs font-semibold text-gray-400 uppercase text-right">24h Volume</div>
-        <div className="text-xs font-semibold text-gray-400 uppercase text-right">Market Cap</div>
+        <div className="text-xs font-bold text-gray-300 uppercase tracking-wider">Collection</div>
+        <div className="text-xs font-bold text-gray-300 uppercase tracking-wider text-right">Floor Price</div>
+        <div className="text-xs font-bold text-gray-300 uppercase tracking-wider text-right">24h Change</div>
+        <div className="text-xs font-bold text-gray-300 uppercase tracking-wider text-right">24h Volume</div>
+        <div className="text-xs font-bold text-gray-300 uppercase tracking-wider text-right">Market Cap</div>
       </div>
 
       {/* Table Rows */}
-      <div className="space-y-2">
+      <div className="space-y-1">
         {data.map((item, index) => {
           // Handle both combined data and plain collection formats
           const itemData = (item as CombinedNFTData).collection ? (item as CombinedNFTData) : { collection: item, stats: null };
@@ -141,23 +143,23 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
             <Link
               key={`nft-${index}-${collectionId}`}
               href={`/nftrankings/${slug}`}
-              className="block"
+              className="block group"
             >
               <div
                 data-nft-row
-                className="hidden lg:grid gap-4 px-6 py-4 bg-gray-900/10 hover:bg-gray-900/30 transition-colors rounded-lg border border-gray-700/10 cursor-pointer hover:border-emerald-500/30"
+                className="hidden lg:grid gap-4 px-6 py-3 hover:bg-white/5 transition-colors duration-150 border-b border-white/5 cursor-pointer"
                 style={{ gridTemplateColumns: '60px 30px 1fr 140px 110px 140px 140px' }}
               >
               {/* Rank - using global position in data array */}
               <div className="flex items-center">
-                <span className="text-sm font-semibold text-gray-400">#{index + 1}</span>
+                <span className={`text-sm font-bold ${index < 3 ? 'bg-gradient-to-r from-purple-400 to-violet-400 bg-clip-text text-transparent' : 'text-gray-400'}`}>#{index + 1}</span>
               </div>
 
               {/* Star Icon */}
               <div className="flex items-center justify-center">
                 <button
-                  onClick={() => toggleFavorite(collectionId)}
-                  className="text-gray-400 hover:text-yellow-400 transition-colors"
+                  onClick={(e) => { e.preventDefault(); toggleFavorite(collectionId); }}
+                  className="text-gray-500 hover:text-yellow-400 transition-colors"
                   title="Add to favorites"
                 >
                   {isFavorite ? (
@@ -171,11 +173,12 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
               {/* Collection Info */}
               <div className="flex items-center gap-3">
                 {image && (
-                  <div className="relative w-10 h-10 flex-shrink-0 rounded-full overflow-hidden bg-gray-700">
+                  <div className="relative w-10 h-10 flex-shrink-0 rounded-lg overflow-hidden bg-gray-700">
                     <Image
                       src={image}
                       alt={name}
                       fill
+                      sizes="40px"
                       className="object-cover"
                     />
                   </div>
@@ -192,18 +195,25 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
 
               {/* Floor Price */}
               <div className="flex flex-col items-end justify-center">
-                <p className="text-sm font-semibold text-white">
+                <p className="text-sm font-bold text-white">
                   {formatFloorPrice(floorPrice)} ETH
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-500">
                   {floorPrice ? formatPrice(floorPrice * 3000) : '-'}
                 </p>
               </div>
 
               {/* 24h Change */}
-              <div className={`flex items-center justify-end text-sm font-semibold ${getChangeColor(priceChange)}`}>
+              <div className={`flex items-center justify-end text-sm font-bold ${getChangeColor(priceChange)}`}>
                 {priceChange !== undefined ? (
-                  <span>{priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%</span>
+                  <span className="flex items-center gap-1">
+                    {priceChange >= 0 ? (
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" /></svg>
+                    ) : (
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                    )}
+                    {priceChange >= 0 ? '+' : ''}{priceChange.toFixed(2)}%
+                  </span>
                 ) : (
                   <span className="text-gray-400">-</span>
                 )}
@@ -225,7 +235,7 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
       </div>
 
       {/* Mobile Card View */}
-      <div className="lg:hidden space-y-4">
+      <div className="lg:hidden space-y-3">
         {data.map((item, index) => {
           const data = (item as CombinedNFTData).collection ? (item as CombinedNFTData) : { collection: item, stats: null };
           const collection = data.collection;
@@ -246,35 +256,39 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
             <Link
               key={`nft-mobile-${index}-${collectionId}`}
               href={`/nftrankings/${slug}`}
-              className="block"
+              className="block group"
             >
               <div
-                className="bg-gray-900/20 border border-gray-700/20 rounded-lg p-4 hover:bg-gray-900/40 transition-colors cursor-pointer hover:border-emerald-500/30"
+                className="bg-gray-900/30 border border-white/5 rounded-xl p-4 hover:bg-gray-900/50 transition-colors cursor-pointer"
               >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {image && (
-                    <div className="relative w-12 h-12 flex-shrink-0 rounded-full overflow-hidden bg-gray-700">
+                    <div className="relative w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-700">
                       <Image
                         src={image}
                         alt={name}
                         fill
+                        sizes="48px"
                         className="object-cover"
                       />
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white">#{index + 1} {name}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-semibold text-gray-400">#{index + 1}</span>
+                    </div>
+                    <p className="text-sm font-semibold text-white truncate">{name}</p>
                     {collection.chain && (
-                      <span className={`text-xs px-2 py-0.5 rounded inline-block ${getChainBadgeColor(collection.chain)}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded inline-block mt-1 ${getChainBadgeColor(collection.chain)}`}>
                         {collection.chain}
                       </span>
                     )}
                   </div>
                 </div>
                 <button
-                  onClick={() => toggleFavorite(collectionId)}
-                  className="text-gray-400 hover:text-yellow-400 transition-colors flex-shrink-0"
+                  onClick={(e) => { e.preventDefault(); toggleFavorite(collectionId); }}
+                  className="text-gray-500 hover:text-yellow-400 transition-colors flex-shrink-0"
                 >
                   {isFavorite ? (
                     <StarIconSolid className="w-5 h-5 text-yellow-400" />
@@ -284,23 +298,23 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-400 text-xs mb-1">Floor Price</p>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="bg-white/5 rounded-lg p-2">
+                  <p className="text-gray-500 text-xs mb-1">Floor Price</p>
                   <p className="text-white font-semibold">{formatFloorPrice(floorPrice)} ETH</p>
                 </div>
-                <div>
-                  <p className="text-gray-400 text-xs mb-1">24h Change</p>
+                <div className="bg-white/5 rounded-lg p-2">
+                  <p className="text-gray-500 text-xs mb-1">24h Change</p>
                   <p className={`font-semibold ${getChangeColor(priceChange)}`}>
                     {priceChange !== undefined ? `${priceChange >= 0 ? '+' : ''}${priceChange.toFixed(2)}%` : '-'}
                   </p>
                 </div>
-                <div>
-                  <p className="text-gray-400 text-xs mb-1">24h Volume</p>
+                <div className="bg-white/5 rounded-lg p-2">
+                  <p className="text-gray-500 text-xs mb-1">24h Volume</p>
                   <p className="text-white font-semibold">{formatPrice(volume24h)}</p>
                 </div>
-                <div>
-                  <p className="text-gray-400 text-xs mb-1">Market Cap</p>
+                <div className="bg-white/5 rounded-lg p-2">
+                  <p className="text-gray-500 text-xs mb-1">Market Cap</p>
                   <p className="text-white font-semibold">{formatPrice(marketCap)}</p>
                 </div>
               </div>
@@ -316,7 +330,7 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
           <button
             onClick={loadMore}
             disabled={isLoading}
-            className="group relative px-6 py-2 bg-button-Primary hover:bg-button-Hover text-button-Text font-semibold rounded-md border-b-2 border-b-button-Secondary hover:border-b-button-HoverSecondary transition-all duration-200 disabled:bg-gray-600 disabled:border-b-gray-600 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+            className="px-6 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isLoading ? (
               <>
@@ -329,7 +343,7 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
             ) : (
               <>
                 <span>Load More NFTs</span>
-                <svg className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </>

@@ -17,7 +17,7 @@ const TypedAnimation = () => {
         startDelay: 500,
         backDelay: 1000,
         loop: true,
-        showCursor: true,
+        showCursor: false,
       });
 
       return () => {
@@ -27,7 +27,11 @@ const TypedAnimation = () => {
   }, [strings, isLoading]);
 
   return (
-    <span className="text-[64px] typed-cursor" ref={typedElement}></span>
+    <span 
+      className="text-[64px]" 
+      ref={typedElement}
+      style={{ minHeight: '1.2em', display: 'inline-block' }}
+    ></span>
   );
 };
 

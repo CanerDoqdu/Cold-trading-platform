@@ -1,7 +1,7 @@
 import HeroSection from "./(ui)/hero";
-import CarouselSection from "./(ui)/carouselsection";
+import CarouselSection from "./(ui)/CarouselSection";
 import EngagementSection from "./(ui)/EngagementSection";
-import WhyCold from "./(ui)/whycold";
+import WhyCold from "./(ui)/WhyCold";
 import DiscoverNfts from "./(ui)/discovernfts";
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -16,7 +16,8 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Ana Sayfa", // Ana sayfa için başlık
+  title: "Ana Sayfa",
+  description: "Trade cryptocurrencies, track real-time market data, manage your portfolio, and discover trending NFTs on COLD - your all-in-one crypto trading platform.",
 };
 
 const HomePage = () => {

@@ -125,16 +125,16 @@ export default function CryptoTable() {
       <PurpleSnakeAnimation>
         <div className="rounded-xl border border-gray-900 bg-gray-950 overflow-hidden">
           {/* Table Header */}
-          <div className="flex items-center justify-between py-4 border-b border-gray-800 px-6 mb-2 bg-gray-900">
+          <div className="flex items-center justify-between py-3 md:py-4 border-b border-gray-800 px-3 md:px-6 mb-2 bg-gray-900">
             <div className="flex-1 text-xs uppercase tracking-wide text-gray-500 font-medium">Name</div>
             <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium">Price</div>
-            <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium">24h Change</div>
-            <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium">24h Volume</div>
-            <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium">Market Cap</div>
+            <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium hidden sm:block">24h Change</div>
+            <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium hidden md:block">24h Volume</div>
+            <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium hidden lg:block">Market Cap</div>
           </div>
 
           {/* Table Rows */}
-          <div className="px-6">
+          <div className="px-3 md:px-6">
             {displayedCryptos.length === 0 ? (
               <div className="py-12 text-center">
                 <p className="text-gray-500 text-sm">

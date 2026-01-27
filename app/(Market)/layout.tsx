@@ -1,24 +1,20 @@
-import "../globals.css";
-import titillium_Web from "../fonts";
-import { AuthContextProvider } from "@/context/AuthContext";
+import { WebSocketProvider } from "@/components/WebSocketContext";
 
 export const metadata = {
   title: 'Markets - COLD',
   description: 'Cryptocurrency markets and prices',
 }
 
+// Route-specific layout - WebSocket is only needed for Markets pages
+// Global providers come from root layout automatically!
 export default function MarketLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${titillium_Web.variable}`}>
-      <body suppressHydrationWarning>
-        <AuthContextProvider>
-          {children}
-        </AuthContextProvider>
-      </body>
-    </html>
-  )
+    <WebSocketProvider>
+      {children}
+    </WebSocketProvider>
+  );
 }

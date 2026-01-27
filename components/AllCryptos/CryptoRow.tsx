@@ -101,22 +101,26 @@ export default function CryptoRow({ id, symbol, name, image, price, change24h, v
       {/* Price Column */}
       <div className="flex-1 text-right">
         <div className="text-sm font-medium text-white">{formatPrice(price)}</div>
+        {/* Show change on mobile below price */}
+        <div className={`text-xs font-medium sm:hidden ${change24h >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+          {change24h >= 0 ? '+' : ''}{change24h?.toFixed(2) || '0'}%
+        </div>
       </div>
 
-      {/* 24h Change Column */}
-      <div className="flex-1 text-right">
+      {/* 24h Change Column - Hidden on mobile */}
+      <div className="flex-1 text-right hidden sm:block">
         <div className={`text-sm font-medium ${change24h >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
           {change24h >= 0 ? '+' : ''}{change24h?.toFixed(2) || '0'}%
         </div>
       </div>
 
-      {/* 24h Volume Column */}
-      <div className="flex-1 text-right">
+      {/* 24h Volume Column - Hidden on mobile & tablet */}
+      <div className="flex-1 text-right hidden md:block">
         <div className="text-sm text-gray-400">{formatVolume(volume24h)}</div>
       </div>
 
-      {/* Market Cap Column */}
-      <div className="flex-1 text-right">
+      {/* Market Cap Column - Hidden on smaller screens */}
+      <div className="flex-1 text-right hidden lg:block">
         <div className="text-sm text-gray-400">{formatMarketCap(marketCap)}</div>
       </div>
     </div>

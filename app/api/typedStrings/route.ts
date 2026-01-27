@@ -2,8 +2,12 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  // Simulate fetching strings from an external source
+  // Static strings - no need to fetch
   const strings = ["Fast.", "Secure.", "Simple."];
   
-  return NextResponse.json(strings);
+  return NextResponse.json(strings, {
+    headers: {
+      'Cache-Control': 'public, max-age=86400, stale-while-revalidate=604800',
+    },
+  });
 }

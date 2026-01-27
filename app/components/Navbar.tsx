@@ -5,10 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { UseAuthContext } from "@/hooks/UseAuthContext";
 import { Uselogout } from "@/hooks/UseLogout";
+import NotificationDropdown from "@/components/NotificationDropdown";
+import ThemeToggle from "@/components/ThemeToggle";
 import logo from "@/public/images/Group.svg";
 
 const navLinks = [
   { name: 'Markets', href: '/markets' },
+  { name: 'Buy/Sell', href: '/trade', highlight: true },
   { name: 'News', href: '/news' },
   { name: 'Learn', href: '/learn' },
   { name: 'Support', href: '/support' },
@@ -16,25 +19,36 @@ const navLinks = [
 ];
 
 const Navbar = () => {
-  const { state } = UseAuthContext();
+  const { state, isLoading } = UseAuthContext();
   const { user } = state;
   const { logout } = Uselogout();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
       }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setMobileMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, []);
+
   const handleLogout = () => {
     logout();
     setDropdownOpen(false);
+    setMobileMenuOpen(false);
   };
 
   const getInitials = (name: string) => {
@@ -48,9 +62,26 @@ const Navbar = () => {
   return (
     <div>
       <div className="bg-[#0d131d] h-16">
-        <div className="flex justify-between items-center w-4/5 h-full mx-auto">
+        <div className="flex justify-between items-center w-11/12 md:w-4/5 h-full mx-auto">
           {/* Logo and Nav Links */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4 md:gap-8">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+
             <Link href="/">
               <div className="flex items-center">
                 <Image
@@ -65,13 +96,17 @@ const Navbar = () => {
               </div>
             </Link>
             
-            {/* Navigation Links */}
+            {/* Navigation Links - Desktop */}
             <nav className="hidden md:flex items-center gap-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="text-gray-400 hover:text-white text-sm font-medium transition-colors"
+                  className={`text-sm font-medium transition-colors ${
+                    link.highlight 
+                      ? 'text-emerald-400 hover:text-emerald-300' 
+                      : 'text-gray-400 hover:text-white'
+                  }`}
                 >
                   {link.name}
                 </Link>
@@ -79,43 +114,57 @@ const Navbar = () => {
             </nav>
           </div>
 
-          {/* Auth Section */}
-          {!user ? (
-            <div className="flex gap-4">
+          {/* Auth Section - Desktop */}
+          {isLoading ? (
+            <div className="hidden md:flex gap-4">
+              <div className="w-20 h-8 bg-gray-700 rounded-md animate-pulse" />
+              <div className="w-16 h-8 bg-gray-800 rounded-md animate-pulse" />
+            </div>
+          ) : !user ? (
+            <div className="flex items-center gap-2 md:gap-4">
+              <ThemeToggle />
               <Link
                 href="/signup"
-                className="text-black font-bold bg-emerald-500 hover:bg-emerald-400 hover:border-b-emerald-600 border-b-4 rounded-md border-b-emerald-700 px-6 py-1.5 text-xs"
+                className="text-black font-bold bg-emerald-500 hover:bg-emerald-400 hover:border-b-emerald-600 border-b-4 rounded-md border-b-emerald-700 px-3 md:px-6 py-1.5 text-xs"
               >
                 Sign up
               </Link>
               <Link
                 href="/login"
-                className="text-white bg-gray-800 hover:bg-gray-700 hover:border-b-gray-600 border-b-4 rounded-md border-b-gray-900 px-6 py-1.5 text-xs font-semibold"
+                className="hidden sm:block text-white bg-gray-800 hover:bg-gray-700 hover:border-b-gray-600 border-b-4 rounded-md border-b-gray-900 px-3 md:px-6 py-1.5 text-xs font-semibold"
               >
                 Login
               </Link>
             </div>
           ) : (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-gray-800/50 transition-all"
-              >
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                  {getInitials(user.name || user.email)}
-                </div>
-                <span className="text-gray-300 text-sm font-medium max-w-[150px] truncate hidden sm:block">
-                  {user.name || user.email}
-                </span>
-                <svg
-                  className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            <div className="flex items-center gap-2">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
+              {/* Notification Bell */}
+              <NotificationDropdown />
+              
+              {/* User Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-gray-800/50 transition-all"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    {getInitials(user.name || user.email)}
+                  </div>
+                  <span className="text-gray-300 text-sm font-medium max-w-[150px] truncate hidden sm:block">
+                    {user.name || user.email}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden z-50">
@@ -148,10 +197,54 @@ const Navbar = () => {
                   </div>
                 </div>
               )}
+              </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {mobileMenuOpen && (
+        <div 
+          ref={mobileMenuRef}
+          className="md:hidden fixed inset-x-0 top-16 bg-[#0d131d] border-t border-gray-800 z-50 animate-in slide-in-from-top duration-200"
+        >
+          <nav className="flex flex-col py-2">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-6 py-3 text-sm font-medium transition-colors border-l-2 ${
+                  link.highlight 
+                    ? 'text-emerald-400 border-emerald-400 bg-emerald-500/10' 
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border-transparent'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+            {/* Mobile Login Link - only show when user not logged in */}
+            {!user && (
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800/50 border-l-2 border-transparent sm:hidden"
+              >
+                Login
+              </Link>
+            )}
+          </nav>
+        </div>
+      )}
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 top-16 bg-black/50 z-40"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
     </div>
   );
 };

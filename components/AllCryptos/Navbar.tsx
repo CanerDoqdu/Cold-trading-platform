@@ -5,10 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { UseAuthContext } from "@/hooks/UseAuthContext";
 import { Uselogout } from "@/hooks/UseLogout";
+import NotificationDropdown from "@/components/NotificationDropdown";
+import ThemeToggle from "@/components/ThemeToggle";
 import logo from "@/public/images/Group.svg";
 
 const navLinks = [
   { name: 'Markets', href: '/markets' },
+  { name: 'Buy/Sell', href: '/trade', highlight: true },
   { name: 'News', href: '/news' },
   { name: 'Learn', href: '/learn' },
   { name: 'Support', href: '/support' },
@@ -71,7 +74,11 @@ const Navbar = () => {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="text-gray-400 hover:text-white text-sm font-medium transition-colors"
+                  className={`text-sm font-medium transition-colors ${
+                    link.highlight 
+                      ? 'text-emerald-400 hover:text-emerald-300' 
+                      : 'text-gray-400 hover:text-white'
+                  }`}
                 >
                   {link.name}
                 </Link>
@@ -81,7 +88,8 @@ const Navbar = () => {
 
           {/* Auth Section */}
           {!user ? (
-            <div className="flex gap-4">
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
               <Link href="/signup" className="text-black font-bold bg-emerald-500 hover:bg-emerald-400 hover:border-b-emerald-600 border-b-4 rounded-md border-b-emerald-700 px-6 py-1.5 text-xs">
                 Sign up
               </Link>
@@ -90,26 +98,34 @@ const Navbar = () => {
               </Link>
             </div>
           ) : (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-gray-800/50 transition-all"
-              >
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                  {getInitials(user.name || user.email)}
-                </div>
-                <span className="text-gray-300 text-sm font-medium max-w-[150px] truncate hidden sm:block">
-                  {user.name || user.email}
-                </span>
-                <svg
-                  className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+            <div className="flex items-center gap-2">
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
+              {/* Notification Bell */}
+              <NotificationDropdown />
+              
+              {/* User Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-gray-800/50 transition-all"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                    {getInitials(user.name || user.email)}
+                  </div>
+                  <span className="text-gray-300 text-sm font-medium max-w-[150px] truncate hidden sm:block">
+                    {user.name || user.email}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden z-50">
@@ -142,6 +158,7 @@ const Navbar = () => {
                   </div>
                 </div>
               )}
+              </div>
             </div>
           )}
         </div>

@@ -5,6 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ProfileNav from './ProfileNav';
 import { UseAuthContext } from '@/hooks/UseAuthContext';
+import { useRecentViews } from '@/hooks/useRecentViews';
+import { usePortfolio } from '@/hooks/usePortfolio';
 import { StarIcon } from '@heroicons/react/24/solid';
 
 interface FavoriteCoin {
@@ -19,9 +21,15 @@ interface FavoriteCoin {
 export default function ProfilePage() {
   const { state } = UseAuthContext();
   const { user } = state;
+  const { recentViews, recentViewsCount } = useRecentViews();
+  const { holdings, loading: portfolioLoading } = usePortfolio();
   const [favorites, setFavorites] = useState<FavoriteCoin[]>([]);
   const [loading, setLoading] = useState(true);
   const displayName = user?.name || 'Guest User';
+
+  // Calculate total portfolio value
+  const totalPortfolioValue = holdings.reduce((sum, h) => sum + (h.totalValue || 0), 0);
+  const totalProfitLoss = holdings.reduce((sum, h) => sum + (h.profitLoss || 0), 0);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -122,20 +130,33 @@ export default function ProfilePage() {
               <span className="text-3xl">⭐</span>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-all">
+          <Link href="/profile/portfolio" className="bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-gray-800 rounded-2xl p-6 hover:border-emerald-500/50 transition-all cursor-pointer block">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Portfolio Value</p>
-                <p className="text-white text-2xl font-bold mt-1">Coming Soon</p>
+                {portfolioLoading ? (
+                  <div className="h-8 w-24 bg-gray-700 animate-pulse rounded mt-1"></div>
+                ) : (
+                  <>
+                    <p className="text-white text-2xl font-bold mt-1">
+                      ${totalPortfolioValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </p>
+                    {holdings.length > 0 && (
+                      <p className={`text-sm mt-0.5 ${totalProfitLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {totalProfitLoss >= 0 ? '+' : ''}${totalProfitLoss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    )}
+                  </>
+                )}
               </div>
               <span className="text-3xl">💰</span>
             </div>
-          </div>
+          </Link>
           <div className="bg-gradient-to-br from-blue-500/20 to-blue-500/5 border border-gray-800 rounded-2xl p-6 hover:border-gray-700 transition-all">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Recent Views</p>
-                <p className="text-white text-2xl font-bold mt-1">Coming Soon</p>
+                <p className="text-white text-2xl font-bold mt-1">{recentViewsCount}</p>
               </div>
               <span className="text-3xl">👁️</span>
             </div>
@@ -231,6 +252,43 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+
+        {/* Recent Views Section */}
+        {recentViews.length > 0 && (
+          <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+                <span className="text-xl">👁️</span>
+                Recently Viewed
+              </h2>
+              <span className="text-sm text-gray-500">
+                Last 7 days
+              </span>
+            </div>
+            
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+              {recentViews.slice(0, 6).map((coin) => (
+                <Link
+                  key={coin.id}
+                  href={`/markets/${coin.id}`}
+                  className="flex-shrink-0 flex flex-col items-center gap-2 p-4 bg-gray-800/50 rounded-xl hover:bg-gray-800 transition min-w-[100px]"
+                >
+                  <Image
+                    src={coin.image}
+                    alt={coin.name}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                  <div className="text-center">
+                    <p className="text-white text-sm font-medium">{coin.symbol.toUpperCase()}</p>
+                    <p className="text-gray-500 text-xs truncate max-w-[80px]">{coin.name}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

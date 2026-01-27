@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { cachedFetch } from '@/lib/apiCache';
 import { ChevronDownIcon } from '@heroicons/react/24/outline';
+import { usePriceAlerts } from '@/hooks/useNotifications';
+import { UseAuthContext } from '@/hooks/UseAuthContext';
 
 interface MarketCoin {
   id: string;
@@ -56,10 +58,21 @@ const formatLarge = (num: number) => {
 };
 
 export default function CoinDetailPageAdvanced({ coinId }: { coinId: string }) {
+  const { state } = UseAuthContext();
+  const { user } = state;
+  const { createAlert } = usePriceAlerts();
+  
   const [coin, setCoin] = useState<MarketCoin | null>(null);
   const [allCoins, setAllCoins] = useState<MarketCoin[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  
+  // Alert modal state
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertPrice, setAlertPrice] = useState('');
+  const [alertCondition, setAlertCondition] = useState<'above' | 'below'>('above');
+  const [alertLoading, setAlertLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   // Chart state
   const [chartData, setChartData] = useState<ChartDataType | null>(null);
@@ -73,6 +86,36 @@ export default function CoinDetailPageAdvanced({ coinId }: { coinId: string }) {
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const abortControllerRef = useRef<AbortController>(new AbortController());
+
+  const handleCreateAlert = async () => {
+    if (!coin || !alertPrice) return;
+    
+    setAlertLoading(true);
+    setAlertMessage(null);
+    
+    const result = await createAlert({
+      coinId: coin.id,
+      coinSymbol: coin.symbol,
+      coinName: coin.name,
+      coinImage: coin.image,
+      targetPrice: parseFloat(alertPrice),
+      condition: alertCondition,
+      currentPrice: coin.current_price
+    });
+    
+    setAlertLoading(false);
+    
+    if (result.success) {
+      setAlertMessage({ type: 'success', text: result.message || 'Alert created!' });
+      setTimeout(() => {
+        setShowAlertModal(false);
+        setAlertMessage(null);
+        setAlertPrice('');
+      }, 2000);
+    } else {
+      setAlertMessage({ type: 'error', text: result.error || 'Failed to create alert' });
+    }
+  };
 
   // Fetch coin data from markets endpoint (instant)
   useEffect(() => {
@@ -419,13 +462,152 @@ export default function CoinDetailPageAdvanced({ coinId }: { coinId: string }) {
     <div className="min-h-screen bg-slate-900 text-white p-4">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex items-center gap-4 mb-6">
-          <img src={coin.image} alt={coin.name} className="w-12 h-12" />
-          <div>
-            <h1 className="text-3xl font-bold">{coin.name}</h1>
-            <p className="text-gray-400">{coin.symbol.toUpperCase()}</p>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <img src={coin.image} alt={coin.name} className="w-12 h-12" />
+            <div>
+              <h1 className="text-3xl font-bold">{coin.name}</h1>
+              <p className="text-gray-400">{coin.symbol.toUpperCase()}</p>
+            </div>
+          </div>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-3">
+            {/* Set Alert Button */}
+            {user && (
+              <button
+                onClick={() => {
+                  setAlertPrice(coin.current_price.toString());
+                  setShowAlertModal(true);
+                }}
+                className="flex items-center gap-2 px-4 py-3 bg-yellow-600/20 hover:bg-yellow-600/30 text-yellow-400 font-medium rounded-lg transition-all border border-yellow-600/30"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                Set Alert
+              </button>
+            )}
+            {/* Trade Button */}
+            <Link
+              href={`/trade/${coin.symbol.toLowerCase()}`}
+              className="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-emerald-500/25"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+              Trade {coin.symbol.toUpperCase()}
+            </Link>
           </div>
         </div>
+
+        {/* Alert Modal */}
+        {showAlertModal && (
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 w-full max-w-md mx-4 animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-white">Set Price Alert</h3>
+                <button
+                  onClick={() => {
+                    setShowAlertModal(false);
+                    setAlertMessage(null);
+                  }}
+                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3 mb-6">
+                <img src={coin.image} alt={coin.name} className="w-10 h-10" />
+                <div>
+                  <p className="text-white font-medium">{coin.name}</p>
+                  <p className="text-gray-400 text-sm">Current: ${formatPrice(coin.current_price)}</p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {/* Condition Select */}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Alert when price goes</label>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setAlertCondition('above')}
+                      className={`flex-1 py-2 rounded-lg font-medium transition-all ${
+                        alertCondition === 'above'
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      }`}
+                    >
+                      ↑ Above
+                    </button>
+                    <button
+                      onClick={() => setAlertCondition('below')}
+                      className={`flex-1 py-2 rounded-lg font-medium transition-all ${
+                        alertCondition === 'below'
+                          ? 'bg-red-600 text-white'
+                          : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                      }`}
+                    >
+                      ↓ Below
+                    </button>
+                  </div>
+                </div>
+
+                {/* Price Input */}
+                <div>
+                  <label className="block text-sm text-gray-400 mb-2">Target Price (USD)</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+                    <input
+                      type="number"
+                      value={alertPrice}
+                      onChange={(e) => setAlertPrice(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg py-3 pl-8 pr-4 text-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Message */}
+                {alertMessage && (
+                  <div className={`p-3 rounded-lg text-sm ${
+                    alertMessage.type === 'success' 
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                      : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                  }`}>
+                    {alertMessage.text}
+                  </div>
+                )}
+
+                {/* Create Button */}
+                <button
+                  onClick={handleCreateAlert}
+                  disabled={alertLoading || !alertPrice}
+                  className="w-full py-3 bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
+                >
+                  {alertLoading ? (
+                    <>
+                      <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                      </svg>
+                      Create Alert
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Price and changes */}
         <div className="bg-slate-800 rounded-lg p-6 mb-6">

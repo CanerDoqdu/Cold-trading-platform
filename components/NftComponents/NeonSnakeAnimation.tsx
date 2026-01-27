@@ -123,35 +123,65 @@ export default function NeonSnakeAnimation({ children }: NeonSnakeAnimationProps
       const headPos = snakeStateRef.current.position;
       const tailPos = (headPos - snakeStateRef.current.length + perimeter) % perimeter;
 
-      // Get head and tail points
-      const headPoint = pointOnPerimeter(0, 0, bounds.w, bounds.h, headPos);
-      const tailPoint = pointOnPerimeter(0, 0, bounds.w, bounds.h, tailPos);
+      // Draw snake with gradient for smooth head/tail - OPTIMIZED
+      const samples = 50; // Balanced for performance
+      const fadeLength = 8; // Number of segments to fade at head and tail
 
-      // Draw snake body with smooth curve
-      ctx.beginPath();
-      const samples = 25; // More samples for longer, smoother line
-
+      // Pre-calculate all points first (more efficient)
+      const points: { x: number; y: number; opacity: number }[] = [];
       for (let i = 0; i <= samples; i++) {
         const ratio = i / samples;
         const currentPos = (tailPos + snakeStateRef.current.length * ratio) % perimeter;
         const point = pointOnPerimeter(0, 0, bounds.w, bounds.h, currentPos);
-
-        if (i === 0) {
-          ctx.moveTo(point.x, point.y);
-        } else {
-          ctx.lineTo(point.x, point.y);
+        
+        let segmentOpacity = 1;
+        if (i < fadeLength) {
+          segmentOpacity = i / fadeLength;
+        } else if (i > samples - fadeLength) {
+          segmentOpacity = (samples - i) / fadeLength;
         }
+        
+        points.push({ ...point, opacity: segmentOpacity });
       }
 
-      // Draw main snake body with fade-in
+      // Draw in batches by opacity level (fewer state changes)
       ctx.strokeStyle = '#00ff66';
-      ctx.lineWidth = 3.5;
+      ctx.lineWidth = 4;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.shadowBlur = 15;
       ctx.shadowColor = '#00ff66';
-      ctx.globalAlpha = opacity * 0.95;
+
+      // Draw main body (full opacity) as single path
+      ctx.beginPath();
+      let started = false;
+      for (let i = fadeLength; i <= samples - fadeLength; i++) {
+        if (!started) {
+          ctx.moveTo(points[i].x, points[i].y);
+          started = true;
+        } else {
+          ctx.lineTo(points[i].x, points[i].y);
+        }
+      }
+      ctx.globalAlpha = opacity;
       ctx.stroke();
+
+      // Draw fade sections with reduced detail
+      for (let i = 0; i < fadeLength; i++) {
+        ctx.beginPath();
+        ctx.moveTo(points[i].x, points[i].y);
+        ctx.lineTo(points[i + 1].x, points[i + 1].y);
+        ctx.globalAlpha = opacity * points[i].opacity;
+        ctx.stroke();
+      }
+
+      for (let i = samples - fadeLength; i < samples; i++) {
+        ctx.beginPath();
+        ctx.moveTo(points[i].x, points[i].y);
+        ctx.lineTo(points[i + 1].x, points[i + 1].y);
+        ctx.globalAlpha = opacity * points[i].opacity;
+        ctx.stroke();
+      }
 
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;

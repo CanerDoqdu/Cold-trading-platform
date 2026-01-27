@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { UseAuthContext } from "@/hooks/UseAuthContext";
 import { Uselogout } from "@/hooks/UseLogout";
+import ThemeToggle from "@/components/ThemeToggle";
 import logo from "@/public/images/Group.svg";
 import { usePathname } from 'next/navigation';
 
@@ -85,7 +86,8 @@ const Navbar = () => {
 
           {/* Auth Section */}
           {!user ? (
-            <div className="flex gap-4">
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
               <Link href="/signup" className="text-black font-bold bg-emerald-500 hover:bg-emerald-400 hover:border-b-emerald-600 border-b-4 rounded-md border-b-emerald-700 px-6 py-1.5 text-xs">
                 Sign up
               </Link>
@@ -94,7 +96,9 @@ const Navbar = () => {
               </Link>
             </div>
           ) : (
-            <div className="relative" ref={dropdownRef}>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center gap-3 px-3 py-1.5 rounded-lg hover:bg-gray-800/50 transition-all"
@@ -146,6 +150,7 @@ const Navbar = () => {
                   </div>
                 </div>
               )}
+              </div>
             </div>
           )}
         </div>

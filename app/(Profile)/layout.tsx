@@ -1,24 +1,18 @@
-import "../globals.css";
-import titillium_Web from "../fonts";
-import { AuthContextProvider } from "@/context/AuthContext";
-
 export const metadata = {
   title: 'Profile - COLD',
   description: 'Manage your COLD profile and account settings',
 }
 
+// Route-specific layout - just wrapper styling
+// Global providers come from root layout automatically!
 export default function ProfileLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${titillium_Web.variable}`}>
-      <body className="bg-black antialiased" suppressHydrationWarning>
-        <AuthContextProvider>
-          {children}
-        </AuthContextProvider>
-      </body>
-    </html>
-  )
+    <div className="bg-black min-h-screen">
+      {children}
+    </div>
+  );
 }

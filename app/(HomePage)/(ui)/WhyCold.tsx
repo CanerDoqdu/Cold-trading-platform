@@ -32,8 +32,9 @@ const WhyCold = () => {
                 <Image
                   src="/images/simplicity-parts/Background_Simple.png"
                   alt=""
-                  width={140}
+                  width={120}
                   height={140}
+                  style={{ width: '140px', height: '140px' }}
                   className="absolute inset-2 object-contain opacity-80"
                 />
                 {/* Documents */}
@@ -41,23 +42,26 @@ const WhyCold = () => {
                   src="/images/simplicity-parts/Documents.png"
                   alt=""
                   width={80}
-                  height={80}
+                  height={31}
+                  style={{ width: '80px', height: 'auto' }}
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-contain z-10"
                 />
                 {/* Left Hand - moves right */}
                 <Image
                   src="/images/simplicity-parts/Hand_1.png"
                   alt=""
-                  width={60}
+                  width={35}
                   height={60}
+                  style={{ width: '35px', height: '60px' }}
                   className="absolute bottom-4 left-2 object-contain z-20 animate-[handLeft_2s_ease-in-out_infinite]"
                 />
                 {/* Right Hand - moves left */}
                 <Image
                   src="/images/simplicity-parts/Hand_2.png"
                   alt=""
-                  width={60}
+                  width={29}
                   height={60}
+                  style={{ width: '29px', height: '60px' }}
                   className="absolute bottom-4 right-2 object-contain z-20 animate-[handRight_2s_ease-in-out_infinite]"
                 />
                 {/* Bubbles */}
@@ -66,6 +70,8 @@ const WhyCold = () => {
                   alt=""
                   width={20}
                   height={20}
+                  unoptimized
+                  style={{ width: '20px', height: '20px' }}
                   className="absolute top-6 right-4 object-contain animate-[float_3s_ease-in-out_infinite]"
                 />
                 <Image
@@ -73,6 +79,8 @@ const WhyCold = () => {
                   alt=""
                   width={16}
                   height={16}
+                  unoptimized
+                  style={{ width: '16px', height: '16px' }}
                   className="absolute top-10 left-6 object-contain animate-[float_2.5s_ease-in-out_infinite_0.5s]"
                 />
               </div>
@@ -121,6 +129,8 @@ const WhyCold = () => {
                   alt=""
                   width={140}
                   height={140}
+                  unoptimized
+                  style={{ width: '140px', height: '140px' }}
                   className="absolute inset-2 object-contain opacity-80"
                 />
                 {/* Hand with finger */}
@@ -129,27 +139,33 @@ const WhyCold = () => {
                   alt=""
                   width={100}
                   height={100}
+                  unoptimized
+                  style={{ width: '100px', height: '100px' }}
                   className="absolute -bottom-10 left-1/2 -translate-x-[25%] object-contain z-30"
-                  />
+                />
                 {/* Fingerprint */}
                 <Image
                   src="/images/secure-parts/Fingerprint.png"
                   alt=""
                   width={50}
                   height={50}
+                  unoptimized
+                  style={{ width: '50px', height: '50px' }}
                   className="absolute top-8 left-1/2 -translate-x-1/2 object-contain z-20"
                 />
                 {/* Scan ring around fingerprint */}
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full border-2 border-emerald-400/60 animate-[scanRing_2s_ease-in-out_infinite] z-30" />
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-16 rounded-full border-2 border-emerald-400/30 animate-[scanRing_2s_ease-in-out_infinite_0.5s] z-30" />
-                {/* Scan line */}
-                <div className="absolute left-4 right-4 h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-[scanVertical_2s_ease-in-out_infinite] z-20 rounded-full shadow-lg shadow-emerald-400/50" />
+                {/* Scan line - using transform for composited animation */}
+                <div className="absolute left-4 right-4 top-[20%] h-1 bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-[scanVertical_2s_ease-in-out_infinite] z-20 rounded-full shadow-lg shadow-emerald-400/50" />
                 {/* Icons floating */}
                 <Image
                   src="/images/secure-parts/Icon_1.png"
                   alt=""
                   width={20}
                   height={20}
+                  unoptimized
+                  style={{ width: '20px', height: '20px' }}
                   className="absolute top-4 right-2 object-contain animate-[float_2.5s_ease-in-out_infinite]"
                 />
                 <Image
@@ -157,6 +173,8 @@ const WhyCold = () => {
                   alt=""
                   width={18}
                   height={18}
+                  unoptimized
+                  style={{ width: '18px', height: '18px' }}
                   className="absolute top-12 left-2 object-contain animate-[float_3s_ease-in-out_infinite_0.3s]"
                 />
                 <Image
@@ -164,6 +182,8 @@ const WhyCold = () => {
                   alt=""
                   width={16}
                   height={16}
+                  unoptimized
+                  style={{ width: '16px', height: '16px' }}
                   className="absolute bottom-12 right-4 object-contain animate-[float_2.8s_ease-in-out_infinite_0.6s]"
                 />
               </div>

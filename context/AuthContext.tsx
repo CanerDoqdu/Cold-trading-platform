@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useReducer, ReactNode, useEffect, useCallback } from "react";
+import { createContext, useReducer, ReactNode, useEffect, useCallback, useState } from "react";
 
 type User = {
   _id: string;
@@ -14,6 +14,7 @@ type Action = { type: "LOGIN"; payload: User } | { type: "LOGOUT" };
 type ContextType = {
   state: State;
   dispatch: React.Dispatch<Action>;
+  isLoading: boolean;
 };
 
 // Session timeout duration (30 minutes in milliseconds)
@@ -37,6 +38,7 @@ const authReducer = (state: State, action: Action): State => {
 export const AuthContext = createContext<ContextType>({
   state: initialState,
   dispatch: () => null,
+  isLoading: true,
 });
 
 // AuthContextProvider bileşeni
@@ -46,8 +48,14 @@ type AuthContextProviderProps = {
 
 export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+  const [isLoading, setIsLoading] = useState(true);
 
-  console.log("Authcontext state", state);
+  // Debug log only in development and only when state actually changes
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Authcontext state", state);
+    }
+  }, [state.user?.email]); // Only log when user email changes
 
   // Logout function
   const performLogout = useCallback(async () => {
@@ -81,41 +89,69 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   }, [state.user, performLogout]);
 
-  // Initial load - check stored user
+  // Initial load - check server session first, then fall back to localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    console.log("Stored user from localStorage:", storedUser);
-    if (storedUser) {
-      // Check if session has expired
-      const lastActivity = localStorage.getItem('lastActivity');
-      if (lastActivity) {
-        const timeSinceLastActivity = Date.now() - parseInt(lastActivity);
-        if (timeSinceLastActivity > SESSION_TIMEOUT) {
-          // Session expired
+    const checkSession = async () => {
+      setIsLoading(true);
+      
+      try {
+        // First, check server-side session (cookie-based)
+        const response = await fetch('/api/user/session');
+        const data = await response.json();
+        
+        if (data.user) {
+          // Server session is valid - update state and localStorage
+          dispatch({ type: "LOGIN", payload: data.user });
+          localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem('lastActivity', Date.now().toString());
+          console.log("Session restored from server:", data.user.email);
+        } else {
+          // No valid server session - clear localStorage
           localStorage.removeItem('user');
           localStorage.removeItem('favorites');
           localStorage.removeItem('lastActivity');
-          return;
+          dispatch({ type: "LOGOUT" });
+          console.log("No valid server session");
         }
+      } catch (error) {
+        console.error("Session check failed:", error);
+        // Network error - try localStorage as fallback
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          const lastActivity = localStorage.getItem('lastActivity');
+          if (lastActivity) {
+            const timeSinceLastActivity = Date.now() - parseInt(lastActivity);
+            if (timeSinceLastActivity > SESSION_TIMEOUT) {
+              // Session expired
+              localStorage.removeItem('user');
+              localStorage.removeItem('favorites');
+              localStorage.removeItem('lastActivity');
+            } else {
+              const user = JSON.parse(storedUser);
+              dispatch({ type: "LOGIN", payload: user });
+            }
+          }
+        }
+      } finally {
+        setIsLoading(false);
       }
-      const user = JSON.parse(storedUser);
-      dispatch({ type: "LOGIN", payload: user });
-      localStorage.setItem('lastActivity', Date.now().toString());
-    }
+    };
+
+    checkSession();
   }, []);
 
   // Set up activity listeners and timeout checker
   useEffect(() => {
     if (!state.user) return;
 
-    // Events that indicate user activity
-    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    // Events that indicate user activity - only essential ones
+    const activityEvents = ['mousedown', 'keydown'];
     
-    // Throttle activity updates (max once per minute)
+    // Throttle activity updates (max once per 5 minutes to reduce re-renders)
     let lastUpdate = 0;
     const throttledUpdate = () => {
       const now = Date.now();
-      if (now - lastUpdate > 60000) { // 1 minute throttle
+      if (now - lastUpdate > 300000) { // 5 minute throttle
         lastUpdate = now;
         updateLastActivity();
       }
@@ -126,8 +162,8 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       window.addEventListener(event, throttledUpdate, { passive: true });
     });
 
-    // Check session timeout every minute
-    const intervalId = setInterval(checkSessionTimeout, 60000);
+    // Check session timeout every 5 minutes (not every minute)
+    const intervalId = setInterval(checkSessionTimeout, 300000);
 
     return () => {
       activityEvents.forEach(event => {
@@ -135,10 +171,10 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       });
       clearInterval(intervalId);
     };
-  }, [state.user, updateLastActivity, checkSessionTimeout]);
+  }, [state.user?.email, updateLastActivity, checkSessionTimeout]); // Use email instead of whole user object
 
   return (
-    <AuthContext.Provider value={{ state, dispatch }}>
+    <AuthContext.Provider value={{ state, dispatch, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

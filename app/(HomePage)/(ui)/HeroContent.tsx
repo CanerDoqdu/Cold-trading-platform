@@ -1,14 +1,55 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import TypedAnimation from '@/components/TypedAnimation';
+import dynamic from 'next/dynamic';
 import RedditSectionClient from '@/components/redditapi/RedditSectionClient';
 import TrendingCard from '@/components/AllCryptos/TrendingCard';
-import HeroSnakeAnimation from '@/components/HeroSnakeAnimation';
 import { NewsArticle } from '@/components/CryptoNews';
 import { NftInfo } from '@/components/Nfts';
+
+// Lazy load heavy components
+const TypedAnimation = dynamic(() => import('@/components/TypedAnimation'), {
+  ssr: false,
+  loading: () => <span className="text-[64px]">Trade Crypto</span>,
+});
+const HeroSnakeAnimation = dynamic(() => import('@/components/HeroSnakeAnimation'), {
+  ssr: false,
+});
+
+// NFT Image with loading skeleton
+function NftImageCard({ nft, fallback }: { nft: NftInfo; fallback: string }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  return (
+    <div className="nft-item">
+      <div className="relative w-[65px] h-[65px] overflow-hidden rounded-lg">
+        {isLoading && (
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 rounded-lg">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-600/30 to-transparent animate-shimmer" />
+          </div>
+        )}
+        <Image
+          src={hasError ? fallback : (nft.image_url || fallback)}
+          alt={nft.name}
+          width={65}
+          height={65}
+          className={`nft-img transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+          quality={60}
+          loading="lazy"
+          onLoad={() => setIsLoading(false)}
+          onError={() => {
+            setHasError(true);
+            setIsLoading(false);
+          }}
+        />
+      </div>
+      <p className="nft-name">{nft.name}</p>
+    </div>
+  );
+}
 
 interface RedditPost {
   title: string;
@@ -98,20 +139,11 @@ export default function HeroContent({
                   <div className="nft-scroller" data-animated="true">
                     <div className="nft-track">
                       {[...displayNfts, ...displayNfts].map((nft, i) => (
-                        <div key={`${nft.name}-${i}`} className="nft-item">
-                          <Image
-                            src={nft.image_url || nftFallbackImg}
-                            alt={nft.name}
-                            width={65}
-                            height={65}
-                            className="nft-img"
-                            quality={60}
-                            loading="lazy"
-                            placeholder="blur"
-                            blurDataURL={nftFallbackImg}
-                          />
-                          <p className="nft-name">{nft.name}</p>
-                        </div>
+                        <NftImageCard 
+                          key={`${nft.name}-${i}`} 
+                          nft={nft} 
+                          fallback={nftFallbackImg} 
+                        />
                       ))}
                     </div>
                   </div>
@@ -160,7 +192,7 @@ export default function HeroContent({
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block text-xs text-gray-400 line-clamp-1 hover:text-white transition-colors cursor-pointer"
+                      className="flex items-center text-sm text-gray-400 line-clamp-1 hover:text-white transition-colors cursor-pointer py-1.5 min-h-[36px]"
                     >
                       {article.title}
                     </a>

@@ -62,6 +62,8 @@ const DiscoverNfts = () => {
               className="rounded-2xl object-cover relative z-10 transition-transform duration-500 group-hover:scale-105"
               width={500}
               height={500}
+              unoptimized
+              style={{ width: '500px', height: '500px' }}
             />
           </div>
         </div>

@@ -167,7 +167,7 @@ These are essential to make the project job-ready:
 ### ⭐ Planned Enhancements (Stand-Out Features)
 These will differentiate the project from basic portfolios:
 
-- **AI Integration** - Claude API for smart price analysis and predictions
+- **AI Live Support** - Claude-powered chatbot for user assistance and navigation
 - **WebSocket Hardening** - Reconnect logic, more pairs, optional server-side gateway
 - **Advanced Caching** - Redis/memory caching for better performance
 - **Rate Limiting** - Protect API routes from abuse

@@ -1,32 +1,18 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/footer";
-import "../globals.css";
-import titillium_Web from "../fonts";
-import { AuthContextProvider } from "@/context/AuthContext";
-import type { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'COLD', // Buraya istediğin başlığı yaz
-};
-
-
-export default function RootLayout({
+// Route-specific layout - only contains components unique to this route group
+// Global providers (Auth, Theme, ChatBot, CookieConsent) come from root layout automatically!
+export default function HomePageLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-  
-      <html lang="en" className={`${titillium_Web.variable}`}>
-    
-        <body suppressHydrationWarning>
-        <AuthContextProvider>
-          <Navbar />
-          {children}
-          <Footer/>
-        </AuthContextProvider>
-      </body>
-      </html>
-  
+    <>
+      <Navbar />
+      {children}
+      <Footer />
+    </>
   );
 }

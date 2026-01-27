@@ -19,6 +19,11 @@ export default function NftScroller() {
             scrollerContent.forEach((item) => {
               const duplicatedItem = item.cloneNode(true) as HTMLElement;
               duplicatedItem.setAttribute("aria-hidden", "true");
+              // Make all focusable elements inside the clone not focusable
+              const focusableElements = duplicatedItem.querySelectorAll('a, button, input, [tabindex]');
+              focusableElements.forEach((el) => {
+                el.setAttribute('tabindex', '-1');
+              });
               scrollerInner.appendChild(duplicatedItem);
             });
           }

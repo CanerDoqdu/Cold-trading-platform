@@ -22,16 +22,16 @@ const CollectionList: React.FC<{ initialData: CollectionItemProps[] }> = ({ init
           {items.map((item, index) => (
             <tr key={index} className="border-gray-700 hover:bg-gray-800 transition-all">
               <td className="px-4 py-2 text-left flex items-center">
-                <StarToggle coinId={item.collection.collection} />
+                <StarToggle coinId={String(item.collection.collection || '')} />
                 <span className="text-left">{index + 1}</span>
               </td>
               <td className="px-4 py-4 text-left flex items-center">
-                <Link href={`/nftrankings/${item.collection.collection}`}>
+                <Link href={`/nftrankings/${String(item.collection.collection || '')}`}>
                   <div className="flex items-center">
-                    <Image src={item.collection.image_url} alt={item.collection.name} width={60} height={60} />
+                    <Image src={String(item.collection.image_url || '')} alt={String(item.collection.name || '')} width={60} height={60} />
                     <div className="ml-2">
-                      <span className="truncate text-[16px] font-semibold">{item.collection.name}</span>
-                      <div className="text-sm text-gray-400">{item.collection.chain}</div>
+                      <span className="truncate text-[16px] font-semibold">{String(item.collection.name || '')}</span>
+                      <div className="text-sm text-gray-400">{String(item.collection.chain || '')}</div>
                     </div>
                   </div>
                 </Link>

@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifySession } from "@/lib/dal";
 
-const protectedRoutes = ["/dashboard", "/profile", "/account-info"];
+// All routes that require authentication
+const protectedRoutes = [
+  "/profile",
+  "/profile/explore", 
+  "/profile/account-info",
+  "/dashboard",
+  "/account-info",
+];
 
 
 export default async function middleware(req: NextRequest) {
