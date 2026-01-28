@@ -18,12 +18,17 @@ const HeroSnakeAnimation = dynamic(() => import('@/components/HeroSnakeAnimation
   ssr: false,
 });
 
-// NFT Image with loading skeleton
+// NFT Image with loading skeleton - clickable to individual NFT page
 function NftImageCard({ nft, fallback }: { nft: NftInfo; fallback: string }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
-  return (
+  // Build OpenSea URL for individual NFT
+  const nftUrl = nft.contract_address && nft.token_id 
+    ? `https://opensea.io/assets/ethereum/${nft.contract_address}/${nft.token_id}`
+    : null;
+
+  const content = (
     <div className="nft-item">
       <div className="relative w-[65px] h-[65px] overflow-hidden rounded-lg">
         {isLoading && (
@@ -49,6 +54,21 @@ function NftImageCard({ nft, fallback }: { nft: NftInfo; fallback: string }) {
       <p className="nft-name">{nft.name}</p>
     </div>
   );
+
+  if (nftUrl) {
+    return (
+      <a 
+        href={nftUrl} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="cursor-pointer hover:scale-105 transition-transform duration-200"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return content;
 }
 
 interface RedditPost {

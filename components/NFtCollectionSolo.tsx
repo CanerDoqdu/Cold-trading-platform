@@ -99,8 +99,21 @@ export async function getBestOfferForNFT(
   );
 
   if (!res.ok) {
-    const errorData = await res.json();
-    console.error(`Error fetching best offer for ${identifier}:`, errorData);
+    // Try to parse error, but handle empty responses gracefully
+    let errorData = {};
+    try {
+      const text = await res.text();
+      if (text) {
+        errorData = JSON.parse(text);
+      }
+    } catch {
+      // Response was empty or not valid JSON
+    }
+    
+    // Only log if there's actual error data
+    if (Object.keys(errorData).length > 0) {
+      console.error(`Error fetching best offer for ${identifier}:`, errorData);
+    }
     
     // Check for throttling error
     if (errorData.detail && errorData.detail.includes("Request was throttled")) {

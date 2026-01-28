@@ -3,6 +3,8 @@ const API_KEY = process.env.OPENSEA_API_KEY;
 export interface NftInfo {
   name: string;
   image_url: string;
+  contract_address?: string;
+  token_id?: string;
 }
 
 if (!API_KEY) {
@@ -36,6 +38,8 @@ export const fetchNftInfo = async (): Promise<NftInfo[]> => {
           order.maker_asset_bundle?.assets?.map((asset) => ({
             name: asset.name || "Unnamed",
             image_url: asset.image_url || "",
+            contract_address: asset.asset_contract?.address || "",
+            token_id: asset.token_id || "",
           })) || [],
       );
 

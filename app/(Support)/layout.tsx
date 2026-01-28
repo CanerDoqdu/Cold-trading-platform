@@ -1,5 +1,5 @@
-import Navbar from "@/app/components/Navbar";
-import Footer from "@/app/components/footer";
+import Navbar from "../components/Navbar";
+import Footer from "../components/footer";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -15,7 +15,7 @@ export default function SupportLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#0a0d14]">
+    <div className="min-h-screen bg-white dark:bg-[#0a0d14]">
       <Navbar />
       <main>{children}</main>
       <Footer />

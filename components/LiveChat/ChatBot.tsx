@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { UseAuthContext } from '@/hooks/UseAuthContext';
+import { useTheme } from '@/context/ThemeContext';
 
 interface Message {
   id: string;
@@ -22,6 +23,8 @@ const INITIAL_MESSAGES: Message[] = [
 export default function ChatBot() {
   const { state } = UseAuthContext();
   const { user } = state;
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
@@ -152,18 +155,24 @@ export default function ChatBot() {
             ${isMinimized ? 'h-16' : 'h-[600px] max-h-[calc(100vh-120px)]'}
           `}
           style={{
-            background: 'linear-gradient(180deg, rgba(17,17,27,0.98) 0%, rgba(10,10,15,0.99) 100%)',
+            background: isDark 
+              ? 'linear-gradient(180deg, rgba(17,17,27,0.98) 0%, rgba(10,10,15,0.99) 100%)'
+              : 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.99) 100%)',
             borderRadius: '24px',
-            border: '1px solid rgba(255,255,255,0.08)',
-            boxShadow: '0 25px 80px -12px rgba(0,0,0,0.6), 0 0 40px rgba(139,92,246,0.1)',
+            border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)',
+            boxShadow: isDark 
+              ? '0 25px 80px -12px rgba(0,0,0,0.6), 0 0 40px rgba(139,92,246,0.1)'
+              : '0 25px 80px -12px rgba(0,0,0,0.15), 0 0 40px rgba(139,92,246,0.05)',
           }}
         >
           {/* Glassmorphism Header */}
           <div 
             className={`px-5 flex items-center justify-between ${isMinimized ? 'h-full py-0' : 'py-4'}`}
             style={{
-              background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(99,102,241,0.1) 100%)',
-              borderBottom: isMinimized ? 'none' : '1px solid rgba(255,255,255,0.06)',
+              background: isDark 
+                ? 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(99,102,241,0.1) 100%)'
+                : 'linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(99,102,241,0.05) 100%)',
+              borderBottom: isMinimized ? 'none' : (isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)'),
             }}
           >
             <div className="flex items-center gap-3">
@@ -182,11 +191,11 @@ export default function ChatBot() {
                     <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-gray-900" />
+                <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ${isDark ? 'ring-gray-900' : 'ring-white'}`} />
               </div>
               <div>
-                <h3 className="text-white font-semibold text-[15px] tracking-tight">Liva AI</h3>
-                <p className="text-gray-400 text-xs flex items-center gap-1.5">
+                <h3 className={`font-semibold text-[15px] tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>Liva AI</h3>
+                <p className={`text-xs flex items-center gap-1.5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                   <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
                   Powered by Llama 3.3
                 </p>
@@ -195,19 +204,19 @@ export default function ChatBot() {
             <div className="flex items-center gap-1">
               <button
                 onClick={clearChat}
-                className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-200"
+                className={`p-2.5 rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/10'}`}
                 title="Clear chat"
               >
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
               <button
                 onClick={() => setIsMinimized(!isMinimized)}
-                className="p-2.5 hover:bg-white/10 rounded-xl transition-all duration-200"
+                className={`p-2.5 rounded-xl transition-all duration-200 ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/10'}`}
                 title={isMinimized ? 'Expand' : 'Minimize'}
               >
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={isMinimized ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"} />
                 </svg>
               </button>
@@ -221,7 +230,7 @@ export default function ChatBot() {
                 className="h-[calc(100%-140px)] overflow-y-auto px-4 py-4 space-y-4"
                 style={{
                   scrollbarWidth: 'thin',
-                  scrollbarColor: 'rgba(139,92,246,0.3) transparent',
+                  scrollbarColor: isDark ? 'rgba(139,92,246,0.3) transparent' : 'rgba(139,92,246,0.5) transparent',
                 }}
               >
                 {messages.map((message) => (
@@ -248,12 +257,12 @@ export default function ChatBot() {
                       style={{
                         background: message.role === 'user' 
                           ? 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)'
-                          : 'rgba(255,255,255,0.05)',
-                        border: message.role === 'user' ? 'none' : '1px solid rgba(255,255,255,0.06)',
+                          : isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                        border: message.role === 'user' ? 'none' : isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.08)',
                       }}
                     >
-                      <p className="text-[14px] text-white leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                      <p className={`text-[10px] mt-2 ${message.role === 'user' ? 'text-purple-200' : 'text-gray-500'}`}>
+                      <p className={`text-[14px] leading-relaxed whitespace-pre-wrap ${message.role === 'user' ? 'text-white' : isDark ? 'text-white' : 'text-gray-900'}`}>{message.content}</p>
+                      <p className={`text-[10px] mt-2 ${message.role === 'user' ? 'text-purple-200' : isDark ? 'text-gray-500' : 'text-gray-500'}`}>
                         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -272,7 +281,7 @@ export default function ChatBot() {
                     </div>
                     <div 
                       className="px-5 py-4 rounded-2xl rounded-bl-md"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.06)' }}
+                      style={{ background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)', border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.08)' }}
                     >
                       <div className="flex items-center gap-1.5">
                         <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -290,19 +299,21 @@ export default function ChatBot() {
               <div 
                 className="absolute bottom-0 left-0 right-0 p-4"
                 style={{
-                  background: 'linear-gradient(180deg, transparent 0%, rgba(10,10,15,1) 30%)',
+                  background: isDark 
+                    ? 'linear-gradient(180deg, transparent 0%, rgba(10,10,15,1) 30%)'
+                    : 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,1) 30%)',
                 }}
               >
                 {!user && (
-                  <p className="text-[11px] text-gray-500 mb-2 text-center">
-                    <a href="/login" className="text-purple-400 hover:text-purple-300 transition-colors">Sign in</a> for personalized responses
+                  <p className={`text-[11px] mb-2 text-center ${isDark ? 'text-gray-500' : 'text-gray-600'}`}>
+                    <a href="/login" className={`transition-colors ${isDark ? 'text-purple-400 hover:text-purple-300' : 'text-purple-600 hover:text-purple-500'}`}>Sign in</a> for personalized responses
                   </p>
                 )}
                 <div 
                   className="flex items-center gap-2 p-1.5 rounded-2xl"
                   style={{
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                    border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.1)',
                   }}
                 >
                   <input
@@ -312,7 +323,7 @@ export default function ChatBot() {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Ask anything..."
-                    className="flex-1 bg-transparent px-4 py-3 text-[14px] text-white placeholder-gray-500 focus:outline-none"
+                    className={`flex-1 bg-transparent px-4 py-3 text-[14px] focus:outline-none ${isDark ? 'text-white placeholder-gray-500' : 'text-gray-900 placeholder-gray-400'}`}
                     disabled={isLoading}
                   />
                   <button
@@ -322,7 +333,7 @@ export default function ChatBot() {
                     style={{
                       background: input.trim() && !isLoading 
                         ? 'linear-gradient(135deg, #8B5CF6 0%, #6366F1 100%)'
-                        : 'rgba(255,255,255,0.05)',
+                        : isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
                       boxShadow: input.trim() && !isLoading ? '0 4px 15px rgba(139,92,246,0.4)' : 'none',
                     }}
                   >

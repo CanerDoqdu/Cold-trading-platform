@@ -8,6 +8,8 @@ import { Uselogout } from "@/hooks/UseLogout";
 import NotificationDropdown from "@/components/NotificationDropdown";
 import ThemeToggle from "@/components/ThemeToggle";
 import logo from "@/public/images/Group.svg";
+import logoWhite from "@/public/images/WhitemodeLogo.png";
+import { useTheme } from "@/context/ThemeContext";
 
 const navLinks = [
   { name: 'Markets', href: '/markets' },
@@ -22,6 +24,7 @@ const Navbar = () => {
   const { state, isLoading } = UseAuthContext();
   const { user } = state;
   const { logout } = Uselogout();
+  const { theme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -85,7 +88,7 @@ const Navbar = () => {
             <Link href="/">
               <div className="flex items-center">
                 <Image
-                  src={logo}
+                  src={theme === 'light' ? logoWhite : logo}
                   alt="Picture of the logo"
                   priority
                   style={{ width: "30px", height: "auto" }}
