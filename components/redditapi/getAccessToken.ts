@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 export async function getRedditToken(): Promise<string> {
   const clientId = process.env.REDDIT_CLIENT_ID;
   const clientSecret = process.env.REDDIT_CLIENT_SECRET;

@@ -55,6 +55,14 @@ export function usePortfolio() {
       setError(null);
 
       const res = await fetch("/api/portfolio");
+      
+      // Silently handle 401 - user not logged in
+      if (res.status === 401) {
+        setPortfolio(null);
+        setHoldings([]);
+        return;
+      }
+      
       const data = await res.json();
 
       if (!res.ok) {

@@ -16,6 +16,7 @@ export interface CryptoCompareData {
 }
 
 export interface NFTData {
+    id: string | number;
     name: string;
     image?: string;
     description?: string;

@@ -16,12 +16,18 @@ interface WebSocketProviderProps {
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
+// Throws error if used outside provider - for components that REQUIRE websocket
 export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
   if (!context) {
     throw new Error("useWebSocket must be used within a WebSocketProvider");
   }
   return context;
+};
+
+// Returns null if used outside provider - for components that can work without websocket
+export const useOptionalWebSocket = () => {
+  return useContext(WebSocketContext);
 };
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {

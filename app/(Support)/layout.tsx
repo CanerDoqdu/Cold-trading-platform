@@ -3,7 +3,8 @@ import Footer from "@/app/components/footer";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Help Center | COLD',
+  title: 'Help Center',
+  description: 'Get help with your COLD account. Find solutions for login issues, deposits, withdrawals, security settings, and more.',
 };
 
 // Route-specific layout - Support pages with Navbar and Footer

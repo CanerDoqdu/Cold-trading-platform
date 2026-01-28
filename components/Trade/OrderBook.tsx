@@ -48,7 +48,7 @@ export default function OrderBook({ currentPrice, symbol }: OrderBookProps) {
       </div>
 
       {/* Headers */}
-      <div className="flex items-center justify-between px-3 py-2 text-xs text-gray-500 border-b border-gray-800">
+      <div className="flex items-center justify-between px-3 py-2 text-xs text-gray-400 border-b border-gray-800">
         <span className="w-1/3">Price (USDT)</span>
         <span className="w-1/3 text-right">Amount ({symbol})</span>
         <span className="w-1/3 text-right">Total</span>
@@ -68,7 +68,7 @@ export default function OrderBook({ currentPrice, symbol }: OrderBookProps) {
             <span className="w-1/3 text-right text-gray-300 relative z-10">
               {order.amount.toFixed(4)}
             </span>
-            <span className="w-1/3 text-right text-gray-500 relative z-10">
+            <span className="w-1/3 text-right text-gray-400 relative z-10">
               {order.total.toFixed(2)}
             </span>
           </div>
@@ -96,7 +96,7 @@ export default function OrderBook({ currentPrice, symbol }: OrderBookProps) {
             <span className="w-1/3 text-right text-gray-300 relative z-10">
               {order.amount.toFixed(4)}
             </span>
-            <span className="w-1/3 text-right text-gray-500 relative z-10">
+            <span className="w-1/3 text-right text-gray-400 relative z-10">
               {order.total.toFixed(2)}
             </span>
           </div>

@@ -82,6 +82,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${titillium_Web.variable}`} suppressHydrationWarning>
       <head>
+        {/* Preconnect to critical third-party domains for faster loading */}
+        <link rel="preconnect" href="https://api.coingecko.com" />
+        <link rel="preconnect" href="https://api.opensea.io" />
+        <link rel="preconnect" href="https://oauth.reddit.com" />
+        <link rel="dns-prefetch" href="https://api.coingecko.com" />
+        <link rel="dns-prefetch" href="https://api.opensea.io" />
+        <link rel="dns-prefetch" href="https://oauth.reddit.com" />
+        
         {/* Prevent theme flash - runs before React hydrates */}
         <script
           dangerouslySetInnerHTML={{

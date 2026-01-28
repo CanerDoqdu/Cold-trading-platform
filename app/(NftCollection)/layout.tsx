@@ -1,4 +1,10 @@
 import Navbar from "../components/AuthNavbar";
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'NFT Collections',
+  description: 'Explore top NFT collections with real-time floor prices, trading volume, and market data from leading NFT marketplaces.',
+};
 
 // Route-specific layout - NFT pages use AuthNavbar
 // Global providers come from root layout automatically!
@@ -8,9 +14,9 @@ export default function NftCollectionLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-black min-h-screen">
+    <main className="bg-black min-h-screen">
       <Navbar />
       {children}
-    </div>
+    </main>
   );
 }

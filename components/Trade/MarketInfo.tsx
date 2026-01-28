@@ -38,7 +38,7 @@ export default function MarketInfo({
           <div>
             <div className="flex items-baseline gap-2">
               <span className="text-xl font-bold text-white">{symbol.toUpperCase()}/USDT</span>
-              <span className="text-gray-500 text-sm">{name}</span>
+              <span className="text-gray-400 text-sm">{name}</span>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-2xl font-bold text-white">
@@ -57,19 +57,19 @@ export default function MarketInfo({
         {/* Stats */}
         <div className="flex flex-wrap gap-6 text-sm">
           <div>
-            <span className="text-gray-500 block">24h High</span>
+            <span className="text-gray-400 block">24h High</span>
             <span className="text-white font-medium">${high24h?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           <div>
-            <span className="text-gray-500 block">24h Low</span>
+            <span className="text-gray-400 block">24h Low</span>
             <span className="text-white font-medium">${low24h?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           <div>
-            <span className="text-gray-500 block">24h Volume</span>
+            <span className="text-gray-400 block">24h Volume</span>
             <span className="text-white font-medium">${formatLarge(volume24h)}</span>
           </div>
           <div>
-            <span className="text-gray-500 block">Market Cap</span>
+            <span className="text-gray-400 block">Market Cap</span>
             <span className="text-white font-medium">${formatLarge(marketCap)}</span>
           </div>
         </div>

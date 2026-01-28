@@ -66,7 +66,7 @@ const Login = () => {
             <div 
               className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-[460px] h-[400px] z-0 transition-all duration-1000 ${mounted ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}
             >
-              <Image src="/images/auth-parts/Background_Simple.png" alt="Background" fill className="object-contain" />
+              <Image src="/images/auth-parts/Background_Simple.png" alt="Background" fill className="object-contain" loading="lazy" />
             </div>
 
             {/* Padlock - On top of Background */}
@@ -82,7 +82,7 @@ const Login = () => {
               className={`absolute bottom-0 left-0 w-28 h-40 z-20 transition-all duration-1000 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
               style={{ animation: mounted ? 'sway 4s ease-in-out infinite' : 'none' }}
             >
-              <Image src="/images/auth-parts/Plant.png" alt="Plant" fill className="object-contain" />
+              <Image src="/images/auth-parts/Plant.png" alt="Plant" fill className="object-contain" loading="lazy" />
             </div>
 
             {/* Character */}
@@ -236,7 +236,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-500/50 text-white font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+              className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 disabled:bg-emerald-500/50 disabled:text-gray-400 text-black font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>

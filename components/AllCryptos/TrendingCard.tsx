@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cachedFetch } from '@/lib/apiCache';
-import { useWebSocket } from '@/components/WebSocketContext';
+import { useOptionalWebSocket } from '@/components/WebSocketContext';
 
 interface Crypto {
   id: string;
@@ -22,7 +22,8 @@ interface TrendingCardProps {
 export default function TrendingCard({ initialData }: TrendingCardProps) {
   const [cryptos, setCryptos] = useState<Crypto[]>(initialData || []);
   const [loading, setLoading] = useState(!initialData || initialData.length === 0);
-  const { prices } = useWebSocket();
+  const wsContext = useOptionalWebSocket();
+  const prices = wsContext?.prices || {};
 
   useEffect(() => {
     // If we have initial data from SSR, don't fetch again
@@ -53,7 +54,7 @@ export default function TrendingCard({ initialData }: TrendingCardProps) {
     return (
       <div className="space-y-1">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-8 bg-gray-700 rounded animate-pulse"></div>
+          <div key={i} className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
         ))}
       </div>
     );
@@ -69,7 +70,7 @@ export default function TrendingCard({ initialData }: TrendingCardProps) {
     <div className="flex flex-col gap-1">
       {cryptos.map((crypto) => (
         <Link key={crypto.id} href={`/markets/${crypto.id}`}>
-          <div className="flex items-center justify-between bg-gray-900 rounded-lg px-3 py-2 hover:bg-gray-800 transition cursor-pointer">
+          <div className="flex items-center justify-between bg-slate-100 dark:bg-gray-900 border border-gray-200/50 dark:border-transparent rounded-lg px-3 py-2 hover:bg-slate-200 dark:hover:bg-gray-800 transition cursor-pointer">
             {/* Left Group: Logo + Symbol + Name */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Image
@@ -80,14 +81,14 @@ export default function TrendingCard({ initialData }: TrendingCardProps) {
                 className="rounded-full flex-shrink-0"
               />
               <div className="flex flex-col gap-0">
-                <div className="text-white font-semibold text-xs">{crypto.symbol.toUpperCase()}</div>
-                <div className="text-gray-400 text-[10px] truncate">{crypto.name}</div>
+                <div className="text-gray-900 dark:text-white font-semibold text-xs">{crypto.symbol.toUpperCase()}</div>
+                <div className="text-gray-500 dark:text-gray-400 text-[10px] truncate">{crypto.name}</div>
               </div>
             </div>
 
             {/* Right Group: Price + Change */}
             <div className="flex items-center gap-2 text-right whitespace-nowrap ml-2">
-              <div className="text-white font-bold text-xs">
+              <div className="text-gray-900 dark:text-white font-bold text-xs">
                 ${(() => {
                   const wsPrice = prices[crypto.symbol.toUpperCase()];
                   if (wsPrice) {

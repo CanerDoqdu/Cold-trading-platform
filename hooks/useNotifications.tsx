@@ -125,8 +125,9 @@ export function usePriceAlerts() {
         const data = await res.json();
         setAlerts(data.alerts || []);
       }
-    } catch (error) {
-      console.error('Error fetching price alerts:', error);
+      // Silently ignore 401 - user not logged in
+    } catch {
+      // Silently fail - user may not be authenticated
     } finally {
       setLoading(false);
     }

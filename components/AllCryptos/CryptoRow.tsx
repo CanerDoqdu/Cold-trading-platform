@@ -88,6 +88,7 @@ export default function CryptoRow({ id, symbol, name, image, price, change24h, v
           <button
             onClick={() => onToggleFavorite?.(id)}
             className="p-1 hover:bg-gray-800 rounded transition"
+            aria-label={isFavorite ? `Remove ${name} from favorites` : `Add ${name} to favorites`}
           >
             {isFavorite ? (
               <StarIconSolid className="w-4 h-4 text-yellow-400" />

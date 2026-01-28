@@ -115,13 +115,13 @@ export default function TradeSymbolPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black p-4">
+      <div className="min-h-screen bg-white dark:bg-black p-4">
         <div className="max-w-[1920px] mx-auto space-y-4">
-          <div className="h-16 bg-gray-900 rounded-xl animate-pulse" />
+          <div className="h-16 bg-gray-200 dark:bg-gray-900 rounded-xl animate-pulse" />
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-2 h-[600px] bg-gray-900 rounded-xl animate-pulse" />
-            <div className="col-span-7 h-[600px] bg-gray-900 rounded-xl animate-pulse" />
-            <div className="col-span-3 h-[600px] bg-gray-900 rounded-xl animate-pulse" />
+            <div className="col-span-2 h-[600px] bg-gray-200 dark:bg-gray-900 rounded-xl animate-pulse" />
+            <div className="col-span-7 h-[600px] bg-gray-200 dark:bg-gray-900 rounded-xl animate-pulse" />
+            <div className="col-span-3 h-[600px] bg-gray-200 dark:bg-gray-900 rounded-xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -130,7 +130,7 @@ export default function TradeSymbolPage() {
 
   if (error || !coin) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 text-lg mb-4">
             Coin &quot;{symbol.toUpperCase()}&quot; not found
@@ -147,9 +147,9 @@ export default function TradeSymbolPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white">
       {/* Top Navigation */}
-      <div className="border-b border-gray-800 bg-gray-950">
+      <div className="border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-950">
         <div className="max-w-[1920px] mx-auto px-3 md:px-4 py-3 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <img src="/images/Group.svg" alt="COLD" className="w-6 md:w-7 h-6 md:h-7" />
@@ -232,7 +232,7 @@ export default function TradeSymbolPage() {
 
         {/* Bottom Info */}
         <div className="bg-gray-950 border border-gray-800 rounded-xl p-4">
-          <div className="flex flex-wrap gap-6 text-xs text-gray-500">
+          <div className="flex flex-wrap gap-6 text-xs text-gray-400">
             <span>💡 This is a demo trading interface. No real transactions are processed.</span>
             <span>📊 Chart powered by TradingView</span>
             <span>🔄 Prices cached for 5 minutes</span>

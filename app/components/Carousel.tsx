@@ -27,10 +27,10 @@ const Scroller: React.FC = async () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen space-y-4 max-w-[1920px] mx-auto py-20">
-      <h1 className="text-center text-white text-[40px] mb-4 font-semibold">
+      <h1 className="text-center text-gray-900 dark:text-white text-[40px] mb-4 font-semibold">
         Build your crypto portfolio
       </h1>
-      <p className="text-gray-400 text-center mb-12 max-w-xl">
+      <p className="text-gray-600 dark:text-gray-400 text-center mb-12 max-w-xl">
         Start with as little as $10 and explore hundreds of cryptocurrencies
       </p>
 
@@ -40,7 +40,7 @@ const Scroller: React.FC = async () => {
             {rowCoins.map((coin, index) => (
               <li
                 key={index}
-                className="coin-box flex items-center justify-end bg-gray-100 rounded-lg min-h-[48px] hover:bg-gray-200 transition cursor-pointer"
+                className="coin-box flex items-center justify-end bg-white dark:bg-gray-100 border border-gray-200 dark:border-transparent shadow-sm shadow-slate-200/50 dark:shadow-none rounded-lg min-h-[48px] hover:bg-gray-50 dark:hover:bg-gray-200 hover:shadow-md hover:shadow-slate-300/50 dark:hover:shadow-none transition cursor-pointer"
                 style={{ width: "auto", padding: "0 8px" }}
               >
                 <Link href={`/markets/${coin.Name?.toLowerCase() || ''}`} className="flex items-center w-full">

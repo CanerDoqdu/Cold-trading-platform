@@ -61,7 +61,7 @@ const Navbar = () => {
 
   return (
     <div>
-      <div className="bg-[#0d131d] h-16">
+      <div className="bg-white/80 dark:bg-[#0d131d] backdrop-blur-md h-16 border-b border-gray-200/80 dark:border-transparent shadow-sm shadow-gray-200/50 dark:shadow-none">
         <div className="flex justify-between items-center w-11/12 md:w-4/5 h-full mx-auto">
           {/* Logo and Nav Links */}
           <div className="flex items-center gap-4 md:gap-8">
@@ -90,35 +90,38 @@ const Navbar = () => {
                   priority
                   style={{ width: "30px", height: "auto" }}
                 />
-                <span className="text-textPrimary text-center text-xl font-semibold pl-2 mt-1">
+                <span className="text-black dark:text-white text-center text-xl font-semibold pl-2 mt-1">
                   COLD
                 </span>
               </div>
             </Link>
             
             {/* Navigation Links - Desktop */}
-            <nav className="hidden md:flex items-center gap-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`text-sm font-medium transition-colors ${
-                    link.highlight 
-                      ? 'text-emerald-400 hover:text-emerald-300' 
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
+            <nav className="hidden md:flex items-center" aria-label="Main navigation">
+              <ul className="flex items-center gap-6">
+                {navLinks.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      href={link.href}
+                      className={`text-sm font-medium transition-colors ${
+                        link.highlight 
+                          ? 'text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300' 
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </nav>
           </div>
 
           {/* Auth Section - Desktop */}
           {isLoading ? (
             <div className="hidden md:flex gap-4">
-              <div className="w-20 h-8 bg-gray-700 rounded-md animate-pulse" />
-              <div className="w-16 h-8 bg-gray-800 rounded-md animate-pulse" />
+              <div className="w-20 h-8 bg-gray-200 dark:bg-gray-700 rounded-md animate-pulse" />
+              <div className="w-16 h-8 bg-gray-300 dark:bg-gray-800 rounded-md animate-pulse" />
             </div>
           ) : !user ? (
             <div className="flex items-center gap-2 md:gap-4">
@@ -167,19 +170,19 @@ const Navbar = () => {
                 </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-gray-900 border border-gray-800 rounded-xl shadow-xl overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-gray-800">
-                    <p className="text-white font-medium text-sm truncate">{user.name || 'User'}</p>
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-xl overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800">
+                    <p className="text-gray-900 dark:text-white font-medium text-sm truncate">{user.name || 'User'}</p>
                     <p className="text-gray-500 text-xs mt-0.5 truncate">{user.email}</p>
                   </div>
                   <div className="py-2">
-                    <Link href="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
+                    <Link href="/profile" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                       <span className="text-sm">Profile</span>
                     </Link>
-                    <Link href="/profile/account-info" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
+                    <Link href="/profile/account-info" onClick={() => setDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -187,7 +190,7 @@ const Navbar = () => {
                       <span className="text-sm">Settings</span>
                     </Link>
                   </div>
-                  <div className="border-t border-gray-800 py-2">
+                  <div className="border-t border-gray-200 dark:border-gray-800 py-2">
                     <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2.5 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors w-full">
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -207,33 +210,38 @@ const Navbar = () => {
       {mobileMenuOpen && (
         <div 
           ref={mobileMenuRef}
-          className="md:hidden fixed inset-x-0 top-16 bg-[#0d131d] border-t border-gray-800 z-50 animate-in slide-in-from-top duration-200"
+          className="md:hidden fixed inset-x-0 top-16 bg-white dark:bg-[#0d131d] border-t border-gray-200 dark:border-gray-800 z-50 animate-in slide-in-from-top duration-200"
         >
-          <nav className="flex flex-col py-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-6 py-3 text-sm font-medium transition-colors border-l-2 ${
-                  link.highlight 
-                    ? 'text-emerald-400 border-emerald-400 bg-emerald-500/10' 
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800/50 border-transparent'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-            {/* Mobile Login Link - only show when user not logged in */}
-            {!user && (
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-6 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800/50 border-l-2 border-transparent sm:hidden"
-              >
-                Login
-              </Link>
-            )}
+          <nav className="py-2" aria-label="Mobile navigation">
+            <ul className="flex flex-col">
+              {navLinks.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`block px-6 py-3 text-sm font-medium transition-colors border-l-2 ${
+                      link.highlight 
+                        ? 'text-emerald-400 border-emerald-400 bg-emerald-500/10' 
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 border-transparent'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+              {/* Mobile Login Link - only show when user not logged in */}
+              {!user && (
+                <li>
+                  <Link
+                    href="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block px-6 py-3 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50 border-l-2 border-transparent sm:hidden"
+                  >
+                    Login
+                  </Link>
+                </li>
+              )}
+            </ul>
           </nav>
         </div>
       )}

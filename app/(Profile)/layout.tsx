@@ -1,7 +1,9 @@
-export const metadata = {
-  title: 'Profile - COLD',
-  description: 'Manage your COLD profile and account settings',
-}
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Profile',
+  description: 'Manage your COLD profile, portfolio, favorites, and account settings. Track your crypto investments and trading history.',
+};
 
 // Route-specific layout - just wrapper styling
 // Global providers come from root layout automatically!
@@ -11,8 +13,8 @@ export default function ProfileLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="bg-black min-h-screen">
+    <main className="bg-black min-h-screen">
       {children}
-    </div>
+    </main>
   );
 }

@@ -6,6 +6,20 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Performance optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  experimental: {
+    optimizePackageImports: ['@heroicons/react', 'swr'],
+    optimizeCss: true,
+  },
+  // Enable compression
+  compress: true,
+  // Reduce bundle size
+  poweredByHeader: false,
+  // Generate ETags for caching
+  generateEtags: true,
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',

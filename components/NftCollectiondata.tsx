@@ -70,13 +70,28 @@ export const getCombinedData = async (offset: number, limit: number) => {
 
     const combinedData = await Promise.all(statsPromises);
 
-    // Ensure there's data to sort, else throw an error
-    if (!combinedData || combinedData.length === 0) {
-      throw new Error("No combined data available after fetching.");
+    // Filter out NFTs that don't have valid stats (no response from API)
+    const validData = combinedData.filter(item => {
+      // Must have stats and some valid data
+      if (!item.stats) return false;
+      
+      // Check if stats has meaningful data
+      const hasFloorPrice = item.stats.total?.floor_price !== undefined;
+      const hasVolume = item.stats.total?.volume !== undefined;
+      const hasMarketCap = item.stats.total?.market_cap !== undefined;
+      
+      // At least one of these should be present
+      return hasFloorPrice || hasVolume || hasMarketCap;
+    });
+
+    // Ensure there's data to return
+    if (!validData || validData.length === 0) {
+      console.warn("No valid NFT data after filtering. Returning unfiltered data.");
+      return combinedData; // Fallback to unfiltered if all filtered out
     }
 
     // Don't sort - keep OpenSea's market_cap ordering for consistent pagination
-    return combinedData;
+    return validData;
   } catch (error) {
     console.error("Error during data combination:", error);
     throw new Error("Error combining data");

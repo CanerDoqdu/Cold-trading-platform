@@ -77,7 +77,7 @@ export default function CoinSearchList({ currentSymbol }: CoinSearchListProps) {
       </div>
 
       {/* Column Headers */}
-      <div className="flex items-center justify-between px-3 py-2 text-xs text-gray-500 border-b border-gray-800">
+      <div className="flex items-center justify-between px-3 py-2 text-xs text-gray-400 border-b border-gray-800">
         <span className="flex-1">Pair</span>
         <span className="w-24 text-right">Price</span>
         <span className="w-16 text-right">24h%</span>
@@ -92,7 +92,7 @@ export default function CoinSearchList({ currentSymbol }: CoinSearchListProps) {
             ))}
           </div>
         ) : filteredCoins.length === 0 ? (
-          <div className="p-4 text-center text-gray-500 text-sm">
+          <div className="p-4 text-center text-gray-400 text-sm">
             No coins found
           </div>
         ) : (
@@ -110,7 +110,7 @@ export default function CoinSearchList({ currentSymbol }: CoinSearchListProps) {
                 <span className="text-white font-medium text-sm">
                   {coin.symbol.toUpperCase()}
                 </span>
-                <span className="text-gray-500 text-xs">/USDT</span>
+                <span className="text-gray-400 text-xs">/USDT</span>
               </div>
               <div className="w-24 text-right">
                 <span className="text-white text-sm">

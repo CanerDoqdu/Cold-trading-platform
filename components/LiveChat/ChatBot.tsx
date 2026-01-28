@@ -43,6 +43,16 @@ export default function ChatBot() {
     }
   }, [isOpen, isMinimized]);
 
+  // Listen for global event to open chat
+  useEffect(() => {
+    const handleOpenChat = () => {
+      setIsOpen(true);
+      setIsMinimized(false);
+    };
+    window.addEventListener('openLivaChat', handleOpenChat);
+    return () => window.removeEventListener('openLivaChat', handleOpenChat);
+  }, []);
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -150,10 +160,10 @@ export default function ChatBot() {
         >
           {/* Glassmorphism Header */}
           <div 
-            className="px-5 py-4 flex items-center justify-between"
+            className={`px-5 flex items-center justify-between ${isMinimized ? 'h-full py-0' : 'py-4'}`}
             style={{
               background: 'linear-gradient(135deg, rgba(139,92,246,0.15) 0%, rgba(99,102,241,0.1) 100%)',
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              borderBottom: isMinimized ? 'none' : '1px solid rgba(255,255,255,0.06)',
             }}
           >
             <div className="flex items-center gap-3">

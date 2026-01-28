@@ -27,7 +27,7 @@ const RedditSectionClient = ({ posts }: RedditSectionClientProps) => {
           href={post.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="block text-sm text-gray-400 hover:text-blue-400 transition cursor-pointer line-clamp-1 py-1.5 min-h-[36px] flex items-center"
+          className="block text-xs text-gray-400 hover:text-blue-400 transition cursor-pointer line-clamp-1 py-1"
         >
           {post.title}
         </a>

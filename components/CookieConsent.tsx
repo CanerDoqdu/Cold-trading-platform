@@ -22,26 +22,32 @@ export default function CookieConsent() {
   const [preferences, setPreferences] = useState<CookiePreferences>(DEFAULT_PREFERENCES);
 
   useEffect(() => {
-    // Check if user has already made a choice
-    const consent = localStorage.getItem('cookie-consent');
-    if (!consent) {
-      // Small delay to prevent flash
-      const timer = setTimeout(() => setShowBanner(true), 1000);
-      return () => clearTimeout(timer);
-    } else {
-      // Load saved preferences
-      try {
-        const saved = JSON.parse(consent);
-        setPreferences(saved);
-      } catch (e) {
-        setShowBanner(true);
+    // Session-based approach like Binance:
+    // - sessionStorage tracks if we asked in THIS browser session
+    // - localStorage stores the actual preferences
+    const askedThisSession = sessionStorage.getItem('cookie-consent-asked');
+    const savedConsent = localStorage.getItem('cookie-consent');
+    
+    if (askedThisSession) {
+      // Already asked this session, just load preferences if they exist
+      if (savedConsent) {
+        try {
+          setPreferences(JSON.parse(savedConsent));
+        } catch (e) {
+          // Invalid data, will ask again
+        }
       }
+      return;
     }
+    
+    // New session - show banner after delay
+    const timer = setTimeout(() => setShowBanner(true), 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   const savePreferences = (prefs: CookiePreferences) => {
     localStorage.setItem('cookie-consent', JSON.stringify(prefs));
-    localStorage.setItem('cookie-consent-date', new Date().toISOString());
+    sessionStorage.setItem('cookie-consent-asked', 'true');
     setPreferences(prefs);
     setShowBanner(false);
     setShowSettings(false);
@@ -99,9 +105,9 @@ export default function CookieConsent() {
               {/* Text */}
               <div className="flex-1">
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">🍪</div>
+                  <div className="text-2xl" aria-hidden="true">🍪</div>
                   <div>
-                    <h3 className="text-white font-semibold text-sm sm:text-base">We value your privacy</h3>
+                    <p className="text-white font-semibold text-sm sm:text-base" role="heading" aria-level={2}>We value your privacy</p>
                     <p className="text-gray-400 text-xs sm:text-sm mt-1 leading-relaxed">
                       We use <span className="text-emerald-400 font-medium">&quot;Strictly Necessary&quot;</span> cookies to keep our site reliable and secure. 
                       We&apos;d like to set additional cookies to understand site usage, make improvements, remember your settings, and assist in our marketing efforts.
@@ -163,10 +169,10 @@ export default function CookieConsent() {
               <div className="bg-gray-800/50 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-white font-semibold text-sm flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full" />
+                    <p className="text-white font-semibold text-sm flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full" aria-hidden="true" />
                       Strictly Necessary
-                    </h3>
+                    </p>
                     <p className="text-gray-400 text-xs mt-1">
                       Essential for the website to function. Cannot be disabled.
                     </p>
@@ -181,13 +187,15 @@ export default function CookieConsent() {
               <div className="bg-gray-800/50 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h3 className="text-white font-semibold text-sm">Functional Cookies</h3>
+                    <p className="text-white font-semibold text-sm">Functional Cookies</p>
                     <p className="text-gray-400 text-xs mt-1">
                       Remember your preferences like theme, language, and display settings.
                     </p>
                   </div>
                   <button
                     onClick={() => setPreferences(p => ({ ...p, functional: !p.functional }))}
+                    aria-label={preferences.functional ? 'Disable functional cookies' : 'Enable functional cookies'}
+                    aria-pressed={preferences.functional}
                     className={`relative w-12 h-6 rounded-full transition-colors ${
                       preferences.functional ? 'bg-emerald-500' : 'bg-gray-700'
                     }`}
@@ -205,13 +213,15 @@ export default function CookieConsent() {
               <div className="bg-gray-800/50 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h3 className="text-white font-semibold text-sm">Analytics Cookies</h3>
+                    <p className="text-white font-semibold text-sm">Analytics Cookies</p>
                     <p className="text-gray-400 text-xs mt-1">
                       Help us understand how visitors interact with our website.
                     </p>
                   </div>
                   <button
                     onClick={() => setPreferences(p => ({ ...p, analytics: !p.analytics }))}
+                    aria-label={preferences.analytics ? 'Disable analytics cookies' : 'Enable analytics cookies'}
+                    aria-pressed={preferences.analytics}
                     className={`relative w-12 h-6 rounded-full transition-colors ${
                       preferences.analytics ? 'bg-emerald-500' : 'bg-gray-700'
                     }`}
@@ -229,13 +239,15 @@ export default function CookieConsent() {
               <div className="bg-gray-800/50 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <h3 className="text-white font-semibold text-sm">Marketing Cookies</h3>
+                    <p className="text-white font-semibold text-sm">Marketing Cookies</p>
                     <p className="text-gray-400 text-xs mt-1">
                       Used to deliver relevant ads and track ad campaign performance.
                     </p>
                   </div>
                   <button
                     onClick={() => setPreferences(p => ({ ...p, marketing: !p.marketing }))}
+                    aria-label={preferences.marketing ? 'Disable marketing cookies' : 'Enable marketing cookies'}
+                    aria-pressed={preferences.marketing}
                     className={`relative w-12 h-6 rounded-full transition-colors ${
                       preferences.marketing ? 'bg-emerald-500' : 'bg-gray-700'
                     }`}

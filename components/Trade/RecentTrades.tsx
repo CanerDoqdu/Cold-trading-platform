@@ -69,7 +69,7 @@ export default function RecentTrades({ currentPrice, symbol }: RecentTradesProps
       </div>
 
       {/* Headers */}
-      <div className="flex items-center justify-between px-3 py-2 text-xs text-gray-500 border-b border-gray-800">
+      <div className="flex items-center justify-between px-3 py-2 text-xs text-gray-400 border-b border-gray-800">
         <span className="w-1/3">Price (USDT)</span>
         <span className="w-1/3 text-right">Amount ({symbol})</span>
         <span className="w-1/3 text-right">Time</span>
@@ -88,7 +88,7 @@ export default function RecentTrades({ currentPrice, symbol }: RecentTradesProps
             <span className="w-1/3 text-right text-gray-300">
               {trade.amount.toFixed(4)}
             </span>
-            <span className="w-1/3 text-right text-gray-500">
+            <span className="w-1/3 text-right text-gray-400">
               {trade.time}
             </span>
           </div>

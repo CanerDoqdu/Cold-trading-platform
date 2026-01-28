@@ -3,7 +3,8 @@ import Footer from "@/app/components/footer";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Learn | COLD',
+  title: 'Learn Crypto',
+  description: 'Learn about cryptocurrency trading, blockchain technology, DeFi, NFTs, and investment strategies with our educational guides.',
 };
 
 // Route-specific layout - Learn pages with Navbar and Footer

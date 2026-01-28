@@ -491,12 +491,12 @@ const LiquidityIllustration = () => {
       
       {/* Title */}
       <div className="absolute -top-4 left-0 z-30">
-        <h2 className="text-3xl md:text-3xl font-bold text-white mb-2">
-          <span className="inline-block border-l-4 border-white pl-4">Liquidity</span>
+        <h2 className="text-3xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          <span className="inline-block border-l-4 border-gray-900 dark:border-white pl-4">Liquidity</span>
         </h2>
         <p className="text-sm pl-5">
           <span className="text-[#42E8E0]">More</span>{' '}
-          <span className="text-gray-300">funding options</span>
+          <span className="text-gray-600 dark:text-gray-300">funding options</span>
         </p>
         <p className="text-xs text-gray-500 pl-5">means it&apos;s easier to get into the action</p>
       </div>
@@ -652,13 +652,13 @@ const WidestRangeIllustration = () => {
 
 export default function NewsPage() {
   return (
-    <div className="min-h-screen bg-[#1a1f2e] overflow-hidden">
+    <div className="min-h-screen bg-gray-100 dark:bg-[#1a1f2e] overflow-hidden">
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-2 lg:px-4 py-4 lg:py-8">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-24">
           {/* Left Content */}
           <div className="flex-1 max-w-xl pl-2 lg:pl-4">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Cryptocurrency and Bitcoin{' '}
               <span className="text-emerald-400">Liquidity</span>
             </h1>
@@ -666,9 +666,9 @@ export default function NewsPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-lg md:text-xl font-semibold text-cyan-400 mb-3">
-                  High trade volume, <span className="text-white">maximum cryptocurrency liquidity</span>
+                  High trade volume, <span className="text-gray-900 dark:text-white">maximum cryptocurrency liquidity</span>
                 </h2>
-                <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base leading-relaxed">
                   Cryptocurrency prices can change quickly. To ensure you can maximize profits, 
                   you need to move in and out of the market quickly. At Cold, our deep liquidity ensures trade
                   execution at the price you want -- with spreads as tight as 1 pip.
@@ -677,9 +677,9 @@ export default function NewsPage() {
               
               <div>
                 <h3 className="text-lg font-semibold text-cyan-400 mb-3">
-                  What is <span className="text-white">liquidity?</span>
+                  What is <span className="text-gray-900 dark:text-white">liquidity?</span>
                 </h3>
-                <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base leading-relaxed">
                   Liquidity refers to how easily an asset can be bought or sold at a stable price on a given market. The 
                   quicker you can sell off an asset as close to your asking price as possible, the more liquid an exchange is 
                   considered to be.
@@ -700,25 +700,25 @@ export default function NewsPage() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-16">
           {/* Left Content */}
           <div className="flex-1 max-w-xl order-2 lg:order-1">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
               Industry-leading security protects
             </h2>
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8">
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-8">
               your investments.
             </h3>
             
             <div className="space-y-8">
               <div>
                 <h4 className="text-lg md:text-xl font-semibold mb-4">
-                  <span className="text-yellow-400">Safeguarding your funds, NFTs and privacy</span>{' '}
-                  <span className="text-white">is our number one objective</span>
+                  <span className="text-yellow-500 dark:text-yellow-400">Safeguarding your funds, NFTs and privacy</span>{' '}
+                  <span className="text-gray-900 dark:text-white">is our number one objective</span>
                 </h4>
-                <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-4">
+                <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base leading-relaxed mb-4">
                   Cold takes a comprehensive approach to protecting your investments in crypto assets and NFTs. 
                   Our team of experts have built in a number of sophisticated measures to prevent the theft of funds, NFTs, or information. 
                   Theft isn&apos;t the only threat of course.
                 </p>
-                <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-4 italic">
+                <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base leading-relaxed mb-4 italic">
                   As a professional exchange we offer financial stability, with full reserves, healthy banking relationships and 
                   the highest standards of legal compliance.
                 </p>
@@ -743,7 +743,7 @@ export default function NewsPage() {
         <div className="flex flex-col lg:flex-row items-center justify-between gap-16">
           {/* Left Content */}
           <div className="flex-1 max-w-xl">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">
               The Widest Range
             </h2>
             <h3 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-cyan-400 mb-8 border-l-4 border-cyan-400 pl-4">
@@ -751,7 +751,7 @@ export default function NewsPage() {
             </h3>
             
             <div className="space-y-8">
-              <p className="text-gray-400 text-sm md:text-base leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base leading-relaxed">
                 Cold is dedicated to providing you with low fees and a variety of digital and fiat funding options 
                 to power your cryptocurrency investments. Whether you&apos;re executing a spot trade, setting up a custom 
                 order, or scheduling a recurring buy, our fast, flexible funding options make it easier than ever to 
@@ -760,10 +760,10 @@ export default function NewsPage() {
               
               <div>
                 <h4 className="text-lg md:text-xl font-semibold mb-4">
-                  <span className="text-yellow-400 underline decoration-yellow-400/50">Fund Your Account</span>{' '}
-                  <span className="text-white">with Traditional Currencies</span>
+                  <span className="text-yellow-500 dark:text-yellow-400 underline decoration-yellow-500/50 dark:decoration-yellow-400/50">Fund Your Account</span>{' '}
+                  <span className="text-gray-900 dark:text-white">with Traditional Currencies</span>
                 </h4>
-                <p className="text-gray-400 text-sm md:text-base leading-relaxed mb-4">
+                <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base leading-relaxed mb-4">
                   Both new and experienced traders will find that our fiat currency funding options make for a 
                   seamless experience that will have you trading in a few simple steps.
                 </p>
@@ -785,40 +785,40 @@ export default function NewsPage() {
       </section>
 
       {/* Features Grid */}
-      <section className="max-w-7xl mx-auto px-6 py-16 border-t border-gray-700/50">
+      <section className="max-w-7xl mx-auto px-6 py-16 border-t border-gray-300 dark:border-gray-700/50">
         <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Why Choose Cold?</h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">Experience the next generation of cryptocurrency trading with our powerful platform.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Choose Cold?</h2>
+          <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Experience the next generation of cryptocurrency trading with our powerful platform.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-gradient-to-br from-[#232938] to-[#1a1f2e] border border-gray-700/50 rounded-2xl p-8 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 group">
+          <div className="bg-gradient-to-br from-gray-50 dark:from-[#232938] to-white dark:to-[#1a1f2e] border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300 group">
             <div className="w-14 h-14 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <svg className="w-7 h-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-3">Lightning Fast Execution</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">Execute trades instantly with our high-performance matching engine designed for speed and reliability.</p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Lightning Fast Execution</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Execute trades instantly with our high-performance matching engine designed for speed and reliability.</p>
           </div>
           
-          <div className="bg-gradient-to-br from-[#232938] to-[#1a1f2e] border border-gray-700/50 rounded-2xl p-8 hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 group">
+          <div className="bg-gradient-to-br from-gray-50 dark:from-[#232938] to-white dark:to-[#1a1f2e] border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8 hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 group">
             <div className="w-14 h-14 bg-gradient-to-br from-cyan-500/20 to-cyan-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <svg className="w-7 h-7 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-3">Bank-Grade Security</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">Your assets are protected with industry-leading security measures including cold storage and 2FA.</p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Bank-Grade Security</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Your assets are protected with industry-leading security measures including cold storage and 2FA.</p>
           </div>
           
-          <div className="bg-gradient-to-br from-[#232938] to-[#1a1f2e] border border-gray-700/50 rounded-2xl p-8 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 group">
+          <div className="bg-gradient-to-br from-gray-50 dark:from-[#232938] to-white dark:to-[#1a1f2e] border border-gray-200 dark:border-gray-700/50 rounded-2xl p-8 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5 transition-all duration-300 group">
             <div className="w-14 h-14 bg-gradient-to-br from-purple-500/20 to-purple-600/10 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <svg className="w-7 h-7 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-3">Competitive Pricing</h3>
-            <p className="text-gray-400 text-sm leading-relaxed">Get the best prices with our deep order books and tight spreads, ensuring maximum value for your trades.</p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Competitive Pricing</h3>
+            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">Get the best prices with our deep order books and tight spreads, ensuring maximum value for your trades.</p>
           </div>
         </div>
       </section>

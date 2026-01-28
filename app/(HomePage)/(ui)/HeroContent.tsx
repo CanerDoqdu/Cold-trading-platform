@@ -27,8 +27,8 @@ function NftImageCard({ nft, fallback }: { nft: NftInfo; fallback: string }) {
     <div className="nft-item">
       <div className="relative w-[65px] h-[65px] overflow-hidden rounded-lg">
         {isLoading && (
-          <div className="absolute inset-0 bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 rounded-lg">
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-600/30 to-transparent animate-shimmer" />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-200 dark:from-gray-800 via-gray-100 dark:via-gray-700 to-gray-200 dark:to-gray-800 rounded-lg">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/30 dark:via-gray-600/30 to-transparent animate-shimmer" />
           </div>
         )}
         <Image
@@ -85,7 +85,7 @@ export default function HeroContent({
   const nftRef = useRef<HTMLDivElement>(null);
 
   return (
-    <section className="flex justify-between min-h-screen lg:h-lvh text-white bg-black relative overflow-x-hidden">
+    <section className="flex justify-between min-h-screen lg:h-lvh text-gray-900 dark:text-white bg-gradient-to-br from-slate-50 via-white to-emerald-50/30 dark:from-black dark:via-black dark:to-black relative overflow-x-hidden">
       <HeroSnakeAnimation trendingRef={trendingRef} newsRef={newsRef} nftRef={nftRef} />
       <div className="w-full flex flex-col lg:flex-row justify-between max-w-section mx-auto px-4 sm:px-6 lg:px-0">
           <div className="pt-20 sm:pt-[90px] w-full lg:w-1/2">
@@ -101,7 +101,7 @@ export default function HeroContent({
               <input
                 type="text"
                 placeholder="Email/Phone number"
-                className="w-full sm:w-[300px] h-[44px] sm:h-[40px] rounded-[10px] border-2 border-emerald-500/50 placeholder-gray-500 bg-[#000000] px-4 transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:shadow-lg focus:shadow-emerald-900/50"
+                className="w-full sm:w-[300px] h-[44px] sm:h-[40px] rounded-[10px] border-2 border-emerald-500/50 placeholder-gray-500 bg-white dark:bg-[#000000] px-4 transition-all duration-200 focus:outline-none focus:border-emerald-500 focus:shadow-lg focus:shadow-emerald-900/50"
               />
               <Link 
                 href="/signup"
@@ -113,23 +113,23 @@ export default function HeroContent({
 
             <div
               ref={nftRef}
-              className="text-sm w-full lg:w-[560px] rounded-[20px] bg-gray-950 border border-gray-800 mt-6 sm:mt-10 lg:mt-[72px] overflow-hidden relative p-4 sm:p-6 shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/40 transition-all duration-300 hover:border-emerald-500/30"
+              className="text-sm w-full lg:w-[560px] rounded-[20px] bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 mt-6 sm:mt-10 lg:mt-[61px] overflow-hidden relative p-4 sm:p-6 shadow-xl shadow-slate-200/60 dark:shadow-emerald-900/20 hover:shadow-2xl hover:shadow-slate-300/70 dark:hover:shadow-emerald-900/40 transition-all duration-300 hover:border-emerald-200 dark:hover:border-emerald-500/30"
             >
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-[16px] font-semibold">NFT's</p>
+              <div className="flex items-center justify-between mb-4 ">
+                <p className="text-[16px] font-semibold text-gray-900 dark:text-white">NFT's</p>
                 <Link
                   href={{
                     pathname: '/nftrankings',
                   }}
-                  className="text-sm text-emerald-400/70 hover:text-emerald-400 transition-colors duration-200 font-medium"
+                  className="text-sm text-emerald-600 dark:text-emerald-400/70 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors duration-200 font-medium"
                 >
                   View All NFTs
                 </Link>
               </div>
 
               <div className="relative overflow-hidden">
-                <div className="absolute left-0 top-0 h-full w-32 bg-gradient-to-r from-gray-950 to-transparent pointer-events-none z-10" />
-                <div className="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-gray-950 to-transparent pointer-events-none z-10" />
+                <div className="absolute left-0 top-0 h-full w-32 bg-gradient-to-r from-white dark:from-gray-950 to-transparent pointer-events-none z-10" />
+                <div className="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-white dark:from-gray-950 to-transparent pointer-events-none z-10" />
 
                 {displayNfts.length === 0 ? (
                   <div className="pb-4">
@@ -155,15 +155,15 @@ export default function HeroContent({
           <div className="flex flex-col gap-4 sm:gap-6 mt-6 lg:mt-12 pb-8 lg:pb-0">
             <div
               ref={trendingRef}
-              className="w-full lg:w-[542px] rounded-[20px] bg-gray-950 border border-gray-800 p-3 shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/40 transition-all duration-300 hover:border-emerald-500/30"
+              className="w-full lg:w-[542px] rounded-[20px] bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-3 shadow-xl shadow-slate-200/60 dark:shadow-emerald-900/20 hover:shadow-2xl hover:shadow-slate-300/70 dark:hover:shadow-emerald-900/40 transition-all duration-300 hover:border-emerald-200 dark:hover:border-emerald-500/30"
             >
               <div className="flex justify-between items-center mb-2">
-                <p className="text-sm font-semibold">Trending</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">Trending</p>
                 <Link
                   href={{
                     pathname: '/markets',
                   }}
-                  className="text-xs text-emerald-400/70 hover:text-emerald-400 transition-colors duration-200 font-medium"
+                  className="text-xs text-emerald-600 dark:text-emerald-400/70 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors duration-200 font-medium"
                 >
                   View All
                 </Link>
@@ -173,14 +173,14 @@ export default function HeroContent({
 
             <div
               ref={newsRef}
-              className="w-full lg:w-[542px] rounded-[20px] bg-gray-950 border border-gray-800 p-3 sm:p-4 space-y-3 shadow-lg shadow-emerald-900/20 hover:shadow-emerald-900/40 transition-all duration-300 hover:border-emerald-500/30"
+              className="w-full lg:w-[542px] rounded-[20px] bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 p-3 sm:p-4 space-y-3 shadow-xl shadow-slate-200/60 dark:shadow-emerald-900/20 hover:shadow-2xl hover:shadow-slate-300/70 dark:hover:shadow-emerald-900/40 transition-all duration-300 hover:border-emerald-200 dark:hover:border-emerald-500/30"
             >
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-300">News</p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">News</p>
                   <Link
                     href="/news"
-                    className="text-xs text-emerald-400/70 hover:text-emerald-400 transition-colors duration-200 font-medium"
+                    className="text-xs text-emerald-600 dark:text-emerald-400/70 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors duration-200 font-medium"
                   >
                     View More
                   </Link>
@@ -192,7 +192,7 @@ export default function HeroContent({
                       href={article.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center text-sm text-gray-400 line-clamp-1 hover:text-white transition-colors cursor-pointer py-1.5 min-h-[36px]"
+                      className="flex items-center text-xs text-gray-600 dark:text-gray-400 line-clamp-1 hover:text-gray-900 dark:hover:text-white transition-colors cursor-pointer py-1"
                     >
                       {article.title}
                     </a>
@@ -200,10 +200,10 @@ export default function HeroContent({
                 </div>
               </div>
 
-              <div className="h-px bg-gray-800" />
+              <div className="h-px bg-gray-200 dark:bg-gray-800" />
 
               <div>
-                <p className="text-xs font-semibold mb-2 uppercase tracking-wide text-gray-300 flex items-center gap-1">
+                <p className="text-xs font-semibold mb-2 uppercase tracking-wide text-gray-600 dark:text-gray-300 flex items-center gap-1">
                   <span className="w-2 h-2 bg-emerald-500 rounded-full" />
                   Live Reddit
                 </p>
@@ -213,40 +213,19 @@ export default function HeroContent({
               </div>
             </div>
 
-            <div className="w-full lg:w-[542px]">
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-2 sm:mb-3">
-                <div className="bg-gray-950 border border-gray-800 rounded-lg p-2 text-center hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/30 transition-all duration-200">
-                  <p className="text-sm sm:text-base font-bold text-emerald-400">10M+</p>
-                  <p className="text-[7px] sm:text-[8px] text-gray-400">Users</p>
-                </div>
-                <div className="bg-gray-950 border border-gray-800 rounded-lg p-2 text-center hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/30 transition-all duration-200">
-                  <p className="text-sm sm:text-base font-bold text-emerald-300">$50B+</p>
-                  <p className="text-[7px] sm:text-[8px] text-gray-400">Traded</p>
-                </div>
-                <div className="bg-gray-950 border border-gray-800 rounded-lg p-2 text-center hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/30 transition-all duration-200">
-                  <p className="text-sm sm:text-base font-bold text-white">150+</p>
-                  <p className="text-[7px] sm:text-[8px] text-gray-400">Countries</p>
-                </div>
+            {/* Stats Cards - aligned with NFT section on the left */}
+            <div className="w-full lg:w-[542px] grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-3 text-center shadow-lg shadow-slate-200/50 dark:shadow-none hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-100 dark:hover:shadow-emerald-900/30 transition-all duration-200">
+                <p className="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400">10M+</p>
+                <p className="text-[8px] sm:text-[10px] text-gray-500 dark:text-gray-400">Users</p>
               </div>
-
-              <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                <Link
-                  href="/markets"
-                  className="bg-gray-950 border border-gray-800 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/30 rounded-lg p-2 transition-all duration-200 text-center hover:scale-105 hover:bg-emerald-900/10"
-                >
-                  <div className="text-base sm:text-lg mb-1">💰</div>
-                  <p className="text-[7px] sm:text-[8px] font-semibold">Buy</p>
-                </Link>
-
-                <div className="bg-gray-950 border border-gray-800 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/30 rounded-lg p-2 transition-all duration-200 text-center cursor-pointer hover:scale-105 hover:bg-emerald-900/10">
-                  <div className="text-base sm:text-lg mb-1">🎁</div>
-                  <p className="text-[7px] sm:text-[8px] font-semibold">Earn</p>
-                </div>
-
-                <div className="bg-gray-950 border border-gray-800 hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-900/30 rounded-lg p-2 transition-all duration-200 text-center cursor-pointer hover:scale-105 hover:bg-emerald-900/10">
-                  <div className="text-base sm:text-lg mb-1">📊</div>
-                  <p className="text-[7px] sm:text-[8px] font-semibold">Trade</p>
-                </div>
+              <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-3 text-center shadow-lg shadow-slate-200/50 dark:shadow-none hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-100 dark:hover:shadow-emerald-900/30 transition-all duration-200">
+                <p className="text-base sm:text-lg font-bold text-emerald-500 dark:text-emerald-300">$50B+</p>
+                <p className="text-[8px] sm:text-[10px] text-gray-500 dark:text-gray-400">Traded</p>
+              </div>
+              <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-3 text-center shadow-lg shadow-slate-200/50 dark:shadow-none hover:border-emerald-300 dark:hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-100 dark:hover:shadow-emerald-900/30 transition-all duration-200">
+                <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">150+</p>
+                <p className="text-[8px] sm:text-[10px] text-gray-500 dark:text-gray-400">Countries</p>
               </div>
             </div>
           </div>

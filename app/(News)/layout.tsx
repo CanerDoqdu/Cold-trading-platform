@@ -3,7 +3,8 @@ import Footer from "@/app/components/footer";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'News | COLD',
+  title: 'Crypto News',
+  description: 'Stay updated with the latest cryptocurrency news, market analysis, and blockchain updates from trusted sources.',
 };
 
 // Route-specific layout - News pages with Navbar and Footer

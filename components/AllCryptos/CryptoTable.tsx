@@ -108,7 +108,7 @@ export default function CryptoTable() {
     return (
       <div className="space-y-2">
         {[...Array(10)].map((_, i) => (
-          <div key={i} className="h-12 bg-gray-800 rounded animate-pulse"></div>
+          <div key={i} className="h-12 bg-gray-200 dark:bg-gray-800 rounded animate-pulse"></div>
         ))}
       </div>
     );
@@ -123,9 +123,9 @@ export default function CryptoTable() {
       />
       
       <PurpleSnakeAnimation>
-        <div className="rounded-xl border border-gray-900 bg-gray-950 overflow-hidden">
+        <div className="rounded-xl border border-gray-200 dark:border-gray-900 bg-white dark:bg-gray-950 overflow-hidden">
           {/* Table Header */}
-          <div className="flex items-center justify-between py-3 md:py-4 border-b border-gray-800 px-3 md:px-6 mb-2 bg-gray-900">
+          <div className="flex items-center justify-between py-3 md:py-4 border-b border-gray-200 dark:border-gray-800 px-3 md:px-6 mb-2 bg-gray-100 dark:bg-gray-900">
             <div className="flex-1 text-xs uppercase tracking-wide text-gray-500 font-medium">Name</div>
             <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium">Price</div>
             <div className="flex-1 text-right text-xs uppercase tracking-wide text-gray-500 font-medium hidden sm:block">24h Change</div>

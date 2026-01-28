@@ -32,32 +32,32 @@ Avatar.displayName = 'Avatar';
 
 // Loading skeleton for the section
 const EngagementSkeleton = () => (
-  <div className="py-24 px-6 bg-gradient-to-b from-black via-gray-950 to-black overflow-hidden">
+  <div className="py-24 px-6 bg-gradient-to-b from-slate-50 dark:from-black via-slate-100 dark:via-gray-950 to-white dark:to-black overflow-hidden">
     <div className="max-w-7xl mx-auto">
       <div className="lg:flex lg:items-center lg:gap-16">
         {/* Left Side Skeleton */}
         <div className="flex-1 lg:pr-8 animate-pulse">
-          <div className="h-4 w-32 bg-gray-800 rounded mb-4" />
-          <div className="h-12 w-3/4 bg-gray-800 rounded mb-2" />
-          <div className="h-12 w-2/3 bg-gray-800 rounded mb-6" />
+          <div className="h-4 w-32 bg-gray-300 dark:bg-gray-800 rounded mb-4" />
+          <div className="h-12 w-3/4 bg-gray-300 dark:bg-gray-800 rounded mb-2" />
+          <div className="h-12 w-2/3 bg-gray-300 dark:bg-gray-800 rounded mb-6" />
           <div className="space-y-2 mb-8">
-            <div className="h-4 w-full bg-gray-800 rounded" />
-            <div className="h-4 w-5/6 bg-gray-800 rounded" />
-            <div className="h-4 w-4/5 bg-gray-800 rounded" />
+            <div className="h-4 w-full bg-gray-300 dark:bg-gray-800 rounded" />
+            <div className="h-4 w-5/6 bg-gray-300 dark:bg-gray-800 rounded" />
+            <div className="h-4 w-4/5 bg-gray-300 dark:bg-gray-800 rounded" />
           </div>
-          <div className="h-14 w-48 bg-gray-800 rounded-xl mb-12" />
-          <div className="flex gap-8 pt-8 border-t border-gray-800/50">
+          <div className="h-14 w-48 bg-gray-300 dark:bg-gray-800 rounded-xl mb-12" />
+          <div className="flex gap-8 pt-8 border-t border-gray-200 dark:border-gray-800/50">
             <div className="space-y-2">
-              <div className="h-8 w-16 bg-gray-800 rounded" />
-              <div className="h-3 w-20 bg-gray-800 rounded" />
+              <div className="h-8 w-16 bg-gray-300 dark:bg-gray-800 rounded" />
+              <div className="h-3 w-20 bg-gray-300 dark:bg-gray-800 rounded" />
             </div>
             <div className="space-y-2">
-              <div className="h-8 w-16 bg-gray-800 rounded" />
-              <div className="h-3 w-24 bg-gray-800 rounded" />
+              <div className="h-8 w-16 bg-gray-300 dark:bg-gray-800 rounded" />
+              <div className="h-3 w-24 bg-gray-300 dark:bg-gray-800 rounded" />
             </div>
             <div className="space-y-2">
-              <div className="h-8 w-12 bg-gray-800 rounded" />
-              <div className="h-3 w-16 bg-gray-800 rounded" />
+              <div className="h-8 w-12 bg-gray-300 dark:bg-gray-800 rounded" />
+              <div className="h-3 w-16 bg-gray-300 dark:bg-gray-800 rounded" />
             </div>
           </div>
         </div>
@@ -65,9 +65,9 @@ const EngagementSkeleton = () => (
         {/* Right Side - Circle Skeleton */}
         <div className="flex-1 mt-16 lg:mt-0 flex items-center justify-center">
           <div className="relative w-[380px] h-[380px] lg:w-[520px] lg:h-[520px]">
-            <div className="absolute inset-0 border border-gray-700/30 rounded-full bg-gray-900/20 animate-pulse" />
-            <div className="absolute inset-[26%] border border-gray-700/40 rounded-full bg-gray-900/30 animate-pulse" />
-            <div className="absolute inset-[43%] bg-gray-800 rounded-full animate-pulse" />
+            <div className="absolute inset-0 border border-gray-300 dark:border-gray-700/30 rounded-full bg-gray-200/20 dark:bg-gray-900/20 animate-pulse" />
+            <div className="absolute inset-[26%] border border-gray-300 dark:border-gray-700/40 rounded-full bg-gray-200/30 dark:bg-gray-900/30 animate-pulse" />
+            <div className="absolute inset-[43%] bg-gray-300 dark:bg-gray-800 rounded-full animate-pulse" />
           </div>
         </div>
       </div>
@@ -155,7 +155,7 @@ const ClaimYourSpotSection = () => {
   return (
     <section 
       ref={sectionRef}
-      className="py-24 px-6 bg-gradient-to-b from-black via-gray-950 to-black overflow-hidden"
+      className="py-24 px-6 bg-gradient-to-b from-slate-50 dark:from-black via-slate-100 dark:via-gray-950 to-white dark:to-black overflow-hidden"
     >
       <style jsx>{`
         @keyframes orbitOuter {
@@ -204,14 +204,14 @@ const ClaimYourSpotSection = () => {
             <span className="text-emerald-400 text-sm font-semibold uppercase tracking-wider mb-4 block">
               Join The Movement
             </span>
-            <h3 className="text-4xl lg:text-6xl font-bold text-white leading-tight">
+            <h3 className="text-4xl lg:text-6xl font-bold text-gray-900 dark:text-white leading-tight">
               Be Part of the
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-300">
                 Future of Finance
               </span>
             </h3>
-            <p className="mt-6 text-lg text-gray-400 max-w-lg leading-relaxed">
+            <p className="mt-6 text-lg text-gray-600 dark:text-gray-400 max-w-lg leading-relaxed">
               Join millions of traders, investors, and enthusiasts who are 
               building wealth together. Get access to exclusive insights, 
               real-time market data, and a community that has your back.
@@ -233,17 +233,17 @@ const ClaimYourSpotSection = () => {
             </div>
             
             {/* Social Proof Stats */}
-            <div className="flex flex-wrap gap-8 mt-12 pt-8 border-t border-gray-800/50">
+            <div className="flex flex-wrap gap-8 mt-12 pt-8 border-t border-gray-200 dark:border-gray-800/50">
               <div className="group">
-                <p className="text-4xl font-bold text-white group-hover:text-emerald-400 transition-colors">2M+</p>
+                <p className="text-4xl font-bold text-gray-900 dark:text-white group-hover:text-emerald-400 transition-colors">2M+</p>
                 <p className="text-gray-500 text-sm mt-1">Active Traders</p>
               </div>
               <div className="group">
-                <p className="text-4xl font-bold text-white group-hover:text-emerald-400 transition-colors">$5B+</p>
+                <p className="text-4xl font-bold text-gray-900 dark:text-white group-hover:text-emerald-400 transition-colors">$5B+</p>
                 <p className="text-gray-500 text-sm mt-1">Trading Volume</p>
               </div>
               <div className="group">
-                <p className="text-4xl font-bold text-white group-hover:text-emerald-400 transition-colors">150+</p>
+                <p className="text-4xl font-bold text-gray-900 dark:text-white group-hover:text-emerald-400 transition-colors">150+</p>
                 <p className="text-gray-500 text-sm mt-1">Countries</p>
               </div>
             </div>

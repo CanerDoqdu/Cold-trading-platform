@@ -120,10 +120,10 @@ export default function BuySellPanel({ symbol, name, currentPrice, coinId }: Buy
         {/* Price Display */}
         <div className="bg-gray-900 rounded-lg p-3 mb-4">
           <div className="flex justify-between text-xs mb-1">
-            <span className="text-gray-500">
+            <span className="text-gray-400">
               {activeTab === 'buy' ? 'Buy' : 'Sell'} Price
             </span>
-            <span className="text-gray-500">Spread: {spread}%</span>
+            <span className="text-gray-400">Spread: {spread}%</span>
           </div>
           <div className={`text-xl font-bold ${activeTab === 'buy' ? 'text-emerald-400' : 'text-red-400'}`}>
             ${effectivePrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -134,7 +134,7 @@ export default function BuySellPanel({ symbol, name, currentPrice, coinId }: Buy
           {/* Limit Price Input */}
           {orderType === 'limit' && (
             <div className="mb-3">
-              <label className="text-xs text-gray-500 mb-1 block">Limit Price (USD)</label>
+              <label className="text-xs text-gray-400 mb-1 block">Limit Price (USD)</label>
               <input
                 type="number"
                 step="any"
@@ -148,7 +148,7 @@ export default function BuySellPanel({ symbol, name, currentPrice, coinId }: Buy
 
           {/* Amount Input */}
           <div className="mb-3">
-            <label className="text-xs text-gray-500 mb-1 block">Amount ({symbol.toUpperCase()})</label>
+            <label className="text-xs text-gray-400 mb-1 block">Amount ({symbol.toUpperCase()})</label>
             <input
               type="number"
               step="any"
@@ -177,8 +177,8 @@ export default function BuySellPanel({ symbol, name, currentPrice, coinId }: Buy
           {/* Total */}
           <div className="bg-gray-900 rounded-lg p-3 mb-4">
             <div className="flex justify-between text-xs mb-1">
-              <span className="text-gray-500">Total</span>
-              <span className="text-gray-500">USD</span>
+              <span className="text-gray-400">Total</span>
+              <span className="text-gray-400">USD</span>
             </div>
             <div className="text-lg font-semibold text-white">
               ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

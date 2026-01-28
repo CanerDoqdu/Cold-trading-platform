@@ -74,7 +74,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gray-950 border-t border-gray-800">
+    <footer className="bg-slate-50 dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800">
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-6 py-16">
         <h2 className="sr-only">Footer Navigation</h2>
@@ -88,9 +88,9 @@ const Footer = () => {
                 priority
                 style={{ width: "32px", height: "auto" }}
               />
-              <span className="text-white text-xl font-bold">COLD</span>
+              <span className="text-gray-900 dark:text-white text-xl font-bold">COLD</span>
             </Link>
-            <p className="text-gray-400 text-sm mb-6 max-w-xs">
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 max-w-xs">
               The next generation cryptocurrency trading platform. Track, trade, and manage your crypto portfolio with ease.
             </p>
             
@@ -102,7 +102,7 @@ const Footer = () => {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 hover:bg-emerald-600 rounded-lg flex items-center justify-center text-gray-400 hover:text-white transition-all"
+                  className="w-10 h-10 bg-gray-200 dark:bg-gray-800 hover:bg-emerald-600 rounded-lg flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-white transition-all"
                   aria-label={social.name}
                 >
                   {social.icon}
@@ -113,13 +113,13 @@ const Footer = () => {
 
           {/* Products */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-base">Products</h3>
+            <h3 className="text-gray-900 dark:text-white font-semibold mb-4 text-base">Products</h3>
             <ul className="space-y-3">
               {footerLinks.products.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-emerald-400 text-sm transition-colors"
+                    className="text-gray-600 dark:text-gray-400 hover:text-emerald-400 text-sm transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -130,13 +130,13 @@ const Footer = () => {
 
           {/* Learn */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-base">Learn</h3>
+            <h3 className="text-gray-900 dark:text-white font-semibold mb-4 text-base">Learn</h3>
             <ul className="space-y-3">
               {footerLinks.learn.map((link, index) => (
                 <li key={index}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-emerald-400 text-sm transition-colors"
+                    className="text-gray-600 dark:text-gray-400 hover:text-emerald-400 text-sm transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -147,13 +147,13 @@ const Footer = () => {
 
           {/* Support */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-base">Support</h3>
+            <h3 className="text-gray-900 dark:text-white font-semibold mb-4 text-base">Support</h3>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-emerald-400 text-sm transition-colors"
+                    className="text-gray-600 dark:text-gray-400 hover:text-emerald-400 text-sm transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -164,13 +164,13 @@ const Footer = () => {
 
           {/* Legal */}
           <div>
-            <h3 className="text-white font-semibold mb-4 text-base">Legal</h3>
+            <h3 className="text-gray-900 dark:text-white font-semibold mb-4 text-base">Legal</h3>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-emerald-400 text-sm transition-colors"
+                    className="text-gray-600 dark:text-gray-400 hover:text-emerald-400 text-sm transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -182,18 +182,18 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-gray-400 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               © {currentYear} COLD. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              <span className="flex items-center gap-2 text-sm text-gray-400">
+              <span className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                 <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                 All systems operational
               </span>
-              <Link href="/support" className="text-gray-400 hover:text-white text-sm transition-colors">
+              <Link href="/support" className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white text-sm transition-colors">
                 Status
               </Link>
             </div>
