@@ -261,7 +261,7 @@ export default function NewsPage() {
           
           {/* Categories */}
           <div className="flex flex-wrap gap-2">
-            <button className="px-4 py-2 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm font-medium rounded-full border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors">
+            <button className="px-4 py-2 bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-sm font-medium rounded-full border border-emerald-500/30 hover:bg-emerald-500/30 transition-colors">
               All News
             </button>
             <button className="px-4 py-2 bg-gray-100 dark:bg-gray-800/50 text-gray-600 dark:text-gray-400 text-sm font-medium rounded-full border border-gray-300 dark:border-gray-700/50 hover:border-gray-400 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white transition-colors">

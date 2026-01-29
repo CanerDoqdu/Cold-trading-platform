@@ -1,0 +1,45 @@
+# ==============================================
+# GitHub Language Statistics Configuration
+# ==============================================
+
+# Lighthouse reports - exclude from language detection
+lighthouse-reports/** linguist-generated=true
+lighthouse-reports/**/*.html linguist-generated=true
+lighthouse-reports/**/*.json linguist-generated=true
+*.report.html linguist-generated=true
+
+# LighthouseCI folder
+.lighthouseci/** linguist-generated=true
+.lighthouseci/*.html linguist-generated=true
+.lighthouseci/*.json linguist-generated=true
+
+# Playwright MCP
+.playwright-mcp/** linguist-generated=true
+
+# Vendor files
+node_modules/** linguist-vendored=true
+
+# Lock files
+package-lock.json linguist-generated=true
+yarn.lock linguist-generated=true
+pnpm-lock.yaml linguist-generated=true
+
+# Build output
+.next/** linguist-generated=true
+out/** linguist-generated=true
+
+# Public assets that shouldn't affect language stats
+public/manifest.json linguist-generated=true
+
+# Config files (optional - keeps focus on source code)
+*.config.js linguist-detectable=false
+*.config.mjs linguist-detectable=false
+*.config.ts linguist-detectable=false
+postcss.config.js linguist-detectable=false
+tailwind.config.ts linguist-detectable=false
+next.config.mjs linguist-detectable=false
+lighthouserc.json linguist-detectable=false
+
+# Documentation detection override (ensure TypeScript/TSX is primary)
+*.ts linguist-detectable=true
+*.tsx linguist-detectable=true

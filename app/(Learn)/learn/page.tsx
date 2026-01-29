@@ -498,7 +498,7 @@ const LiquidityIllustration = () => {
           <span className="text-[#42E8E0]">More</span>{' '}
           <span className="text-gray-600 dark:text-gray-300">funding options</span>
         </p>
-        <p className="text-xs text-gray-500 pl-5">means it&apos;s easier to get into the action</p>
+        <p className="text-xs text-gray-600 dark:text-gray-400 pl-5">means it&apos;s easier to get into the action</p>
       </div>
       
       {/* Magnifying Glass */}
@@ -722,7 +722,7 @@ export default function NewsPage() {
                   As a professional exchange we offer financial stability, with full reserves, healthy banking relationships and 
                   the highest standards of legal compliance.
                 </p>
-                <p className="text-gray-500 text-xs md:text-sm leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm leading-relaxed">
                   Kraken&apos;s comprehensive approach to cybersecurity and information security management systems 
                   has earned us the ISO/IEC 27001:2013 and SOC 2, Type 1 certifications. This demonstrates our ability to meet the 
                   highest international security standards, as well as our commitment to keeping your funds and information safe.
@@ -767,7 +767,7 @@ export default function NewsPage() {
                   Both new and experienced traders will find that our fiat currency funding options make for a 
                   seamless experience that will have you trading in a few simple steps.
                 </p>
-                <p className="text-gray-500 text-xs md:text-sm leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm leading-relaxed">
                   We offer fiat currency funding with US Dollars (USD), Euros (EUR), and Canadian Dollars (CAD), 
                   all with minimal fees. US clients (except in NY, WA & TX) may link their bank accounts to fund 
                   their Cold accounts with USD via Bank Transfer (ACH) with no fee. Depositing funds with CAD 

@@ -100,7 +100,7 @@ export async function getBestOfferForNFT(
 
   if (!res.ok) {
     // Try to parse error, but handle empty responses gracefully
-    let errorData = {};
+    let errorData: { detail?: string } = {};
     try {
       const text = await res.text();
       if (text) {

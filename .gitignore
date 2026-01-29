@@ -44,3 +44,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# lighthouse reports (generated files, not source code)
+/lighthouse-reports/
+
+# Lighthouse CI cache
+/.lighthouseci/
+
+# Playwright MCP screenshots
+/.playwright-mcp/
