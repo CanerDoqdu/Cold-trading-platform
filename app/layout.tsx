@@ -16,14 +16,14 @@ export const metadata: Metadata = {
   authors: [{ name: 'COLD Team' }],
   creator: 'COLD',
   publisher: 'COLD',
-  metadataBase: new URL('https://cold.io'),
+  metadataBase: new URL('https://crypto-henna-beta.vercel.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://cold.io',
+    url: 'https://crypto-henna-beta.vercel.app',
     siteName: 'COLD',
     title: 'COLD - Crypto Trading Platform',
     description: 'Trade cryptocurrencies, track markets, and manage your portfolio.',

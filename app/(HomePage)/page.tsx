@@ -16,7 +16,7 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Ana Sayfa",
+  title: "COLD - Crypto Trading Platform",
   description: "Trade cryptocurrencies, track real-time market data, manage your portfolio, and discover trending NFTs on COLD - your all-in-one crypto trading platform.",
 };
 

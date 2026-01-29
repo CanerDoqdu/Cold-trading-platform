@@ -20,7 +20,7 @@ Binance-like market experience built with Next.js 15: live crypto listings, deep
 
 ## 🌟 Live Demo
 
-> 🔗 **[Live Demo]** _(Coming Soon)_
+> 🔗 **[Live Demo](https://crypto-henna-beta.vercel.app/)**
 
 ## ✨ Features
 
