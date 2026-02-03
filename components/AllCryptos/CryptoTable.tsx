@@ -23,6 +23,9 @@ export default function CryptoTable() {
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Crypto[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const { state } = UseAuthContext();
   const { user } = state;
 
@@ -68,6 +71,60 @@ export default function CryptoTable() {
     fetchFavorites();
   }, [fetchFavorites]);
 
+  useEffect(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    if (!normalizedQuery) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    let isCancelled = false;
+    const timer = setTimeout(async () => {
+      try {
+        setIsSearching(true);
+        const searchRes = await fetch(`/api/coingecko/search?query=${encodeURIComponent(normalizedQuery)}`);
+        const searchData = await searchRes.json();
+
+        const coinIds = (searchData?.coins || [])
+          .slice(0, 25)
+          .map((coin: any) => coin.id)
+          .filter(Boolean);
+
+        if (!coinIds.length) {
+          if (!isCancelled) {
+            setSearchResults([]);
+          }
+          return;
+        }
+
+        const marketsData = await cachedFetch(
+          `/api/coingecko/markets?vs_currency=usd&ids=${coinIds.join(',')}&sparkline=false`,
+          {},
+          120000
+        );
+
+        if (!isCancelled) {
+          setSearchResults(Array.isArray(marketsData) ? marketsData : []);
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          setSearchResults([]);
+        }
+        console.error('Search failed:', error);
+      } finally {
+        if (!isCancelled) {
+          setIsSearching(false);
+        }
+      }
+    }, 400);
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
+
   const toggleFavorite = async (coinId: string) => {
     if (user) {
       // Save to database
@@ -99,10 +156,11 @@ export default function CryptoTable() {
     }
   };
 
-  // Filter cryptos based on active tab
-  const displayedCryptos = activeTab === 'favorites' 
-    ? cryptos.filter(crypto => favorites.has(crypto.id))
-    : cryptos;
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const sourceCryptos = normalizedQuery ? searchResults : cryptos;
+  const displayedCryptos = activeTab === 'favorites'
+    ? sourceCryptos.filter(crypto => favorites.has(crypto.id))
+    : sourceCryptos;
 
   if (loading) {
     return (
@@ -116,11 +174,38 @@ export default function CryptoTable() {
 
   return (
     <div>
-      <Tabs 
-        activeTab={activeTab} 
-        onTabChange={setActiveTab} 
-        favoritesCount={favorites.size}
-      />
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+        <Tabs 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab} 
+          favoritesCount={favorites.size}
+        />
+
+        <div className="relative w-full md:w-[320px]">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search coins (e.g., sei, bitcoin)"
+            className="w-full rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+            aria-label="Search coins"
+          />
+          {isSearching && (
+            <span className="absolute right-9 top-1/2 -translate-y-1/2 text-xs text-gray-400">
+              Searching...
+            </span>
+          )}
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
       
       <PurpleSnakeAnimation>
         <div className="rounded-xl border border-gray-200 dark:border-gray-900 bg-white dark:bg-gray-950 overflow-hidden">
@@ -138,8 +223,8 @@ export default function CryptoTable() {
             {displayedCryptos.length === 0 ? (
               <div className="py-12 text-center">
                 <p className="text-gray-500 text-sm">
-                  {activeTab === 'favorites' 
-                    ? 'No favorites yet. Click the star icon to add coins to your favorites.' 
+                  {activeTab === 'favorites' && !normalizedQuery
+                    ? 'No favorites yet. Click the star icon to add coins to your favorites.'
                     : 'No cryptocurrencies found.'}
                 </p>
               </div>
