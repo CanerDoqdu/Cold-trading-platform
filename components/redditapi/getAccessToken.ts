@@ -5,7 +5,6 @@ export async function getRedditToken(): Promise<string> {
   const password = process.env.REDDIT_PASSWORD;
   const userAgent = process.env.USER_AGENT;
 
-  // Gerekli olan env değişkenlerinin yüklendiğinden emin olun
   if (!clientId || !clientSecret || !username || !password || !userAgent) {
     throw new Error('Missing required environment variables');
   }

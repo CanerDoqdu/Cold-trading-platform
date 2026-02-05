@@ -26,7 +26,6 @@ export default function AllCryptolistingsPage() {
             <Tabs />
           </div>
 
-          {/* Crypto Table - CryptoTable kendi içinde PurpleSnakeAnimation ile wrapped */}
           <div>
             <CryptoTable />
           </div>

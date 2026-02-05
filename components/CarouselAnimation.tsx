@@ -88,7 +88,6 @@ const ScrollerAnimation: React.FC<ScrollerAnimationProps> = () => {
     const scrollers = document.querySelectorAll<HTMLDivElement>(".scroller");
 
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      // İlk yüklemede bir kez animasyonu başlatın
       if (
         scrollers.length > 0 &&
         !scrollers[0].hasAttribute("data-initialized")
@@ -101,7 +100,6 @@ const ScrollerAnimation: React.FC<ScrollerAnimationProps> = () => {
               scroller.querySelector<HTMLUListElement>(".scroller__inner");
             const scrollerContent = Array.from(scrollerInner?.children || []);
 
-            // İçeriği klonlayarak sonsuz bir kaydırma efekti yaratıyoruz.
             scrollerContent.forEach((item) => {
               const duplicatedItem = item.cloneNode(true) as HTMLElement;
               duplicatedItem.setAttribute("aria-hidden", "true");
@@ -125,7 +123,6 @@ const ScrollerAnimation: React.FC<ScrollerAnimationProps> = () => {
           setupTouchScroll();
         }, 0);
 
-        // İlk yüklemede bir kez başlat
         scrollers[0].setAttribute("data-initialized", "true");
       }
     }

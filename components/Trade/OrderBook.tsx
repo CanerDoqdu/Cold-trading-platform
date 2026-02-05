@@ -14,7 +14,6 @@ interface OrderBookProps {
 }
 
 export default function OrderBook({ currentPrice, symbol }: OrderBookProps) {
-  // Simüle edilmiş order book verileri
   const { asks, bids } = useMemo(() => {
     const generateOrders = (basePrice: number, isBuy: boolean, count: number): Order[] => {
       const orders: Order[] = [];
@@ -31,8 +30,8 @@ export default function OrderBook({ currentPrice, symbol }: OrderBookProps) {
     };
 
     return {
-      asks: generateOrders(currentPrice, false, 8), // Satış emirleri (kırmızı)
-      bids: generateOrders(currentPrice, true, 8),  // Alış emirleri (yeşil)
+      asks: generateOrders(currentPrice, false, 8),
+      bids: generateOrders(currentPrice, true, 8),
     };
   }, [currentPrice]);
 

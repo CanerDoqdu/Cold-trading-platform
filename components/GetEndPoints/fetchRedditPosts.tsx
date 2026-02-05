@@ -23,7 +23,7 @@ export async function fetchRedditPosts(token: string): Promise<RedditPost[]> {
     return data.data.children.map((post: any) => ({
       title: post.data.title,
       url: post.data.url,
-      score: post.data.score,  // eksik olan özellikler eklendi
+      score: post.data.score,
       created: post.data.created_utc,
       author: post.data.author,
     }));

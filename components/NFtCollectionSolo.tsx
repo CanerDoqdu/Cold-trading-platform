@@ -48,8 +48,8 @@ export async function getCollectionStats(collectionName: string) {
   const res = await fetch(
     `https://api.opensea.io/api/v2/collections/${collectionName}/stats`,
     {
-      ...fetchOptions, // Fetch ayarlarını buradan alıyor
-      next: { revalidate: 60 }, // Önbelleğe alma süresi 60 saniye
+      ...fetchOptions,
+      next: { revalidate: 60 },
     },
   );
 
@@ -135,8 +135,8 @@ export async function getDescription(collectionName: string) {
   const res = await fetch(
     `https://api.opensea.io/api/v2/collections/${collectionName}`,
     {
-      ...fetchOptions, // Fetch ayarlarını buradan alıyor
-      next: { revalidate: 60 }, // Önbelleğe alma süresi 60 saniye
+      ...fetchOptions,
+      next: { revalidate: 60 },
     },
   );
 

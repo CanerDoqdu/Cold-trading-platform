@@ -20,8 +20,7 @@ export default function BuySellPanel({ symbol, name, currentPrice, coinId }: Buy
   
   const { addHolding } = usePortfolio();
 
-  // Spread simülasyonu
-  const buyPrice = currentPrice * 1.001; // +0.1%
+  const buyPrice = currentPrice * 1.001;
   const sellPrice = currentPrice * 0.999; // -0.1%
   const spread = ((buyPrice - sellPrice) / currentPrice * 100).toFixed(3);
 
@@ -53,7 +52,6 @@ export default function BuySellPanel({ symbol, name, currentPrice, coinId }: Buy
           setMessage({ type: 'error', text: result.error || 'Failed to execute order' });
         }
       } else {
-        // Sell simülasyonu (sadece mesaj göster)
         setMessage({ type: 'success', text: `Sell order for ${amount} ${symbol.toUpperCase()} would be executed at $${effectivePrice.toFixed(2)}` });
         setAmount('');
       }

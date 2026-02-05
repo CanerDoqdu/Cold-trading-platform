@@ -20,10 +20,8 @@ type ContextType = {
 // Session timeout duration (30 minutes in milliseconds)
 const SESSION_TIMEOUT = 30 * 60 * 1000;
 
-// Varsayılan state
 const initialState: State = { user: null };
 
-// Reducer fonksiyonu
 const authReducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "LOGIN":
@@ -41,7 +39,6 @@ export const AuthContext = createContext<ContextType>({
   isLoading: true,
 });
 
-// AuthContextProvider bileşeni
 type AuthContextProviderProps = {
   children: ReactNode;
 };

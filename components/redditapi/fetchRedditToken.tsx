@@ -4,7 +4,7 @@ const fetchToken = async () => {
   const clientSecret = process.env.REDDIT_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    throw new Error("Reddit API kimlik bilgileri eksik!");
+    throw new Error("Reddit API credentials are missing!");
   }
 
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
@@ -18,7 +18,7 @@ const fetchToken = async () => {
     body: "grant_type=client_credentials",
   });
 
-  if (!res.ok) throw new Error("Token alma başarısız");
+  if (!res.ok) throw new Error("Failed to fetch token");
   const data = await res.json();
   return data.access_token;
 };

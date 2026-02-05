@@ -18,7 +18,6 @@ interface RecentTradesProps {
 export default function RecentTrades({ currentPrice, symbol }: RecentTradesProps) {
   const [trades, setTrades] = useState<Trade[]>([]);
 
-  // Simüle edilmiş trade'ler oluştur
   useEffect(() => {
     const generateTrades = () => {
       const newTrades: Trade[] = [];

@@ -19,7 +19,7 @@ export async function getCollectionsData(offset: number, limit: number) {
   const res = await fetch(url, options);
 
   if (!res.ok) {
-    throw new Error("Koleksiyon verisi çekilemedi");
+    throw new Error("Failed to fetch collection data");
   }
 
   const data = await res.json();
@@ -41,7 +41,7 @@ export async function getStatsData(collectionId: string) {
   );
 
   if (!res.ok) {
-    throw new Error(`${collectionId} için stats verisi çekilemedi`);
+    throw new Error(`Failed to fetch stats data for ${collectionId}`);
   }
 
   return res.json();

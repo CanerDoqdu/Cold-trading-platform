@@ -1,6 +1,6 @@
 import axios from "axios";
 import cache from "memory-cache";
-import { getAccessToken } from "@/components/redditapi/redditToken"; // Token almak için import ettik
+import { getAccessToken } from "@/components/redditapi/redditToken";
 
 const REDDIT_URL = "https://oauth.reddit.com/r/bitcoin/hot?limit=3";
 
@@ -28,7 +28,7 @@ export async function getRedditData() {
     
     if (!accessToken) {
       console.error("Access token not available.");
-      throw new Error("Erişim token'ı alınamadı");
+      throw new Error("Failed to retrieve access token");
     }
   
     const headers = {

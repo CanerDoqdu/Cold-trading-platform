@@ -21,7 +21,6 @@ const getNews = unstable_cache(
       accept: "application/json",
     };
 
-    // API_KEY tanımlıysa headers içine ekliyoruz
     if (API_KEY) {
       headers["api_key"] = API_KEY;
     }

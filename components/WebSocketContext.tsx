@@ -1,7 +1,6 @@
 "use client";
 import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from "react";
 
-// WebSocketContextType tipini genişletiyoruz
 interface WebSocketContextType {
   prices: { [key: string]: string | null };
   marketCapData: any[];
@@ -9,7 +8,6 @@ interface WebSocketContextType {
   isConnected: boolean;
 }
 
-// WebSocketProviderProps tipini oluşturuyoruz, children özelliğini dahil ediyoruz
 interface WebSocketProviderProps {
   children: React.ReactNode;
 }

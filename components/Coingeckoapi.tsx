@@ -2,9 +2,8 @@ let cachedPrices: { BTC?: number; ETH?: number; SOL?: number; ADA?: number; XRP?
 let lastFetched: number = 0;
 
 export const getCryptoPrices = async () => {
-  const cacheDuration = 5 * 60 * 1000; // Cache süresi 5 dakika (5 * 60 * 1000 ms)
+  const cacheDuration = 5 * 60 * 1000; // Cache duration: 5 minutes
 
-  // Cache'li veriyi kontrol et
   if (cachedPrices.BTC && Date.now() - lastFetched < cacheDuration) {
     console.log('Returning cached data');
     return {
@@ -13,12 +12,9 @@ export const getCryptoPrices = async () => {
       SOL: cachedPrices.SOL,
       ADA: cachedPrices.ADA,
       XRP: cachedPrices.XRP,
-    }; // Cache'den döner
+    };
   }
 
-  // Veriyi API'den çek
-  // Server Components should not call internal API via relative URL.
-  // Use upstream on server; use internal API only on client.
   const isServer = typeof window === 'undefined';
   const url = isServer
     ? `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,cardano,ripple,dogecoin&vs_currencies=usd`
@@ -56,7 +52,6 @@ const prices = {
   DOGE: data.dogecoin.usd,
 };
 
-  // Cache'i güncelle
   cachedPrices = prices;
   lastFetched = Date.now();
 

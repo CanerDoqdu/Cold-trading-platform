@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { usePriceAlerts } from '@/hooks/useNotifications';
 import { UseAuthContext } from '@/hooks/UseAuthContext';
 
-// TradingView widget'ı client-side only olarak yükle
 const TradingViewWidget = dynamic(
   () => import('@/components/Trade/TradingViewWidget'),
   { ssr: false, loading: () => <div className="h-full bg-gray-900 animate-pulse rounded-xl" /> }
