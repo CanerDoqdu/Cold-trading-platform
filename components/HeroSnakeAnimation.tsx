@@ -120,10 +120,16 @@ export default function HeroSnakeAnimation({
   const [snakePosition, setSnakePosition] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [isReady, setIsReady] = useState(false);
+  const [sectionDimensions, setSectionDimensions] = useState<Record<Section, { width: number; height: number }>>({
+    trending: { width: 0, height: 0 },
+    news: { width: 0, height: 0 },
+    nft: { width: 0, height: 0 },
+  });
   
   const phaseStartRef = useRef<number>(Date.now());
   const animationRef = useRef<number>();
   const lastTimeRef = useRef<number>(Date.now());
+  const lastDimensionsRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
 
   // Check for mobile on mount
   useEffect(() => {
@@ -133,18 +139,85 @@ export default function HeroSnakeAnimation({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Wait for refs to be ready before starting animation
+  // Wait for refs to be ready and dimensions to stabilize before starting animation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (trendingRef.current && newsRef.current && nftRef.current) {
+    let checkCount = 0;
+    let lastDims = { width: 0, height: 0 };
+    let stableCount = 0;
+    
+    const checkStability = () => {
+      if (!trendingRef.current || !newsRef.current || !nftRef.current) {
+        checkCount++;
+        if (checkCount < 20) { // Try for up to 2 seconds
+          setTimeout(checkStability, 100);
+        }
+        return;
+      }
+      
+      const rect = trendingRef.current.getBoundingClientRect();
+      const currentDims = { width: rect.width, height: rect.height };
+      
+      // Check if dimensions have stabilized (same for 3 consecutive checks)
+      if (Math.abs(currentDims.width - lastDims.width) < 5 && 
+          Math.abs(currentDims.height - lastDims.height) < 5) {
+        stableCount++;
+        if (stableCount >= 3 && currentDims.height > 50) { // Need 3 stable reads and minimum height
+          // Store initial dimensions
+          lastDimensionsRef.current = currentDims;
+          phaseStartRef.current = Date.now();
+          lastTimeRef.current = Date.now();
+          setIsReady(true);
+          return;
+        }
+      } else {
+        stableCount = 0;
+      }
+      
+      lastDims = currentDims;
+      checkCount++;
+      if (checkCount < 30) { // Try for up to 3 seconds
+        setTimeout(checkStability, 100);
+      } else if (currentDims.height > 50) {
+        // Fallback: start anyway if we have reasonable dimensions
+        lastDimensionsRef.current = currentDims;
         phaseStartRef.current = Date.now();
         lastTimeRef.current = Date.now();
         setIsReady(true);
       }
-    }, 500); // Wait 500ms for layout to settle
+    };
+    
+    // Start checking after initial delay
+    const timer = setTimeout(checkStability, 200);
     
     return () => clearTimeout(timer);
   }, [trendingRef, newsRef, nftRef]);
+
+  // Watch for significant dimension changes and reset animation if needed
+  useEffect(() => {
+    if (!isReady || !trendingRef.current) return;
+    
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        const lastDims = lastDimensionsRef.current;
+        
+        // If dimensions changed significantly (more than 20px), reset the current section animation
+        if (Math.abs(width - lastDims.width) > 20 || Math.abs(height - lastDims.height) > 20) {
+          lastDimensionsRef.current = { width, height };
+          // Reset to fadeIn phase for current section
+          setSnakePosition(0);
+          setOpacity(0);
+          phaseStartRef.current = Date.now();
+          lastTimeRef.current = Date.now();
+          setPhase('fadeIn');
+        }
+      }
+    });
+    
+    resizeObserver.observe(trendingRef.current);
+    
+    return () => resizeObserver.disconnect();
+  }, [isReady, trendingRef, currentSection]);
 
   const getRefForSection = useCallback((section: Section) => {
     if (section === 'trending') return trendingRef;
@@ -266,9 +339,10 @@ function SnakeCanvas({ targetRef, isActive, opacity, position, color }: SnakeCan
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [bounds, setBounds] = useState({ width: 0, height: 0, top: 0, left: 0 });
 
-  // Update bounds - use transform for smooth scroll
+  // Update bounds - use transform for smooth scroll + ResizeObserver for content changes
   useEffect(() => {
     let rafId: number | null = null;
+    let resizeObserver: ResizeObserver | null = null;
     
     const updatePosition = () => {
       if (!targetRef.current) return;
@@ -290,6 +364,14 @@ function SnakeCanvas({ targetRef, isActive, opacity, position, color }: SnakeCan
     // Initial update
     updatePosition();
     
+    // Watch for size changes (content loading)
+    if (targetRef.current) {
+      resizeObserver = new ResizeObserver(() => {
+        updatePosition();
+      });
+      resizeObserver.observe(targetRef.current);
+    }
+    
     window.addEventListener('resize', updatePosition);
     window.addEventListener('scroll', onScroll, { passive: true });
     
@@ -297,6 +379,7 @@ function SnakeCanvas({ targetRef, isActive, opacity, position, color }: SnakeCan
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', onScroll);
       if (rafId !== null) cancelAnimationFrame(rafId);
+      if (resizeObserver) resizeObserver.disconnect();
     };
   }, [targetRef]);
 

@@ -74,4 +74,3 @@ userSchema.statics.googleAuth = async function (googleId, email, name) {
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;
-i
