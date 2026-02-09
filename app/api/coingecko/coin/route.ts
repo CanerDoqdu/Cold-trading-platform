@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { marketCache } from '@/lib/serverCache';
 
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 const CACHE_CONTROL = 's-maxage=300, stale-while-revalidate=600';
-
-const fallbackCache = new Map<string, any>();
-const marketsCache = new Map<string, any>();
 
 function withCacheHeaders<T>(response: NextResponse<T>) {
   response.headers.set('Cache-Control', CACHE_CONTROL);
@@ -45,7 +43,7 @@ function convertMarketsToCoin(marketData: any): any {
 // Try to get markets data for fallback
 async function getMarketsDataForCoin(coinId: string): Promise<any | null> {
   // First check if we have this coin in markets cache
-  const cached = marketsCache.get(coinId);
+  const cached = marketCache.get(`markets_coin_${coinId}`);
   if (cached) {
     return convertMarketsToCoin(cached);
   }
@@ -60,9 +58,9 @@ async function getMarketsDataForCoin(coinId: string): Promise<any | null> {
 
     if (response.ok) {
       const markets = await response.json();
-      // Cache all coins from markets response
+      // Cache all coins from markets response (LRU auto-evicts old)
       markets.forEach((coin: any) => {
-        marketsCache.set(coin.id, coin);
+        marketCache.set(`markets_coin_${coin.id}`, coin, 10 * 60 * 1000);
       });
 
       const found = markets.find((c: any) => c.id === coinId);
@@ -95,7 +93,7 @@ export async function GET(req: NextRequest) {
 
     if (upstream.status === 429) {
       // Rate limited: try caches in order
-      const cached = fallbackCache.get(cacheKey);
+      const cached = marketCache.get(cacheKey);
       if (cached) {
         console.warn(`429 rate limit, serving cached coin data for ${id}`);
         return withCacheHeaders(NextResponse.json(cached));
@@ -136,7 +134,7 @@ export async function GET(req: NextRequest) {
     }
 
     const data = await upstream.json();
-    fallbackCache.set(cacheKey, data);
+    marketCache.set(cacheKey, data, 5 * 60 * 1000);
     return withCacheHeaders(NextResponse.json(data));
   } catch (error) {
     return NextResponse.json(

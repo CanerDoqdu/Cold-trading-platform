@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { marketCache } from '@/lib/serverCache';
 
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 const CACHE_CONTROL = 's-maxage=300, stale-while-revalidate=600';
-
-const fallbackCache = new Map<string, any>();
 
 function withCacheHeaders<T>(response: NextResponse<T>) {
   response.headers.set('Cache-Control', CACHE_CONTROL);
@@ -29,7 +28,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (upstream.status === 429) {
-      const cached = fallbackCache.get(cacheKey);
+      const cached = marketCache.get(cacheKey);
       if (cached) {
         console.warn(`429 rate limit, serving cached chart for ${id}`);
         return withCacheHeaders(NextResponse.json(cached));
@@ -55,7 +54,7 @@ export async function GET(req: NextRequest) {
     }
 
     const data = await upstream.json();
-    fallbackCache.set(cacheKey, data);
+    marketCache.set(cacheKey, data, 5 * 60 * 1000);
     return withCacheHeaders(NextResponse.json(data));
   } catch (error) {
     return NextResponse.json(
