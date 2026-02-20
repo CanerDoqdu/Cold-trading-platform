@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { marketCache } from '@/lib/serverCache';
+import { withErrorHandler, AppError } from '@/lib/errors';
+import { config } from '@/lib/config';
 
-const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 const CACHE_CONTROL = 's-maxage=300, stale-while-revalidate=600';
 
 function withCacheHeaders<T>(response: NextResponse<T>) {
@@ -9,7 +10,7 @@ function withCacheHeaders<T>(response: NextResponse<T>) {
   return response;
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withErrorHandler(async (req: NextRequest) => {
   const search = req.nextUrl.searchParams;
   const vsCurrency = search.get('vs_currency') ?? 'usd';
   const order = search.get('order') ?? 'market_cap_desc';
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
   const sanitizedPerPage = Math.min(Math.max(perPage, 1), 100); // Allow up to 100
   const sanitizedPage = Math.max(page, 1);
 
-  let url = `${COINGECKO_BASE}/coins/markets?vs_currency=${encodeURIComponent(vsCurrency)}&order=${encodeURIComponent(order)}&per_page=${sanitizedPerPage}&page=${sanitizedPage}&sparkline=${encodeURIComponent(sparkline)}`;
+  let url = `${config.coingeckoBaseUrl}/coins/markets?vs_currency=${encodeURIComponent(vsCurrency)}&order=${encodeURIComponent(order)}&per_page=${sanitizedPerPage}&page=${sanitizedPage}&sparkline=${encodeURIComponent(sparkline)}`;
   
   // Add coin IDs filter if provided (for favorites)
   if (ids) {
@@ -36,45 +37,26 @@ export async function GET(req: NextRequest) {
   
   const cacheKey = `markets_${vsCurrency}_${order}_${sanitizedPerPage}_${sanitizedPage}_${priceChangePercentage}_${ids}`;
 
-  try {
-    const upstream = await fetch(url, {
-      headers: { Accept: 'application/json' },
-      next: { revalidate: 300 },
-    });
+  const upstream = await fetch(url, {
+    headers: { Accept: 'application/json' },
+    next: { revalidate: 300 },
+  });
 
-    if (upstream.status === 429) {
-      const cached = marketCache.get(cacheKey);
-      if (cached) {
-        console.warn('429 rate limit, serving cached markets');
-        return withCacheHeaders(NextResponse.json(cached));
-      }
-      return NextResponse.json(
-        { error: 'Rate limited and no cache available' },
-        { status: 429 },
-      );
+  if (upstream.status === 429) {
+    const cached = marketCache.get(cacheKey);
+    if (cached) {
+      return withCacheHeaders(NextResponse.json(cached));
     }
-
-    if (!upstream.ok) {
-      const body = await upstream.text();
-      return withCacheHeaders(
-        NextResponse.json(
-          {
-            error: 'Upstream CoinGecko error',
-            status: upstream.status,
-            body: body?.slice(0, 1000),
-          },
-          { status: upstream.status },
-        ),
-      );
-    }
-
-    const data = await upstream.json();
-    marketCache.set(cacheKey, data, 5 * 60 * 1000); // 5 min TTL
-    return withCacheHeaders(NextResponse.json(data));
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch markets', details: (error as Error).message },
-      { status: 502 },
-    );
+    throw new AppError('COINGECKO_ERROR', 'CoinGecko rate limited and no cache available');
   }
-}
+
+  if (!upstream.ok) {
+    throw new AppError('COINGECKO_ERROR', `CoinGecko returned ${upstream.status}`, {
+      upstreamStatus: upstream.status,
+    });
+  }
+
+  const data = await upstream.json();
+  marketCache.set(cacheKey, data, config.cacheTTLDefault);
+  return withCacheHeaders(NextResponse.json(data));
+});

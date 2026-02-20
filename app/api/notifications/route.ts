@@ -3,113 +3,93 @@ import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
 import dbConnect from '@/lib/dbConnect';
 import Notification from '@/models/notificationModel';
+import { AppError, withErrorHandler } from '@/lib/errors';
+import { config } from '@/lib/config';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret');
+const getJwtSecret = () => new TextEncoder().encode(config.jwtSecret);
 
-async function getUserId() {
+async function getUserId(): Promise<string> {
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
   
-  if (!token) return null;
+  if (!token) throw new AppError('UNAUTHORIZED', 'No session token');
   
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getJwtSecret());
     return payload.userId as string;
   } catch {
-    return null;
+    throw new AppError('TOKEN_INVALID');
   }
 }
 
 // GET - Fetch user's notifications
-export async function GET(request: NextRequest) {
-  try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const userId = await getUserId();
+  await dbConnect();
 
-    await dbConnect();
+  const { searchParams } = new URL(request.url);
+  const limit = parseInt(searchParams.get('limit') || '20');
+  const unreadOnly = searchParams.get('unread') === 'true';
 
-    const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const unreadOnly = searchParams.get('unread') === 'true';
-
-    const query: any = { userId };
-    if (unreadOnly) {
-      query.isRead = false;
-    }
-
-    const notifications = await Notification.find(query)
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .lean();
-
-    const unreadCount = await Notification.countDocuments({ userId, isRead: false });
-
-    return NextResponse.json({ 
-      notifications, 
-      unreadCount 
-    });
-  } catch (error) {
-    console.error('Error fetching notifications:', error);
-    return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
+  const query: any = { userId };
+  if (unreadOnly) {
+    query.isRead = false;
   }
-}
+
+  const notifications = await Notification.find(query)
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean();
+
+  const unreadCount = await Notification.countDocuments({ userId, isRead: false });
+
+  return NextResponse.json({ 
+    success: true,
+    notifications, 
+    unreadCount 
+  });
+});
 
 // PUT - Mark notifications as read
-export async function PUT(request: NextRequest) {
-  try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export const PUT = withErrorHandler(async (request: NextRequest) => {
+  const userId = await getUserId();
+  await dbConnect();
 
-    await dbConnect();
+  const body = await request.json();
+  const { notificationId, markAllRead } = body;
 
-    const body = await request.json();
-    const { notificationId, markAllRead } = body;
-
-    if (markAllRead) {
-      await Notification.updateMany(
-        { userId, isRead: false },
-        { isRead: true }
-      );
-    } else if (notificationId) {
-      await Notification.findOneAndUpdate(
-        { _id: notificationId, userId },
-        { isRead: true }
-      );
-    }
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error updating notifications:', error);
-    return NextResponse.json({ error: 'Failed to update notifications' }, { status: 500 });
+  if (!markAllRead && !notificationId) {
+    throw AppError.validation('Either notificationId or markAllRead is required');
   }
-}
+
+  if (markAllRead) {
+    await Notification.updateMany(
+      { userId, isRead: false },
+      { isRead: true }
+    );
+  } else if (notificationId) {
+    await Notification.findOneAndUpdate(
+      { _id: notificationId, userId },
+      { isRead: true }
+    );
+  }
+
+  return NextResponse.json({ success: true });
+});
 
 // DELETE - Delete a notification
-export async function DELETE(request: NextRequest) {
-  try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+export const DELETE = withErrorHandler(async (request: NextRequest) => {
+  const userId = await getUserId();
+  await dbConnect();
 
-    await dbConnect();
+  const { searchParams } = new URL(request.url);
+  const notificationId = searchParams.get('id');
 
-    const { searchParams } = new URL(request.url);
-    const notificationId = searchParams.get('id');
-
-    if (!notificationId) {
-      return NextResponse.json({ error: 'Notification ID required' }, { status: 400 });
-    }
-
-    await Notification.findOneAndDelete({ _id: notificationId, userId });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error deleting notification:', error);
-    return NextResponse.json({ error: 'Failed to delete notification' }, { status: 500 });
+  if (!notificationId) {
+    throw AppError.validation('Notification ID is required', { field: 'id' });
   }
-}
+
+  await Notification.findOneAndDelete({ _id: notificationId, userId });
+
+  return NextResponse.json({ success: true });
+});

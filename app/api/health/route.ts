@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { marketCache, nftCache, contentCache, generalCache } from '@/lib/serverCache';
 import { rateLimiter } from '@/lib/rateLimit';
+import { config } from '@/lib/config';
 
 /**
  * Health & monitoring endpoint
@@ -14,6 +15,7 @@ export async function GET() {
 
   return NextResponse.json({
     status: 'healthy',
+    environment: config.nodeEnv,
     timestamp: new Date().toISOString(),
     uptime: Math.floor(process.uptime()) + 's',
 
@@ -36,6 +38,13 @@ export async function GET() {
     // Rate limiter status
     rateLimiter: {
       activeTrackedIPs: rateLimiter.size,
+    },
+
+    // Config info (non-sensitive)
+    config: {
+      logLevel: config.logLevel,
+      cacheMaxEntries: config.cacheMaxEntries,
+      cacheTTL: config.cacheTTLDefault,
     },
   });
 }

@@ -48,6 +48,8 @@ next-env.d.ts
 # lighthouse reports (generated files, not source code)
 /lighthouse-reports/
 
+# development roadmap (local tracking, not part of repo)
+TODO.md
 # Lighthouse CI cache
 /.lighthouseci/
 
