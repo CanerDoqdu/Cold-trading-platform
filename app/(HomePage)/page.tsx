@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import HeroSection from "./(ui)/hero";
 import CarouselSection from "./(ui)/CarouselSection";
 import EngagementSection from "./(ui)/EngagementSection";

@@ -1,5 +1,3 @@
-const API_KEY = process.env.OPENSEA_API_KEY;
-
 interface OpenSeaItem {
   token_id: string;
   image_url: string;
@@ -11,24 +9,28 @@ interface OpenSeaItem {
   };
 }
 
-if (!API_KEY) {
-  throw new Error("API Key is missing!");
+function getApiKey(): string {
+  const key = process.env.OPENSEA_API_KEY;
+  if (!key) throw new Error("OPENSEA_API_KEY is missing!");
+  return key;
 }
 
-const fetchOptions: RequestInit = {
-  method: "GET",
-  headers: {
-    "X-API-KEY": API_KEY,
-    Accept: "application/json",
-  },
-};
+function getFetchOptions(): RequestInit {
+  return {
+    method: "GET",
+    headers: {
+      "X-API-KEY": getApiKey(),
+      Accept: "application/json",
+    },
+  };
+}
 
 // Function to fetch NFTs for a collection
 export async function getNFTs(slug: string) {
   const res = await fetch(
     `https://api.opensea.io/api/v2/collection/${slug}/nfts`,
     {
-      ...fetchOptions,
+      ...getFetchOptions(),
       next: { revalidate: 60 },
     },
   );
@@ -48,7 +50,7 @@ export async function getCollectionStats(collectionName: string) {
   const res = await fetch(
     `https://api.opensea.io/api/v2/collections/${collectionName}/stats`,
     {
-      ...fetchOptions,
+      ...getFetchOptions(),
       next: { revalidate: 60 },
     },
   );
@@ -68,7 +70,7 @@ export async function getCollectionItems(collectionName: string) {
   const res = await fetch(
     `https://api.opensea.io/api/v2/collections/${collectionName}`,
     {
-      ...fetchOptions, // Fetch ayarlarını buradan alıyor
+      ...getFetchOptions(), // Fetch ayarlarını buradan alıyor
       next: { revalidate: 60 }, // Önbelleğe alma süresi 60 saniye
     },
   );
@@ -93,7 +95,7 @@ export async function getBestOfferForNFT(
   const res = await fetch(
     `https://api.opensea.io/api/v2/offers/collection/${collectionSlug}/nfts/${identifier}/best`,
     {
-      ...fetchOptions,
+      ...getFetchOptions(),
       next: { revalidate: 60 },
     },
   );
@@ -135,7 +137,7 @@ export async function getDescription(collectionName: string) {
   const res = await fetch(
     `https://api.opensea.io/api/v2/collections/${collectionName}`,
     {
-      ...fetchOptions,
+      ...getFetchOptions(),
       next: { revalidate: 60 },
     },
   );
