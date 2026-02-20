@@ -70,7 +70,7 @@ export const GET = withErrorHandler(async (req: NextRequest) => {
   });
 
   // Normalize + cache the response
-  const normalized = Array.isArray(data) ? data.map(normalizeMarketData) : data;
+  const normalized = Array.isArray(data) ? normalizeMarketData(data) : data;
   marketCache.set(cacheKey, normalized, config.cacheTTLDefault);
   return withCacheHeaders(NextResponse.json(normalized));
 });
