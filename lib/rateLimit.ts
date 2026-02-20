@@ -168,7 +168,6 @@ class RateLimiter {
 // ============================
 // SINGLETON — shared across all API routes
 // ============================
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const globalForRateLimit = globalThis as any;
 export const rateLimiter: RateLimiter =
   globalForRateLimit.__rateLimiter ?? (globalForRateLimit.__rateLimiter = new RateLimiter());

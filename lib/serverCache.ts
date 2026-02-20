@@ -260,7 +260,6 @@ class ServerCache<T = any> {
 // ============================
 // PRE-CONFIGURED CACHE INSTANCES
 // ============================
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const g = globalThis as any;
 
 /** Cache for market/price data — high volume, short TTL */

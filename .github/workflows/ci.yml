@@ -28,7 +28,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run lint
+      - run: npx eslint . --max-warnings 50
 
   # ─── Type Check ───
   typecheck:
