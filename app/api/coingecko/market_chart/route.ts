@@ -1,65 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { marketCache } from '@/lib/serverCache';
+import { withErrorHandler, AppError } from '@/lib/errors';
+import { config } from '@/lib/config';
+import { deduplicator } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 
-const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 const CACHE_CONTROL = 's-maxage=300, stale-while-revalidate=600';
+const log = logger.child({ route: 'coingecko/market_chart' });
 
 function withCacheHeaders<T>(response: NextResponse<T>) {
   response.headers.set('Cache-Control', CACHE_CONTROL);
   return response;
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withErrorHandler(async (req: NextRequest) => {
   const id = req.nextUrl.searchParams.get('id');
   const daysParam = req.nextUrl.searchParams.get('days');
 
   if (!id) {
-    return NextResponse.json({ error: 'id is required' }, { status: 400 });
+    throw AppError.validation('id query parameter is required');
   }
 
   const days = Math.max(1, Number(daysParam ?? 7));
-  const url = `${COINGECKO_BASE}/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=${days}`;
   const cacheKey = `market_chart_${id}_${days}`;
 
-  try {
+  // Check cache first
+  const cached = marketCache.get(cacheKey);
+  if (cached) {
+    log.debug('Cache HIT', { cacheKey });
+    return withCacheHeaders(NextResponse.json(cached));
+  }
+
+  // Deduplicated chart fetch
+  const data = await deduplicator.dedupe(cacheKey, async () => {
+    const url = `${config.coingeckoBaseUrl}/coins/${encodeURIComponent(id)}/market_chart?vs_currency=usd&days=${days}`;
+    log.debug('Cache MISS, fetching chart', { coinId: id, days });
+
     const upstream = await fetch(url, {
       headers: { Accept: 'application/json' },
       next: { revalidate: 300 },
     });
 
     if (upstream.status === 429) {
-      const cached = marketCache.get(cacheKey);
-      if (cached) {
-        console.warn(`429 rate limit, serving cached chart for ${id}`);
-        return withCacheHeaders(NextResponse.json(cached));
+      const stale = marketCache.get(cacheKey);
+      if (stale) {
+        log.warn('Rate limited, serving stale chart', { coinId: id });
+        return stale;
       }
-      return NextResponse.json(
-        { error: 'Rate limited and no cache available' },
-        { status: 429 },
-      );
+      throw new AppError('COINGECKO_ERROR', 'CoinGecko rate limited and no chart cache');
     }
 
     if (!upstream.ok) {
-      const body = await upstream.text();
-      return withCacheHeaders(
-        NextResponse.json(
-          {
-            error: 'Upstream CoinGecko error',
-            status: upstream.status,
-            body: body?.slice(0, 1000),
-          },
-          { status: upstream.status },
-        ),
-      );
+      throw new AppError('COINGECKO_ERROR', `CoinGecko chart returned ${upstream.status}`, {
+        upstreamStatus: upstream.status,
+      });
     }
 
-    const data = await upstream.json();
-    marketCache.set(cacheKey, data, 5 * 60 * 1000);
-    return withCacheHeaders(NextResponse.json(data));
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch market chart', details: (error as Error).message },
-      { status: 502 },
-    );
-  }
-}
+    return upstream.json();
+  });
+
+  marketCache.set(cacheKey, data, 5 * 60 * 1000);
+  return withCacheHeaders(NextResponse.json(data));
+});

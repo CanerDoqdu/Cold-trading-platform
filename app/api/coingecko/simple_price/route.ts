@@ -1,46 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { marketCache } from '@/lib/serverCache';
+import { withErrorHandler, AppError } from '@/lib/errors';
+import { config } from '@/lib/config';
+import { deduplicator } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 
-const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 const CACHE_CONTROL = 's-maxage=30, stale-while-revalidate=300';
+const log = logger.child({ route: 'coingecko/simple_price' });
 
 function withCacheHeaders<T>(response: NextResponse<T>) {
   response.headers.set('Cache-Control', CACHE_CONTROL);
   return response;
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withErrorHandler(async (req: NextRequest) => {
   const search = req.nextUrl.searchParams;
   const ids = search.get('ids') ?? 'bitcoin,ethereum,solana,cardano,ripple,dogecoin';
   const vs = search.get('vs_currencies') ?? 'usd';
 
-  const url = `${COINGECKO_BASE}/simple/price?ids=${encodeURIComponent(ids)}&vs_currencies=${encodeURIComponent(vs)}`;
+  const cacheKey = `simple_price_${ids}_${vs}`;
 
-  try {
+  // Short-TTL cache for price data (30s)
+  const cached = marketCache.get(cacheKey);
+  if (cached) {
+    return withCacheHeaders(NextResponse.json(cached));
+  }
+
+  const data = await deduplicator.dedupe(cacheKey, async () => {
+    const url = `${config.coingeckoBaseUrl}/simple/price?ids=${encodeURIComponent(ids)}&vs_currencies=${encodeURIComponent(vs)}`;
+    log.debug('Fetching simple price', { ids, vs });
+
     const upstream = await fetch(url, {
       headers: { Accept: 'application/json' },
       next: { revalidate: 30 },
     });
 
     if (!upstream.ok) {
-      const body = await upstream.text();
-      return withCacheHeaders(
-        NextResponse.json(
-          {
-            error: 'Upstream CoinGecko error',
-            status: upstream.status,
-            body: body?.slice(0, 1000),
-          },
-          { status: upstream.status },
-        ),
-      );
+      throw new AppError('COINGECKO_ERROR', `CoinGecko simple/price returned ${upstream.status}`, {
+        upstreamStatus: upstream.status,
+      });
     }
 
-    const data = await upstream.json();
-    return withCacheHeaders(NextResponse.json(data));
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch simple price', details: (error as Error).message },
-      { status: 502 },
-    );
-  }
-}
+    return upstream.json();
+  });
+
+  marketCache.set(cacheKey, data, 30_000); // 30s TTL for prices
+  return withCacheHeaders(NextResponse.json(data));
+});

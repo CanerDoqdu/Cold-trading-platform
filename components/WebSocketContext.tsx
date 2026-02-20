@@ -1,5 +1,11 @@
 "use client";
 import React, { createContext, useState, useEffect, useContext, useCallback, useRef } from "react";
+import { WebSocketBatcher } from "@/lib/cache/wsBatcher";
+
+interface PriceUpdate {
+  coin: string;
+  price: string;
+}
 
 interface WebSocketContextType {
   prices: { [key: string]: string | null };
@@ -34,9 +40,40 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
   const [isConnected, setIsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
   const mountedRef = useRef(true);
+  const batcherRef = useRef<WebSocketBatcher<PriceUpdate> | null>(null);
+
+  // Initialize batcher once — batches rapid price updates to avoid re-render floods
+  // Without batching: BTC updates 10x/sec → 10 React re-renders/sec → UI jank
+  // With batching:    BTC updates 10x/sec → 4 batched updates/sec → smooth 60fps
+  useEffect(() => {
+    const batcher = new WebSocketBatcher<PriceUpdate>({
+      flushIntervalMs: 250,    // flush 4x per second (human eye can't see faster)
+      maxBufferSize: 50,       // safety valve
+      mergeKey: (msg) => msg.coin,  // only keep latest price per coin
+      onFlush: (batch) => {
+        if (!mountedRef.current) return;
+        setPrices((prev) => {
+          const next = { ...prev };
+          for (const { coin, price } of batch) {
+            next[coin] = price;
+          }
+          return next;
+        });
+      },
+      onBackpressure: (dropped) => {
+        console.warn(`[WS Batcher] Backpressure: dropped ${dropped} messages`);
+      },
+    });
+    batcher.start();
+    batcherRef.current = batcher;
+
+    return () => {
+      batcher.stop();
+      batcherRef.current = null;
+    };
+  }, []);
 
   const connect = useCallback(() => {
-    // Prevent connection if already connected or connecting
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       return;
     }
@@ -70,7 +107,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
       if (data.TYPE === "5" && data.PRICE) {
         const price = data.PRICE.toFixed(2);
         const coin = data.FROMSYMBOL;
-        setPrices((prevPrices) => ({ ...prevPrices, [coin]: price }));
+        // Push to batcher instead of direct setState — prevents re-render flood
+        batcherRef.current?.push({ coin, price });
       }
     };
 

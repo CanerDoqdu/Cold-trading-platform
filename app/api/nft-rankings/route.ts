@@ -1,34 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCombinedData } from '@/components/NftCollectiondata';
 import { nftCache } from '@/lib/serverCache';
+import { withErrorHandler } from '@/lib/errors';
+import { deduplicator } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const offset = parseInt(searchParams.get('offset') || '0', 10);
-    const limit = parseInt(searchParams.get('limit') || '20', 10);
-    const cacheKey = `nft_rankings_${offset}_${limit}`;
+const log = logger.child({ route: 'nft-rankings' });
 
-    // Try server cache first (prevents hammering OpenSea API)
-    const cached = nftCache.get(cacheKey);
-    if (cached) {
-      console.log(`[NFT API] Cache HIT: ${cacheKey}`);
-      return NextResponse.json(cached);
-    }
+export const GET = withErrorHandler(async (request: NextRequest) => {
+  const { searchParams } = new URL(request.url);
+  const offset = parseInt(searchParams.get('offset') || '0', 10);
+  const limit = parseInt(searchParams.get('limit') || '20', 10);
+  const cacheKey = `nft_rankings_${offset}_${limit}`;
 
-    console.log(`[API] Fetching NFT rankings: offset=${offset}, limit=${limit}`);
-    const data = await getCombinedData(offset, limit);
-    console.log(`[API] Returned ${data.length} items. First collection: ${data[0]?.collection?.name}`);
-    
-    // Cache for 15 minutes (NFT data doesn't change that fast)
-    nftCache.set(cacheKey, data, 15 * 60 * 1000);
-    
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error fetching NFT rankings:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fetch data' },
-      { status: 500 }
-    );
+  // Check cache first
+  const cached = nftCache.get(cacheKey);
+  if (cached) {
+    log.debug('Cache HIT', { cacheKey });
+    return NextResponse.json(cached);
   }
-}
+
+  // Deduplicated NFT fetch — prevents parallel OpenSea hammering
+  const data = await deduplicator.dedupe(cacheKey, async () => {
+    log.info('Fetching NFT rankings', { offset, limit });
+    return getCombinedData(offset, limit);
+  });
+
+  // Cache for 15 minutes
+  nftCache.set(cacheKey, data, 15 * 60 * 1000);
+  return NextResponse.json(data);
+});

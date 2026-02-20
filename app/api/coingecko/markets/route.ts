@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { marketCache } from '@/lib/serverCache';
 import { withErrorHandler, AppError } from '@/lib/errors';
 import { config } from '@/lib/config';
+import { deduplicator, normalizeMarketData } from '@/lib/cache';
+import { logger } from '@/lib/logger';
 
 const CACHE_CONTROL = 's-maxage=300, stale-while-revalidate=600';
+const log = logger.child({ route: 'coingecko/markets' });
 
 function withCacheHeaders<T>(response: NextResponse<T>) {
   response.headers.set('Cache-Control', CACHE_CONTROL);
@@ -18,45 +21,56 @@ export const GET = withErrorHandler(async (req: NextRequest) => {
   const page = Number(search.get('page') ?? 1);
   const sparkline = search.get('sparkline') ?? 'false';
   const priceChangePercentage = search.get('price_change_percentage') ?? '';
-  const ids = search.get('ids') ?? ''; // Support filtering by coin IDs
+  const ids = search.get('ids') ?? '';
 
-  const sanitizedPerPage = Math.min(Math.max(perPage, 1), 100); // Allow up to 100
+  const sanitizedPerPage = Math.min(Math.max(perPage, 1), 100);
   const sanitizedPage = Math.max(page, 1);
 
   let url = `${config.coingeckoBaseUrl}/coins/markets?vs_currency=${encodeURIComponent(vsCurrency)}&order=${encodeURIComponent(order)}&per_page=${sanitizedPerPage}&page=${sanitizedPage}&sparkline=${encodeURIComponent(sparkline)}`;
-  
-  // Add coin IDs filter if provided (for favorites)
-  if (ids) {
-    url += `&ids=${encodeURIComponent(ids)}`;
-  }
-  
-  // Add price change percentage if requested (e.g., "7d,30d")
-  if (priceChangePercentage) {
-    url += `&price_change_percentage=${encodeURIComponent(priceChangePercentage)}`;
-  }
-  
+
+  if (ids) url += `&ids=${encodeURIComponent(ids)}`;
+  if (priceChangePercentage) url += `&price_change_percentage=${encodeURIComponent(priceChangePercentage)}`;
+
   const cacheKey = `markets_${vsCurrency}_${order}_${sanitizedPerPage}_${sanitizedPage}_${priceChangePercentage}_${ids}`;
 
-  const upstream = await fetch(url, {
-    headers: { Accept: 'application/json' },
-    next: { revalidate: 300 },
+  // Check cache first (before hitting CoinGecko)
+  const cached = marketCache.get(cacheKey);
+  if (cached) {
+    log.debug('Cache HIT', { cacheKey });
+    return withCacheHeaders(NextResponse.json(cached));
+  }
+
+  // Deduplicated fetch — if 10 users request same page simultaneously,
+  // only ONE request goes to CoinGecko. Others await the same Promise.
+  const data = await deduplicator.dedupe(cacheKey, async () => {
+    log.debug('Cache MISS, fetching upstream', { cacheKey });
+
+    const upstream = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      next: { revalidate: 300 },
+    });
+
+    if (upstream.status === 429) {
+      // Try stale cache on rate limit
+      const stale = marketCache.get(cacheKey);
+      if (stale) {
+        log.warn('Rate limited, serving stale cache', { cacheKey });
+        return stale;
+      }
+      throw new AppError('COINGECKO_ERROR', 'CoinGecko rate limited and no cache available');
+    }
+
+    if (!upstream.ok) {
+      throw new AppError('COINGECKO_ERROR', `CoinGecko returned ${upstream.status}`, {
+        upstreamStatus: upstream.status,
+      });
+    }
+
+    return upstream.json();
   });
 
-  if (upstream.status === 429) {
-    const cached = marketCache.get(cacheKey);
-    if (cached) {
-      return withCacheHeaders(NextResponse.json(cached));
-    }
-    throw new AppError('COINGECKO_ERROR', 'CoinGecko rate limited and no cache available');
-  }
-
-  if (!upstream.ok) {
-    throw new AppError('COINGECKO_ERROR', `CoinGecko returned ${upstream.status}`, {
-      upstreamStatus: upstream.status,
-    });
-  }
-
-  const data = await upstream.json();
-  marketCache.set(cacheKey, data, config.cacheTTLDefault);
-  return withCacheHeaders(NextResponse.json(data));
+  // Normalize + cache the response
+  const normalized = Array.isArray(data) ? data.map(normalizeMarketData) : data;
+  marketCache.set(cacheKey, normalized, config.cacheTTLDefault);
+  return withCacheHeaders(NextResponse.json(normalized));
 });
