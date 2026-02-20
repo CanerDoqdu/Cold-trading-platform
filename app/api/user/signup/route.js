@@ -1,49 +1,44 @@
 import { NextResponse } from "next/server";
-import connectToDatabase from "../../../../lib/dbConnect";
-import User from "../../../../models/userModel";
-import jwt from "jsonwebtoken";
+import connectToDatabase from "@/lib/dbConnect";
+import User from "@/models/userModel";
+import { withErrorHandler, AppError } from "@/lib/errors";
+import { validate, schemas, sanitizeUser, createTokenPair, setTokenCookies, attachCsrfToken } from "@/lib/security";
+import { logger } from "@/lib/logger";
 
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
-};
+export const POST = withErrorHandler(async (request) => {
+  const body = await request.json();
 
-export async function POST(request) {
-  try {
-    const { name, email, password } = await request.json();
+  // Server-side validation (name 2-50 chars, valid email, password 6-128 chars)
+  const { name, email, password } = validate(body, schemas.signup);
 
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: "All fields must be filled." },
-        { status: 400 }
-      );
-    }
+  await connectToDatabase();
 
-    await connectToDatabase();
-    const user = await User.signup(name, email, password);
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Signup failed, user not created." },
-        { status: 400 }
-      );
-    }
-
-    const token = createToken(user._id);
-
-    const response = NextResponse.json(
-      { _id: user._id, name: user.name, email: user.email },
-      { status: 200 }
-    );
-
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      maxAge: 3 * 24 * 60 * 60,
-      path: "/",
-    });
-
-    return response;
-  } catch (error) {
-    console.error("Signup error:", error.message);
-    return NextResponse.json({ error: error.message }, { status: 400 });
+  // Check for existing user before attempting signup
+  const existing = await User.findOne({ email });
+  if (existing) {
+    throw new AppError("EMAIL_IN_USE");
   }
-}
+
+  const user = await User.signup(name, email, password);
+
+  if (!user) {
+    throw AppError.internal("Signup failed, user not created");
+  }
+
+  // Generate access + refresh token pair
+  const tokens = await createTokenPair(user._id.toString(), user.role);
+
+  const response = NextResponse.json(
+    sanitizeUser(user),
+    { status: 201 }
+  );
+
+  // Set httpOnly cookies
+  setTokenCookies(response, tokens);
+
+  // Attach CSRF token
+  attachCsrfToken(response);
+
+  logger.info("User signed up", { userId: user._id.toString() });
+  return response;
+});

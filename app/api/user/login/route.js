@@ -1,53 +1,37 @@
 import { NextResponse } from "next/server";
-import connectToDatabase from "../../../../lib/dbConnect";
-import User from "../../../../models/userModel";
-import jwt from "jsonwebtoken";
+import connectToDatabase from "@/lib/dbConnect";
+import User from "@/models/userModel";
+import { withErrorHandler, AppError } from "@/lib/errors";
+import { validate, schemas, sanitizeUser, createTokenPair, setTokenCookies, attachCsrfToken } from "@/lib/security";
+import { logger } from "@/lib/logger";
 
-const createToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
-};
+export const POST = withErrorHandler(async (request) => {
+  const body = await request.json();
 
-export async function POST(request) {
-  try {
-    const { email, password } = await request.json();
+  // Server-side validation (blocks NoSQL injection, enforces format)
+  const { email, password } = validate(body, schemas.login);
 
-    if (!email || !password) {
-      console.error("Email or password missing.");
-      return NextResponse.json(
-        { error: "All fields must be filled." },
-        { status: 400 }
-      );
-    }
+  await connectToDatabase();
+  const user = await User.login(email, password);
 
-    await connectToDatabase();
-    const user = await User.login(email, password);
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "Invalid credentials." },
-        { status: 400 }
-      );
-    }
-
-    const token = createToken(user._id);
-    if (!token) throw new Error("Token creation failed.");
-
-    const response = NextResponse.json(
-      { _id: user._id, name: user.name, email: user.email },
-      { status: 200 }
-    );
-
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 3 * 24 * 60 * 60,
-      path: "/",
-    });
-
-    console.log("Login successful, cookie set.");
-    return response;
-  } catch (error) {
-    console.error("Login error:", error.message);
-    return NextResponse.json({ error: error.message }, { status: 400 });
+  if (!user) {
+    throw new AppError("INVALID_CREDENTIALS");
   }
-}
+
+  // Generate access + refresh token pair
+  const tokens = await createTokenPair(user._id.toString(), user.role);
+
+  const response = NextResponse.json(
+    sanitizeUser(user), // strips password, __v, etc.
+    { status: 200 }
+  );
+
+  // Set httpOnly cookies (access + refresh)
+  setTokenCookies(response, tokens);
+
+  // Attach CSRF token for subsequent requests
+  attachCsrfToken(response);
+
+  logger.info("User logged in", { userId: user._id.toString() });
+  return response;
+});
