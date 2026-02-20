@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { marketCache } from '@/lib/serverCache';
+import { withErrorHandler, AppError } from '@/lib/errors';
+import { logger } from '@/lib/logger';
 
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3';
 const CACHE_CONTROL = 's-maxage=300, stale-while-revalidate=600';
+
+const log = logger.child({ module: 'coingecko/markets' });
 
 function withCacheHeaders<T>(response: NextResponse<T>) {
   response.headers.set('Cache-Control', CACHE_CONTROL);
   return response;
 }
 
-export async function GET(req: NextRequest) {
+export const GET = withErrorHandler(async (req: NextRequest) => {
   const search = req.nextUrl.searchParams;
   const vsCurrency = search.get('vs_currency') ?? 'usd';
   const order = search.get('order') ?? 'market_cap_desc';
@@ -36,45 +40,27 @@ export async function GET(req: NextRequest) {
   
   const cacheKey = `markets_${vsCurrency}_${order}_${sanitizedPerPage}_${sanitizedPage}_${priceChangePercentage}_${ids}`;
 
-  try {
-    const upstream = await fetch(url, {
-      headers: { Accept: 'application/json' },
-      next: { revalidate: 300 },
-    });
+  const upstream = await fetch(url, {
+    headers: { Accept: 'application/json' },
+    next: { revalidate: 300 },
+  });
 
-    if (upstream.status === 429) {
-      const cached = marketCache.get(cacheKey);
-      if (cached) {
-        console.warn('429 rate limit, serving cached markets');
-        return withCacheHeaders(NextResponse.json(cached));
-      }
-      return NextResponse.json(
-        { error: 'Rate limited and no cache available' },
-        { status: 429 },
-      );
+  if (upstream.status === 429) {
+    const cached = marketCache.get(cacheKey);
+    if (cached) {
+      log.warn('CoinGecko 429 rate limit — serving from cache');
+      return withCacheHeaders(NextResponse.json(cached));
     }
-
-    if (!upstream.ok) {
-      const body = await upstream.text();
-      return withCacheHeaders(
-        NextResponse.json(
-          {
-            error: 'Upstream CoinGecko error',
-            status: upstream.status,
-            body: body?.slice(0, 1000),
-          },
-          { status: upstream.status },
-        ),
-      );
-    }
-
-    const data = await upstream.json();
-    marketCache.set(cacheKey, data, 5 * 60 * 1000); // 5 min TTL
-    return withCacheHeaders(NextResponse.json(data));
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch markets', details: (error as Error).message },
-      { status: 502 },
-    );
+    throw AppError.external('RATE_LIMITED', 'CoinGecko rate limit exceeded');
   }
-}
+
+  if (!upstream.ok) {
+    throw AppError.external('COINGECKO_ERROR', `CoinGecko returned ${upstream.status}`, {
+      upstreamStatus: upstream.status,
+    });
+  }
+
+  const data = await upstream.json();
+  marketCache.set(cacheKey, data, 5 * 60 * 1000); // 5 min TTL
+  return withCacheHeaders(NextResponse.json(data));
+});

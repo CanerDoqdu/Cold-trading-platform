@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import ProfileNav from '../ProfileNav';
 import { usePriceAlerts, useNotifications } from '@/hooks/useNotifications';
 import { UseAuthContext } from '@/hooks/UseAuthContext';
@@ -95,7 +96,7 @@ export default function AlertsPage() {
                 <p className="text-gray-500 text-sm mb-4">
                   Set price alerts on any coin page to get notified when prices reach your target
                 </p>
-                <a
+                <Link
                   href="/markets"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors"
                 >
@@ -103,7 +104,7 @@ export default function AlertsPage() {
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
-                </a>
+                </Link>
               </div>
             ) : (
               <div className="space-y-3">
