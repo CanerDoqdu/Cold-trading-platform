@@ -53,3 +53,10 @@ next-env.d.ts
 
 # Playwright MCP screenshots
 /.playwright-mcp/
+
+# Project TODO files (personal tracking, not for git)
+TODO.md
+TODO-Max.md
+COLD-TODO-Max.md
+*-TODO-*.md
+TODO-*.md
