@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import React, { Suspense } from "react";
 import { getCombinedData } from "@/components/NftCollectiondata"; 
 import NFTRankingsTable from "@/components/NftComponents/NFTRankingsTable";

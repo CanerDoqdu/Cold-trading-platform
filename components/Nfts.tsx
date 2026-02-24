@@ -1,5 +1,3 @@
-const API_KEY = process.env.OPENSEA_API_KEY;
-
 export interface NftInfo {
   name: string;
   image_url: string;
@@ -7,16 +5,19 @@ export interface NftInfo {
   token_id?: string;
 }
 
-if (!API_KEY) {
-  throw new Error("API Key is missing!");
+function getApiKey(): string {
+  const key = process.env.OPENSEA_API_KEY;
+  if (!key) throw new Error("OPENSEA_API_KEY is missing!");
+  return key;
 }
 
 export const fetchNftInfo = async (): Promise<NftInfo[]> => {
+  const apiKey = getApiKey();
   const options: RequestInit = {
     method: "GET",
     headers: {
       accept: "application/json",
-      "X-API-KEY": API_KEY,
+      "X-API-KEY": apiKey,
     },
     next: { revalidate: 300 }, // refresh every 5 minutes
   };
