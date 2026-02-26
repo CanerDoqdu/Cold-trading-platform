@@ -26,7 +26,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
+      ],
+      "@public/*": [
+        "./public/*"
       ]
     },
     "target": "ES2017"
@@ -34,10 +37,10 @@
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "pages/api/coin.js",
-    "app/api/typedStrings/route.ts"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "*.ts",
+    "*.mjs"
   ],
   "exclude": [
     "node_modules"
