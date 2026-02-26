@@ -26,6 +26,12 @@ jobs:
               pull_number: context.payload.pull_request.number,
             });
 
+            const invalidTitlePrefix = /^(\s*\[?pr\s*[-_]?\s*\d+\]?\s*[:\-]?\s*)/i;
+            if (invalidTitlePrefix.test(pr.title || '')) {
+              core.setFailed('PR title must not use numbered prefixes like PR-2 / PR 2. Use an outcome-based title.');
+              return;
+            }
+
             // Don't overwrite a manually written description
             if (pr.body && !pr.body.startsWith('<!-- auto-generated -->')) {
               core.info('PR has a manual description — skipping auto-generation.');
@@ -56,17 +62,25 @@ jobs:
 
             const body = [
               '<!-- auto-generated -->',
-              '## What changed',
+              '## Context',
+              '- Problem statement: _fill in_',
+              '- Why now: _fill in_',
+              '',
+              '## Changes',
               commits || '- (no commits yet)',
               '',
-              '## Files affected',
+              '## Files Affected',
               files,
               '',
-              '## Checklist',
+              '## Validation',
               '- [ ] `npm run typecheck` passes',
               '- [ ] `npm run lint` passes',
               '- [ ] `npm run build` passes',
               '- [ ] No secrets committed',
+              '',
+              '## Risk',
+              '- Risk level: Low / Medium / High',
+              '- Rollback plan: _fill in_',
             ].join('\n');
 
             await github.rest.pulls.update({

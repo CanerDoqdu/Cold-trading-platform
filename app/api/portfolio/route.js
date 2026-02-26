@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import dbConnect from "@/lib/dbConnect";
 import Portfolio from "@/models/portfolioModel";
+import { addHoldingSchema, updateHoldingSchema, deleteHoldingSchema } from "@/lib/schemas";
 
 // Helper: Get user ID from token
 async function getUserId() {
@@ -51,11 +52,12 @@ export async function POST(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { coinId, symbol, name, amount, buyPrice, buyDate, notes } = await request.json();
-
-    if (!coinId || !symbol || !name || !amount || !buyPrice) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    const body = await request.json();
+    const parsed = addHoldingSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
+    const { coinId, symbol, name, amount, buyPrice, buyDate, notes } = parsed.data;
 
     await dbConnect();
 
@@ -67,10 +69,10 @@ export async function POST(request) {
 
     portfolio.holdings.push({
       coinId,
-      symbol: symbol.toUpperCase(),
+      symbol,
       name,
-      amount: parseFloat(amount),
-      buyPrice: parseFloat(buyPrice),
+      amount,
+      buyPrice,
       buyDate: buyDate ? new Date(buyDate) : new Date(),
       notes: notes || "",
     });
@@ -92,11 +94,12 @@ export async function DELETE(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { holdingId } = await request.json();
-
-    if (!holdingId) {
-      return NextResponse.json({ error: "Holding ID required" }, { status: 400 });
+    const body = await request.json();
+    const parsed = deleteHoldingSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
+    const { holdingId } = parsed.data;
 
     await dbConnect();
 
@@ -127,11 +130,13 @@ export async function PUT(request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { holdingId, amount, buyPrice, buyDate, notes } = await request.json();
-
-    if (!holdingId) {
-      return NextResponse.json({ error: "Holding ID required" }, { status: 400 });
+    const body = await request.json();
+    const parsed = updateHoldingSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
+    const { holdingId, amount, buyPrice, notes } = parsed.data;
+    const { buyDate } = body;
 
     await dbConnect();
 
@@ -147,8 +152,8 @@ export async function PUT(request) {
       return NextResponse.json({ error: "Holding not found" }, { status: 404 });
     }
 
-    if (amount !== undefined) holding.amount = parseFloat(amount);
-    if (buyPrice !== undefined) holding.buyPrice = parseFloat(buyPrice);
+    if (amount !== undefined) holding.amount = amount;
+    if (buyPrice !== undefined) holding.buyPrice = buyPrice;
     if (buyDate !== undefined) holding.buyDate = new Date(buyDate);
     if (notes !== undefined) holding.notes = notes;
 
