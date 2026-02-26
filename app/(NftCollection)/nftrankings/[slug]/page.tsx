@@ -48,7 +48,7 @@ export default async function CollectionPage({
     // Use a default value for search query to avoid undefined error
     const searchQuery = resolvedSearchParams.search || ""; // Fallback to empty string if undefined
     const offers = await Promise.all(
-      nfts.map(async (nft) => ({
+      nfts.map(async (nft: { identifier: string; name: string; traits?: { value: string }[] }) => ({
         identifier: nft.identifier,
         offer: await getBestOfferForNFT(slug, nft.identifier),
       }))
@@ -58,12 +58,12 @@ export default async function CollectionPage({
     );
     // NFT'leri filtrele
     const filteredNfts = searchQuery
-      ? nfts.filter((nft) => {
+      ? nfts.filter((nft: { identifier: string; name: string; traits?: { value: string }[] }) => {
           const lowerQuery = searchQuery.toLowerCase();
           return (
             nft.name.toLowerCase().includes(lowerQuery) ||
             (nft.traits &&
-              nft.traits.some((trait) =>
+              nft.traits.some((trait: { value: string }) =>
                 trait.value.toLowerCase().includes(lowerQuery),
               ))
           );

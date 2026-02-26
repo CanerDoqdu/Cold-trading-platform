@@ -20,7 +20,7 @@ async function getCachedAccessToken(): Promise<string> {
       }
     }
   
-    return accessToken || '';  // Return the token or an empty string if not found
+    return (accessToken as string) || '';  // Return the token or an empty string if not found
   }
   
 export async function getRedditData() {
@@ -45,10 +45,11 @@ export async function getRedditData() {
   
       return posts;
     } catch (error) {
-      if (error.response) {
-        console.error("Error fetching Reddit data:", error.response.data);
+      const errAny = error as Record<string, unknown>;
+      if (errAny['response']) {
+        console.error("Error fetching Reddit data:", (errAny['response'] as Record<string, unknown>)['data']);
       } else {
-        console.error("Error fetching Reddit data:", error.message);
+        console.error("Error fetching Reddit data:", error instanceof Error ? error.message : String(error));
       }
       throw new Error("Reddit API request failed");
     }

@@ -13,6 +13,12 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@heroicons/react', 'swr'],
     optimizeCss: true,
+    serverActions: {
+      allowedOrigins: [
+        'localhost:3000',
+        process.env.NEXT_PUBLIC_BASE_URL?.replace(/^https?:\/\//, '') ?? '',
+      ].filter(Boolean),
+    },
   },
   // Enable compression
   compress: true,
@@ -60,10 +66,13 @@ const nextConfig = {
     qualities: [60, 75, 80, 85, 90, 95, 100],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days cache
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
+      { protocol: 'https', hostname: 'assets.coingecko.com' },
+      { protocol: 'https', hostname: 'coin-images.coingecko.com' },
+      { protocol: 'https', hostname: 'openseauserdata.com' },
+      { protocol: 'https', hostname: 'i.seadn.io' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: '*.googleusercontent.com' },
+      // Add more trusted domains here; never use hostname: '**' in production
     ],
   },
 };

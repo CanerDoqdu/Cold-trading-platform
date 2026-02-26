@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-const ScrollPositionHandler = ({ slug }) => {
+const ScrollPositionHandler = ({ slug }: { slug: string }) => {
   useEffect(() => {
     const savedScrollPosition = sessionStorage.getItem(`scrollPosition-${slug}`);
 

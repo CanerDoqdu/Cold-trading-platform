@@ -10,10 +10,14 @@ const gridOptions = [
   { id: 9, src: "/icons/nine.svg", alt: "Nine Grid" },
 ];
 
-export default function GridIcons({ onGridChange }) {
-  const [selectedGrid, setSelectedGrid] = useState(gridOptions[0].id); // Default to the first grid option
+interface GridIconsProps {
+  onGridChange: (id: number) => void;
+}
 
-  const handleGridChange = (id) => {
+export default function GridIcons({ onGridChange }: GridIconsProps) {
+  const [selectedGrid, setSelectedGrid] = useState<number>(4);
+
+  const handleGridChange = (id: number) => {
     setSelectedGrid(id);
     onGridChange(id); // Notify parent of grid change
   };
