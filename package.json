@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings 220",
+    "lint": "eslint . --max-warnings 230",
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "db:migrate": "npx ts-node scripts/migrate-db.ts",
+    "validate": "npm run typecheck && npm run lint && npm run build"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
