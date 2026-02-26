@@ -59,6 +59,18 @@ export const RATE_LIMIT_PROFILES = {
     maxRequests: 30,           // 30 req/min
     message: 'Too many write operations. Please slow down.',
   },
+  // Per-user authenticated API — generous per user
+  authenticated: {
+    windowMs: 60 * 1000,      // 1 minute
+    maxRequests: 200,          // 200 req/min per userId
+    message: 'Too many requests for your account. Please slow down.',
+  },
+  // Trading routes — strict per user
+  trading: {
+    windowMs: 60 * 1000,      // 1 minute
+    maxRequests: 30,           // 30 orders/min per userId
+    message: 'Too many order requests. Please slow down.',
+  },
 } as const;
 
 class RateLimiter {

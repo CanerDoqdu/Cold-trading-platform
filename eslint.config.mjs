@@ -5,6 +5,7 @@ const eslintConfig = [
   {
     rules: {
       'no-console': 'warn',
+      'no-prototype-builtins': 'error',
       'react/no-unescaped-entities': 'warn',
     },
   },

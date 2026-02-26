@@ -4,6 +4,12 @@ import { jwtVerify } from 'jose';
 import dbConnect from '@/lib/dbConnect';
 import Notification from '@/models/notificationModel';
 import { withErrorHandler, AppError } from '@/lib/errors';
+import { z } from 'zod';
+
+const markReadSchema = z.object({
+  notificationId: z.string().min(1).optional(),
+  markAllRead: z.boolean().optional(),
+}).refine(d => d.notificationId || d.markAllRead, { message: 'Provide notificationId or markAllRead' });
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret');
 
@@ -54,7 +60,11 @@ export const PUT = withErrorHandler(async (request: NextRequest) => {
   await dbConnect();
 
   const body = await request.json();
-  const { notificationId, markAllRead } = body;
+  const parsed = markReadSchema.safeParse(body);
+  if (!parsed.success) {
+    throw AppError.validation(parsed.error.issues[0].message);
+  }
+  const { notificationId, markAllRead } = parsed.data;
 
   if (markAllRead) {
     await Notification.updateMany(

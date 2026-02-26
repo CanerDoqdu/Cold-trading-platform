@@ -4,28 +4,25 @@ import User from '@/models/userModel';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
+import { changePasswordSchema } from '@/lib/schemas';
+import { audit, extractRequestMeta } from '@/lib/auditLog';
 
 export async function POST(request) {
   try {
     await dbConnect();
 
-    const { currentPassword, newPassword } = await request.json();
+    const raw = await request.json();
 
-    // Validate input
-    if (!currentPassword || !newPassword) {
+    // Zod validation
+    const parsed = changePasswordSchema.safeParse(raw);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Current password and new password are required' },
+        { error: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
-    // Validate new password strength
-    if (newPassword.length < 6) {
-      return NextResponse.json(
-        { error: 'New password must be at least 6 characters' },
-        { status: 400 }
-      );
-    }
+    const { currentPassword, newPassword } = parsed.data;
 
     // Get user from token
     const cookieStore = await cookies();
@@ -38,7 +35,6 @@ export async function POST(request) {
       );
     }
 
-    // Verify token and get user ID
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.SECRET);
@@ -49,7 +45,6 @@ export async function POST(request) {
       );
     }
 
-    // Find user
     const user = await User.findById(decoded._id);
     if (!user) {
       return NextResponse.json(
@@ -58,7 +53,6 @@ export async function POST(request) {
       );
     }
 
-    // Verify current password
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
       return NextResponse.json(
@@ -67,20 +61,18 @@ export async function POST(request) {
       );
     }
 
-    // Hash new password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-    // Update password
-    user.password = hashedPassword;
+    user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
+
+    const { ip, userAgent } = extractRequestMeta(request);
+    await audit({ userId: decoded._id, action: 'PASSWORD_CHANGE', ip, userAgent });
 
     return NextResponse.json(
       { message: 'Password changed successfully' },
       { status: 200 }
     );
   } catch (error) {
-    console.error('Change password error:', error);
     return NextResponse.json(
       { error: 'Server error' },
       { status: 500 }

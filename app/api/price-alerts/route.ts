@@ -4,6 +4,7 @@ import { jwtVerify } from 'jose';
 import dbConnect from '@/lib/dbConnect';
 import PriceAlert from '@/models/priceAlertModel';
 import Notification from '@/models/notificationModel';
+import { createAlertSchema } from '@/lib/schemas';
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET || 'fallback-secret');
 
@@ -53,11 +54,15 @@ export async function POST(request: NextRequest) {
     await dbConnect();
 
     const body = await request.json();
-    const { coinId, coinSymbol, coinName, coinImage, targetPrice, condition, currentPrice } = body;
-
-    if (!coinId || !coinSymbol || !targetPrice || !condition) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const parsed = createAlertSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.flatten().fieldErrors },
+        { status: 400 },
+      );
     }
+
+    const { coinId, coinSymbol, coinName, coinImage, targetPrice, condition, currentPrice } = parsed.data;
 
     // Check if user already has an active alert for this coin with same condition
     const existingAlert = await PriceAlert.findOne({

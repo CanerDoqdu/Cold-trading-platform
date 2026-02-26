@@ -9,6 +9,27 @@ const userSchema = new mongoose.Schema({
   authProvider: { type: String, enum: ['local', 'google'], default: 'local' },
   favorites: { type: [String], default: [] },
   lastActivity: { type: Date, default: Date.now },
+
+  // ── Email verification ───────────────
+  emailVerified: { type: Boolean, default: false },
+  emailVerifyToken: { type: String, default: null },
+  emailVerifyExpires: { type: Date, default: null },
+
+  // ── 2FA (TOTP) ──────────────────────
+  totpSecret: { type: String, default: null },        // encrypted
+  totpEnabled: { type: Boolean, default: false },
+  backupCodes: { type: [String], default: [] },        // hashed one-time codes
+
+  // ── Password reset ──────────────────
+  resetPasswordToken: { type: String, default: null }, // hashed token
+  resetPasswordExpires: { type: Date, default: null },
+
+  // ── Terms of Service ────────────────
+  tosAcceptedAt: { type: Date, default: null },
+  tosVersion: { type: String, default: null },
+
+  // ── Account lockout (reference field) 
+  failedLoginAttempts: { type: Number, default: 0 },
 });
 
 // Hash password before saving

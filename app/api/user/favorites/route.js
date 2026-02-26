@@ -3,6 +3,12 @@ import dbConnect from '@/lib/dbConnect';
 import User from '@/models/userModel';
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
+import { z } from 'zod';
+
+const favoriteSchema = z.object({
+  coinId: z.string().min(1).max(100),
+  action: z.enum(['add', 'remove', 'toggle']).optional(),
+});
 
 // Get user's favorites
 export async function GET(request) {
@@ -43,11 +49,12 @@ export async function POST(request) {
   try {
     await dbConnect();
 
-    const { coinId, action } = await request.json();
-
-    if (!coinId) {
-      return NextResponse.json({ error: 'Coin ID is required' }, { status: 400 });
+    const body = await request.json();
+    const parsed = favoriteSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
+    const { coinId, action } = parsed.data;
 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;

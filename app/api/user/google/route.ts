@@ -4,6 +4,8 @@ import dbConnect from '@/lib/dbConnect';
 import User from '@/models/userModel';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
+import { googleAuthSchema } from '@/lib/schemas';
+import { audit, extractRequestMeta } from '@/lib/auditLog';
 
 // Type for User model with custom static methods
 interface UserModel {
@@ -20,11 +22,12 @@ const createToken = (userId: string) => {
 
 export async function POST(request: NextRequest) {
   try {
-    const { credential } = await request.json();
-    
-    if (!credential) {
-      return NextResponse.json({ error: 'No credential provided' }, { status: 400 });
+    const raw = await request.json();
+    const parsed = googleAuthSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten().fieldErrors }, { status: 400 });
     }
+    const { credential } = parsed.data;
 
     // Verify Google token
     const ticket = await client.verifyIdToken({
