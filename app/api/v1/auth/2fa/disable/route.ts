@@ -52,6 +52,9 @@ export async function POST(request: NextRequest) {
   }
 
   // Verify TOTP code
+  if (!user.totpSecret) {
+    return NextResponse.json({ error: '2FA secret not found' }, { status: 400 });
+  }
   const result = verifySync({ token: body.data.code, secret: user.totpSecret });
   if (!result.valid) {
     return NextResponse.json({ error: 'Invalid TOTP code' }, { status: 400 });

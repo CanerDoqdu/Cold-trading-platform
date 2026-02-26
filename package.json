@@ -10,7 +10,8 @@
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "db:migrate": "npx ts-node scripts/migrate-db.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",

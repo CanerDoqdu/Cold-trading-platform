@@ -1,11 +1,13 @@
 /**
  * Vercel Cron: portfolio-snapshot — runs daily at midnight UTC.
  * Takes a snapshot of each user's portfolio value for P&L history charts.
+ * Snapshots are stored in a dedicated PortfolioSnapshot collection with TTL.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/dbConnect';
-import Portfolio from '@/models/portfolioModel';
+import Portfolio from '@/models/Portfolio.model';
+import PortfolioSnapshot from '@/models/PortfolioSnapshot.model';
 import { batchFetchPrices } from '@/lib/db/dataLoaders';
 import { logger } from '@/lib/logger';
 
@@ -26,9 +28,11 @@ export async function GET(req: NextRequest) {
     await dbConnect();
 
     const portfolios = await Portfolio.find({}).lean() as unknown as Array<{
-      userId: string; holdings: Array<{ coinId: string; amount: number }>;
+      userId: string; holdings: Array<{ coinId: string; symbol: string; amount: number }>;
     }>;
     let snapshotCount = 0;
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
 
     for (const p of portfolios) {
       if (!p.holdings || p.holdings.length === 0) continue;
@@ -36,23 +40,29 @@ export async function GET(req: NextRequest) {
       const coinIds = p.holdings.map((h) => h.coinId);
       const prices = await batchFetchPrices(coinIds);
 
-      let totalValue = 0;
-      for (const h of p.holdings) {
+      let totalValueCents = 0;
+      const breakdown = p.holdings.map((h) => {
         const price = prices[h.coinId] || 0;
-        totalValue += h.amount * price;
-      }
+        const valueMicro = Math.round(h.amount * price * 1_000_000);
+        totalValueCents += Math.round(h.amount * price * 100);
+        return {
+          coinId: h.coinId,
+          symbol: h.symbol,
+          amount: h.amount,
+          valueMicroUsd: String(valueMicro),
+        };
+      });
 
-      // Save snapshot in the portfolio document (or a separate collection)
-      await Portfolio.findOneAndUpdate(
-        { userId: p.userId },
+      // Upsert snapshot (one per user per day — idempotent)
+      await PortfolioSnapshot.findOneAndUpdate(
+        { userId: p.userId, date: today },
         {
-          $push: {
-            snapshots: {
-              $each: [{ date: new Date(), totalValue }],
-              $slice: -365, // keep last year of daily snapshots
-            },
+          $set: {
+            totalValueMinor: String(totalValueCents),
+            holdingBreakdown: breakdown,
           },
         },
+        { upsert: true },
       );
       snapshotCount++;
     }
