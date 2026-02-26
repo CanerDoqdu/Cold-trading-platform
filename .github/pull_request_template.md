@@ -1,7 +1,3 @@
-## Title Convention (Required)
-- Do not use numbered prefixes like `PR-2`, `PR 2`, `[PR2]`.
-- Use outcome-based titles, e.g. `Harden auth flows with 2FA and CSRF`.
-
 ## Context
 - Problem statement:
 - Why now:

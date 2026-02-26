@@ -4,6 +4,7 @@ import { AuthContextProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import ClientProviders from "@/components/ClientProviders";
+import { SWRProvider } from "@/components/SWRProvider";
 import type { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
@@ -112,11 +113,13 @@ export default function RootLayout({
         {/* Global Providers - automatically available everywhere */}
         <AuthContextProvider>
           <ThemeProvider>
-            <ErrorBoundary>
-              <main id="main-content">
-                {children}
-              </main>
-            </ErrorBoundary>
+            <SWRProvider>
+              <ErrorBoundary>
+                <main id="main-content">
+                  {children}
+                </main>
+              </ErrorBoundary>
+            </SWRProvider>
             
             {/* Global Components - lazy loaded on client */}
             <ClientProviders />
