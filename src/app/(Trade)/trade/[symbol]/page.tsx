@@ -9,9 +9,13 @@ import CoinSearchList from '@/components/Trade/CoinSearchList';
 import OrderBook from '@/components/Trade/OrderBook';
 import RecentTrades from '@/components/Trade/RecentTrades';
 import MarketInfo from '@/components/Trade/MarketInfo';
+import WSReconnectBanner from '@/components/WSReconnectBanner';
 import Link from 'next/link';
 import { usePriceAlerts } from '@/hooks/useNotifications';
 import { UseAuthContext } from '@/hooks/UseAuthContext';
+import { useBinanceTicker } from '@/hooks/useBinanceTicker';
+import { useBinanceTrades } from '@/hooks/useBinanceTrades';
+import { useBinanceOrderBook } from '@/hooks/useBinanceOrderBook';
 
 const TradingViewWidget = dynamic(
   () => import('@/components/Trade/TradingViewWidget'),
@@ -41,6 +45,16 @@ export default function TradeSymbolPage() {
   const [coin, setCoin] = useState<CoinData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+
+  // ── Real-time Binance WebSocket streams ───────────────
+  // Binance uses pairs like "BTCUSDT", our symbol is "btc"
+  const binanceSymbol = `${symbol.toUpperCase()}USDT`;
+  const { ticker: liveTicker, status: wsStatus, freshness } = useBinanceTicker(binanceSymbol);
+  const { trades: liveTrades } = useBinanceTrades(binanceSymbol);
+  const { orderBook: liveOrderBook } = useBinanceOrderBook(binanceSymbol);
+
+  // Use live price from WS when available, fallback to REST
+  const livePrice = liveTicker?.price ?? coin?.current_price ?? 0;
   
   // Alert modal state
   const [showAlertModal, setShowAlertModal] = useState(false);
@@ -147,6 +161,9 @@ export default function TradeSymbolPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white">
+      {/* WebSocket status banner */}
+      <WSReconnectBanner status={wsStatus} />
+
       {/* Top Navigation */}
       <div className="border-b border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-950">
         <div className="max-w-[1920px] mx-auto px-3 md:px-4 py-3 flex items-center justify-between">
@@ -180,6 +197,9 @@ export default function TradeSymbolPage() {
           low24h={coin.low_24h}
           volume24h={coin.total_volume}
           marketCap={coin.market_cap}
+          liveTicker={liveTicker}
+          freshness={freshness}
+          connectionStatus={wsStatus}
         />
 
         {/* Alert Button */}
@@ -204,7 +224,7 @@ export default function TradeSymbolPage() {
             <BuySellPanel
               symbol={coin.symbol}
               name={coin.name}
-              currentPrice={coin.current_price}
+              currentPrice={livePrice}
               coinId={coin.id}
             />
           </div>
@@ -218,8 +238,16 @@ export default function TradeSymbolPage() {
 
             {/* Order Book & Recent Trades */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-              <OrderBook currentPrice={coin.current_price} symbol={coin.symbol.toUpperCase()} />
-              <RecentTrades currentPrice={coin.current_price} symbol={coin.symbol.toUpperCase()} />
+              <OrderBook
+                currentPrice={livePrice}
+                symbol={coin.symbol.toUpperCase()}
+                liveOrderBook={liveOrderBook}
+              />
+              <RecentTrades
+                currentPrice={livePrice}
+                symbol={coin.symbol.toUpperCase()}
+                liveTrades={liveTrades}
+              />
             </div>
           </div>
 
@@ -234,7 +262,7 @@ export default function TradeSymbolPage() {
           <div className="flex flex-wrap gap-6 text-xs text-gray-400">
             <span>💡 This is a demo trading interface. No real transactions are processed.</span>
             <span>📊 Chart powered by TradingView</span>
-            <span>🔄 Prices cached for 5 minutes</span>
+            <span>🔄 {wsStatus === 'connected' ? 'Real-time data via Binance WebSocket' : 'Prices cached for 5 minutes'}</span>
           </div>
         </div>
       </div>
