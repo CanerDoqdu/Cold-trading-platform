@@ -26,7 +26,8 @@ export const fetchCryptoChange = async (): Promise<CryptoChanges> => {
 
     return changes;
   } catch (error) {
-    console.error("Error fetching 24-hour changes:", error.message);
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error("Error fetching 24-hour changes:", msg);
     return { BTC: null, ETH: null, SOL: null, ADA: null, XRP: null, DOGE: null };
   }
 };

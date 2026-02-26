@@ -37,3 +37,11 @@ declare module '*.ico' {
   const content: import('next/image').StaticImageData;
   export default content;
 }
+
+declare module 'memory-cache' {
+  function get(key: string): unknown;
+  function put(key: string, value: unknown, time?: number): void;
+  function del(key: string): void;
+  function clear(): void;
+  export { get, put, del, clear };
+}

@@ -16,7 +16,7 @@ const RedditSection = async () => {
 
   return (
     <div>
-      {posts.slice(0, 3).map((post, index) => (
+      {posts.slice(0, 3).map((post: { title: string; url: string }, index: number) => (
         <a
           key={index}
           href={post.url}

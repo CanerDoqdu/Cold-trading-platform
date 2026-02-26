@@ -26,7 +26,8 @@ export async function getAccessToken(): Promise<string | null> {
     return response.data.access_token;
   } catch (error) {
     // Handle error if token retrieval fails
-    console.error("Error obtaining access token:", error.response ? error.response.data : error.message);
+    const errAny = error as Record<string, unknown>;
+    console.error("Error obtaining access token:", errAny['response'] ? (errAny['response'] as Record<string, unknown>)['data'] : (error instanceof Error ? error.message : String(error)));
     return null;
   }
 }

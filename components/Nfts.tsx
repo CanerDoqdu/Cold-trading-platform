@@ -35,11 +35,11 @@ export const fetchNftInfo = async (): Promise<NftInfo[]> => {
 
     if (data && Array.isArray(data.orders)) {
       const allNfts = data.orders.flatMap(
-        (order) =>
-          order.maker_asset_bundle?.assets?.map((asset) => ({
+        (order: Record<string, unknown>) =>
+          (order.maker_asset_bundle as { assets?: Record<string, unknown>[] })?.assets?.map((asset) => ({
             name: asset.name || "Unnamed",
             image_url: asset.image_url || "",
-            contract_address: asset.asset_contract?.address || "",
+            contract_address: (asset.asset_contract as { address?: string } | undefined)?.address || "",
             token_id: asset.token_id || "",
           })) || [],
       );
