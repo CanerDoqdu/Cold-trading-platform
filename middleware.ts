@@ -113,6 +113,7 @@ function generateNonce(): string {
 export default async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const nonce = generateNonce();
+  const requestId = crypto.randomUUID();
   const sessionCookie = req.cookies.get('token')?.value;
   const isAuthPage = authPages.includes(path);
   const isProtectedRoute = protectedRoutes.some((r) => path.startsWith(r));
@@ -181,6 +182,7 @@ export default async function middleware(req: NextRequest) {
     }
 
     const response = NextResponse.next();
+    response.headers.set('X-Request-ID', requestId);
     response.headers.set('X-RateLimit-Limit', String(result.limit));
     response.headers.set('X-RateLimit-Remaining', String(result.remaining));
     response.headers.set('X-RateLimit-Reset', String(result.resetTime));
@@ -191,9 +193,10 @@ export default async function middleware(req: NextRequest) {
   // ── Page routes ─────────────────────
   const response = NextResponse.next();
 
-  // Security headers on every page response
+  // Security + tracing headers on every page response
   setSecurityHeaders(response, nonce);
   response.headers.set('x-nonce', nonce);
+  response.headers.set('X-Request-ID', requestId);
 
   // Issue CSRF cookie if missing
   if (!req.cookies.get('csrf-token')) {
