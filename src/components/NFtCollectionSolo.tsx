@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 interface OpenSeaItem {
   token_id: string;
   image_url: string;

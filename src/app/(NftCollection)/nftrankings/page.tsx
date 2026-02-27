@@ -1,9 +1,11 @@
-export const dynamic = 'force-dynamic';
+// ISR: revalidate every 15 minutes (NFT data doesn't change rapidly)
+export const revalidate = 900;
 
 import React, { Suspense } from "react";
-import { getCombinedData } from "@/components/NftCollectiondata"; 
+import { getNFTRankings } from "@/lib/opensea";
 import NFTRankingsTable from "@/components/NftComponents/NFTRankingsTable";
 import NFTRankingsTableSkeleton from "@/components/NftComponents/NFTRankingsTableSkeleton";
+import NFTErrorBoundary from "@/components/NftComponents/NFTErrorBoundary";
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -12,9 +14,17 @@ export const metadata: Metadata = {
 };
 
 async function RankingsContent() {
-  // SSR: Fetch the first 20 items for fast initial load
-  const initialData = await getCombinedData(0, 20);
-  return <NFTRankingsTable initialData={initialData} />;
+  try {
+    const { data, fromCache } = await getNFTRankings(0, 20);
+    return <NFTRankingsTable initialData={data} fromCache={fromCache} />;
+  } catch {
+    return (
+      <NFTErrorBoundary
+        title="Failed to load NFT rankings"
+        message="We couldn't fetch the latest rankings. Please try again."
+      />
+    );
+  }
 }
 
 export default async function CollectionsStatsPage() {
