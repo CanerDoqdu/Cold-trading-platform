@@ -90,6 +90,9 @@ export default withSentryConfig(withBundleAnalyzer(nextConfig), {
   // Disable source map upload in CI without tokens
   authToken: process.env.SENTRY_AUTH_TOKEN || '',
 
+  // Never upload source maps unless we have a real auth token
+  disableSourceMapsUpload: !process.env.SENTRY_AUTH_TOKEN,
+
   // Hide source maps from users
   hideSourceMaps: true,
 
