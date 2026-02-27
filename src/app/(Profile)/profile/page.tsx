@@ -6,7 +6,7 @@ import Link from 'next/link';
 import ProfileNav from './ProfileNav';
 import { UseAuthContext } from '@/hooks/UseAuthContext';
 import { useRecentViews } from '@/hooks/useRecentViews';
-import { usePortfolio } from '@/hooks/usePortfolio';
+import PortfolioSummaryWidget from '@/components/Portfolio/PortfolioSummaryWidget';
 import { StarIcon } from '@heroicons/react/24/solid';
 
 interface FavoriteCoin {
@@ -22,14 +22,9 @@ export default function ProfilePage() {
   const { state } = UseAuthContext();
   const { user } = state;
   const { recentViews, recentViewsCount } = useRecentViews();
-  const { holdings, loading: portfolioLoading } = usePortfolio();
   const [favorites, setFavorites] = useState<FavoriteCoin[]>([]);
   const [loading, setLoading] = useState(true);
   const displayName = user?.name || 'Guest User';
-
-  // Calculate total portfolio value
-  const totalPortfolioValue = holdings.reduce((sum, h) => sum + (h.totalValue || 0), 0);
-  const totalProfitLoss = holdings.reduce((sum, h) => sum + (h.profitLoss || 0), 0);
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -133,21 +128,9 @@ export default function ProfilePage() {
           <Link href="/profile/portfolio" className="bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border border-gray-800 rounded-2xl p-6 hover:border-emerald-500/50 transition-all cursor-pointer block">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Portfolio Value</p>
-                {portfolioLoading ? (
-                  <div className="h-8 w-24 bg-gray-700 animate-pulse rounded mt-1"></div>
-                ) : (
-                  <>
-                    <p className="text-white text-2xl font-bold mt-1">
-                      ${totalPortfolioValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </p>
-                    {holdings.length > 0 && (
-                      <p className={`text-sm mt-0.5 ${totalProfitLoss >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                        {totalProfitLoss >= 0 ? '+' : ''}${totalProfitLoss.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </p>
-                    )}
-                  </>
-                )}
+                <p className="text-gray-400 text-sm">Portfolio</p>
+                <p className="text-white text-2xl font-bold mt-1">📊</p>
+                <p className="text-emerald-400 text-sm mt-0.5">View Dashboard →</p>
               </div>
               <span className="text-3xl">💰</span>
             </div>
@@ -162,6 +145,9 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Portfolio Summary */}
+        {user && <PortfolioSummaryWidget />}
 
         {/* Favorites Section */}
         <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-6">
