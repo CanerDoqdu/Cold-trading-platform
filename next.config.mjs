@@ -68,8 +68,9 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'assets.coingecko.com' },
       { protocol: 'https', hostname: 'coin-images.coingecko.com' },
+      { protocol: 'https', hostname: 'www.cryptocompare.com' },
       { protocol: 'https', hostname: 'openseauserdata.com' },
-      { protocol: 'https', hostname: 'i.seadn.io' },
+      { protocol: 'https', hostname: '*.seadn.io' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: '*.googleusercontent.com' },
       // Add more trusted domains here; never use hostname: '**' in production

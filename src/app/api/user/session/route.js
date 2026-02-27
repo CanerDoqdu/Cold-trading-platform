@@ -22,7 +22,7 @@ export async function GET(request) {
 
     // Get user data from database
     await connectToDatabase();
-    const user = await User.findById(session._id).select("_id name email");
+    const user = await User.findById(session._id).select("_id name email emailVerified paperBalanceMinor");
 
     if (!user) {
       // User not found - clear token
@@ -36,6 +36,8 @@ export async function GET(request) {
         _id: user._id.toString(),
         name: user.name,
         email: user.email,
+        emailVerified: user.emailVerified ?? false,
+        paperBalanceMinor: user.paperBalanceMinor ?? '1000000',
       }
     }, { status: 200 });
   } catch (error) {
