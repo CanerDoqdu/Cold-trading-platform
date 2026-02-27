@@ -28,9 +28,10 @@ interface CombinedNFTData {
 
 interface NFTRankingsTableProps {
   initialData: (NFTCollection | CombinedNFTData)[];
+  fromCache?: boolean;
 }
 
-export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps) {
+export default function NFTRankingsTable({ initialData, fromCache }: NFTRankingsTableProps) {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [data, setData] = useState(initialData);
   const [isLoading, setIsLoading] = useState(false);
@@ -102,6 +103,16 @@ export default function NFTRankingsTable({ initialData }: NFTRankingsTableProps)
   return (
     <NeonSnakeAnimation>
       <div className="space-y-1 sm:space-y-2 overflow-x-auto">
+        {/* Stale data indicator */}
+        {fromCache && (
+          <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg mx-2 mt-2">
+            <svg className="w-4 h-4 text-yellow-400 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-yellow-300 text-xs">Showing cached data — refreshing in the background...</span>
+          </div>
+        )}
         {/* Table Header */}
         <div className="hidden lg:grid gap-4 px-6 py-4 bg-gray-900/50 border-b border-white/10 sticky top-0 z-10 min-w-[900px]" style={{ gridTemplateColumns: '60px 30px 1fr 140px 110px 140px 140px' }}>
           <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">

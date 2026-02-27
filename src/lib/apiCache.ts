@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 // Professional API caching system (like TradingView, Binance)
 interface CacheEntry {
   data: any;
