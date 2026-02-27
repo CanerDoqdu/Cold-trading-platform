@@ -1,18 +1,19 @@
-// app/[slug]/page.tsx
-export const dynamic = 'force-dynamic';
+// ISR: revalidate every 15 minutes
+export const revalidate = 900;
 
 import Image from "next/image";
 import Link from "next/link";
 import {
-  getCollectionItems,
+  getCollection,
   getCollectionStats,
-  getNFTs,
-  getDescription,
-  getBestOfferForNFT,
-} from "@/components/NFtCollectionSolo";
+  getNFTsByCollection,
+  getBestOffer,
+} from "@/lib/opensea";
 import ExpandableText from "@/hooks/useLineClamp";
 import { CheckBadgeIcon, ArrowLeftIcon } from "@heroicons/react/24/solid";
 import NFTGridWrapper from "@/components/NftComponents/NFTGridWrapper";
+import CollectionStats from "@/components/NftComponents/CollectionStats";
+import NFTErrorBoundary from "@/components/NftComponents/NFTErrorBoundary";
 
 interface Params {
   slug: string;
@@ -34,36 +35,56 @@ export default async function CollectionPage({
   const slug = resolvedParams.slug;
 
   try {
-    const collection = await getCollectionItems(slug);
-    const stats = await getCollectionStats(slug);
-    const nfts = await getNFTs(slug);
-    const description = await getDescription(slug); // Fetch description here
+    // Fetch collection info, stats, and NFTs in parallel
+    const [collectionResult, statsResult, nftsResult] = await Promise.all([
+      getCollection(slug),
+      getCollectionStats(slug).catch(() => ({ data: null, fromCache: false })),
+      getNFTsByCollection(slug, 50).catch(() => ({ data: [], fromCache: false })),
+    ]);
 
-    if (!collection || !nfts || nfts.length === 0) {
+    const collection = collectionResult.data;
+    const stats = statsResult.data;
+    const nfts = nftsResult.data;
+    const fromCache = collectionResult.fromCache || statsResult.fromCache;
+
+    if (!collection) {
       return (
-        <div className="text-red-500">No data found for collection: {slug}</div>
+        <NFTErrorBoundary
+          title="Collection not found"
+          message={`We couldn't find data for collection: ${slug}`}
+        />
       );
     }
 
-    // Use a default value for search query to avoid undefined error
-    const searchQuery = resolvedSearchParams.search || ""; // Fallback to empty string if undefined
+    const description = collection.description ?? 'No description available for this collection.';
+
+    // Use a default value for search query
+    const searchQuery = resolvedSearchParams.search || "";
+
+    // Fetch best offers in parallel (with individual error handling)
     const offers = await Promise.all(
-      nfts.map(async (nft: { identifier: string; name: string; traits?: { value: string }[] }) => ({
-        identifier: nft.identifier,
-        offer: await getBestOfferForNFT(slug, nft.identifier),
-      }))
+      nfts.map(async (nft) => {
+        try {
+          const { data: offer } = await getBestOffer(slug, nft.identifier);
+          return { identifier: nft.identifier, offer };
+        } catch {
+          return { identifier: nft.identifier, offer: null };
+        }
+      })
     );
-    const offersMap = Object.fromEntries(
-      offers.map(({ identifier, offer }) => [identifier, offer])
-    );
-    // NFT'leri filtrele
+    const offersMap: Record<string, Record<string, unknown>> = {};
+    for (const { identifier, offer } of offers) {
+      if (offer != null) offersMap[identifier] = offer;
+    }
+
+    // Filter NFTs by search query
     const filteredNfts = searchQuery
-      ? nfts.filter((nft: { identifier: string; name: string; traits?: { value: string }[] }) => {
+      ? nfts.filter((nft) => {
           const lowerQuery = searchQuery.toLowerCase();
           return (
-            nft.name.toLowerCase().includes(lowerQuery) ||
+            (nft.name ?? '').toLowerCase().includes(lowerQuery) ||
             (nft.traits &&
-              nft.traits.some((trait: { value: string }) =>
+              nft.traits.some((trait) =>
                 trait.value.toLowerCase().includes(lowerQuery),
               ))
           );
@@ -72,6 +93,17 @@ export default async function CollectionPage({
 
     return (
       <div className="relative min-h-screen bg-black text-white">
+        {/* Stale data indicator */}
+        {fromCache && (
+          <div className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 bg-yellow-500/20 border border-yellow-500/40 rounded-lg text-yellow-300 text-xs">
+            <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            Refreshing...
+          </div>
+        )}
+
         {/* Back Button */}
         <div className="absolute top-4 left-4 z-20">
           <Link 
@@ -95,7 +127,7 @@ export default async function CollectionPage({
                 muted
                 className="object-cover w-full h-full opacity-70"
               />
-            ) : (
+            ) : collection.banner_image_url ? (
               <Image
                 src={collection.banner_image_url.replace(/w=\d+/, "w=1920")}
                 alt="Banner Image"
@@ -104,7 +136,7 @@ export default async function CollectionPage({
                 priority
                 sizes="100vw"
               />
-            )}
+            ) : null}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
 
             <div className="absolute bottom-0 left-0 w-full p-4 sm:p-6 z-10">
@@ -136,42 +168,8 @@ export default async function CollectionPage({
                   </div>
                 </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 sm:gap-4">
-                  <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg p-3 text-center border border-gray-700/50">
-                    <p className="text-lg sm:text-xl font-bold text-white">
-                      {stats?.total?.volume
-                        ? stats.total.volume.toFixed(2)
-                        : "-"}
-                    </p>
-                    <p className="text-xs text-gray-400">Total Volume</p>
-                  </div>
-                  <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg p-3 text-center border border-gray-700/50">
-                    <p className="text-lg sm:text-xl font-bold text-white">
-                      {stats?.total?.floor_price
-                        ? stats.total.floor_price.toFixed(2)
-                        : "-"}{" "}
-                      <span className="text-xs text-gray-400">ETH</span>
-                    </p>
-                    <p className="text-xs text-gray-400">Floor Price</p>
-                  </div>
-                  <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg p-3 text-center border border-gray-700/50">
-                    <p className="text-lg sm:text-xl font-bold text-white">
-                      {stats?.total?.average_price
-                        ? stats.total.average_price.toFixed(3)
-                        : "-"}
-                    </p>
-                    <p className="text-xs text-gray-400">Avg Price</p>
-                  </div>
-                  <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg p-3 text-center border border-gray-700/50 hidden sm:block">
-                    <p className="text-lg sm:text-xl font-bold text-white">{stats?.total?.num_owners || "-"}</p>
-                    <p className="text-xs text-gray-400">Owners</p>
-                  </div>
-                  <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg p-3 text-center border border-gray-700/50 hidden sm:block">
-                    <p className="text-lg sm:text-xl font-bold text-white">{stats?.total?.sales || "-"}</p>
-                    <p className="text-xs text-gray-400">Sales</p>
-                  </div>
-                </div>
+                {/* Stats Grid — use CollectionStats component */}
+                {stats && <CollectionStats stats={stats} />}
               </div>
             </div>
           </div>
@@ -205,12 +203,23 @@ export default async function CollectionPage({
 
         {/* Use NFTGridWrapper for grid display */}
         <div className="max-w-screen-xl mx-auto px-4 pb-12">
-          <NFTGridWrapper slug={slug} initialNfts={filteredNfts} offers={offersMap} />
+          {filteredNfts.length > 0 ? (
+            <NFTGridWrapper slug={slug} initialNfts={filteredNfts} offers={offersMap} />
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              {searchQuery ? `No NFTs match "${searchQuery}"` : 'No NFTs found in this collection.'}
+            </div>
+          )}
         </div>
       </div>
     );
   } catch (error) {
-    console.error("Error fetching collection data:", error);
-    return <div className="text-red-500">Error loading collection data.</div>;
+    const message = error instanceof Error ? error.message : String(error);
+    return (
+      <NFTErrorBoundary
+        title="Error loading collection"
+        message={message}
+      />
+    );
   }
 }

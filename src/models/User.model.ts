@@ -37,6 +37,9 @@ export interface IUser {
   /* Paper trading balance — integer minor units (USD cents) stored as string */
   paperBalanceMinor: string;
 
+  /* NFT watchlist — collection slugs the user is tracking */
+  nftWatchlist: string[];
+
   /* Soft delete */
   deletedAt?: Date | null;
 
@@ -93,6 +96,9 @@ const userSchema = new Schema<IUserDocument, IUserModel>(
 
     // Paper trading balance (USD cents as string — $10,000.00 default)
     paperBalanceMinor: { type: String, default: '1000000' },
+
+    // NFT watchlist (collection slugs)
+    nftWatchlist: { type: [String], default: [] },
 
     // Soft delete
     deletedAt: { type: Date, default: null },
