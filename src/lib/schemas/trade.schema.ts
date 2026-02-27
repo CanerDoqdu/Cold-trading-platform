@@ -6,6 +6,18 @@ const positiveFinite = z
   .positive('Must be a positive number')
   .finite('Must be a finite number');
 
+/** Up to 8 decimal places (crypto standard) */
+const cryptoAmount = positiveFinite.refine((v) => {
+  const parts = v.toString().split('.');
+  return !parts[1] || parts[1].length <= 8;
+}, 'Supports up to 8 decimal places');
+
+/** Up to 8 decimal places for price */
+const cryptoPrice = positiveFinite.refine((v) => {
+  const parts = v.toString().split('.');
+  return !parts[1] || parts[1].length <= 8;
+}, 'Supports up to 8 decimal places');
+
 // ── Place order ────────────────────────
 export const orderSchema = z.object({
   symbol: z
@@ -14,16 +26,16 @@ export const orderSchema = z.object({
     .max(20)
     .regex(/^[A-Za-z0-9-]+$/, 'Invalid symbol format')
     .toUpperCase(),
+  coinId: z.string().min(1).max(100),
+  coinName: z.string().min(1).max(100),
   side: z.enum(['buy', 'sell'], { message: 'Side must be "buy" or "sell"' }),
-  amount: positiveFinite.refine((v) => {
-    const parts = v.toString().split('.');
-    return !parts[1] || parts[1].length <= 8;
-  }, 'Amount supports up to 8 decimal places'),
-  price: positiveFinite.refine((v) => {
-    const parts = v.toString().split('.');
-    return !parts[1] || parts[1].length <= 8;
-  }, 'Price supports up to 8 decimal places'),
-  type: z.enum(['market', 'limit']).default('limit'),
+  amount: cryptoAmount,
+  clientPrice: cryptoPrice,
+  type: z.enum(['market', 'limit']).default('market'),
+  limitPrice: cryptoPrice.optional(),
+  idempotencyKey: z
+    .string()
+    .uuid('Idempotency key must be a valid UUID'),
 });
 export type OrderInput = z.infer<typeof orderSchema>;
 
