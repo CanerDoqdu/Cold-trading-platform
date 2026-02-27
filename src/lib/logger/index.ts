@@ -58,6 +58,43 @@ class Logger {
     return new Logger({ ...this.context, ...ctx });
   }
 
+  /**
+   * Create a request-scoped logger with correlationId, path, and method.
+   * Convenience for API routes.
+   */
+  forRequest(requestId: string, path: string, method: string, userId?: string): Logger {
+    return this.child({
+      requestId,
+      path,
+      method,
+      ...(userId ? { userId } : {}),
+    });
+  }
+
+  /**
+   * Create a trade-scoped logger with coin + order context.
+   * Always use for trading-related logs.
+   */
+  forTrade(coinSymbol: string, orderSide: 'buy' | 'sell', userId?: string): Logger {
+    return this.child({
+      module: 'trade',
+      coinSymbol,
+      orderSide,
+      ...(userId ? { userId } : {}),
+    });
+  }
+
+  /**
+   * Create a crypto API-scoped logger.
+   */
+  forApi(provider: string, endpoint?: string): Logger {
+    return this.child({
+      module: 'external-api',
+      provider,
+      ...(endpoint ? { endpoint } : {}),
+    });
+  }
+
   debug(message: string, data?: Record<string, unknown>) {
     this.log('debug', message, data);
   }

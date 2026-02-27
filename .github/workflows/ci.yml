@@ -58,6 +58,9 @@ jobs:
       REDDIT_PASSWORD: ci-dummy
       USER_AGENT: CI/1.0
       GEMINI_API_KEY: ci-dummy-gemini-key
+      NEXT_PUBLIC_SENTRY_DSN: ""
+      SENTRY_ORG: ""
+      SENTRY_PROJECT: ""
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
