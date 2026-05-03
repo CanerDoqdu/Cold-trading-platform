@@ -1,10 +1,4 @@
 import React, { Suspense } from "react";
-import { getCryptoPrices } from "@/components/Coingeckoapi";
-import { fetchgeneralinfo, CoinInfo } from "@/components/CryptoGeneralInfo";
-import {
-  fetchCryptoChange,
-  CryptoChanges,
-} from "@/components/Crypto24HourChange";
 import { fetchNews, NewsArticle } from "@/components/CryptoNews";
 import { fetchNftInfo, NftInfo } from "@/components/Nfts";
 import TypedAnimation from "@/components/TypedAnimation";
@@ -29,20 +23,27 @@ async function fetchTrendingCoins() {
   }
 }
 
+async function resolveOrFallback<T>(
+  label: string,
+  promise: Promise<T>,
+  fallback: T,
+): Promise<T> {
+  try {
+    return await promise;
+  } catch (error) {
+    console.error(`Hero data source failed: ${label}`, error);
+    return fallback;
+  }
+}
+
 // Separate async component for data-dependent content
 async function HeroData() {
-  const coinSymbols = ["BTC", "ETH", "SOL"];
-
-  // Fetch all data simultaneously including trending
-  const [coinInfos, initialPrices, cryptoChanges, newsArticles, nftInfos, redditPosts, trendingCoins] =
+  const [newsArticles, nftInfos, redditPosts, trendingCoins] =
     await Promise.all([
-      fetchgeneralinfo(coinSymbols),
-      getCryptoPrices(),
-      fetchCryptoChange(),
-      fetchNews(),
-      fetchNftInfo(),
-      getRedditData(),
-      fetchTrendingCoins(),
+      resolveOrFallback('news', fetchNews(), [] as NewsArticle[]),
+      resolveOrFallback('nfts', fetchNftInfo(), [] as NftInfo[]),
+      resolveOrFallback('reddit', getRedditData(), null as Awaited<ReturnType<typeof getRedditData>> | null),
+      resolveOrFallback('trending coins', fetchTrendingCoins(), []),
     ]);
 
   // Filter out NFTs with missing or non-renderable images to avoid broken thumbnails
