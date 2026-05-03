@@ -1,4 +1,5 @@
 import bundleAnalyzer from '@next/bundle-analyzer';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -78,4 +79,30 @@ const nextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+export default withSentryConfig(withBundleAnalyzer(nextConfig), {
+  // Sentry build options
+  org: process.env.SENTRY_ORG || '',
+  project: process.env.SENTRY_PROJECT || '',
+
+  // Only upload source maps when DSN is set (production deploys)
+  silent: !process.env.NEXT_PUBLIC_SENTRY_DSN,
+
+  // Disable source map upload in CI without tokens
+  authToken: process.env.SENTRY_AUTH_TOKEN || '',
+
+  // Never upload source maps unless we have a real auth token
+  disableSourceMapsUpload: !process.env.SENTRY_AUTH_TOKEN,
+
+  // Hide source maps from users
+  hideSourceMaps: true,
+
+  // Webpack-based options (replaces deprecated top-level ones)
+  webpack: {
+    // Tree-shake Sentry debug logging in production
+    treeshake: {
+      removeDebugLogging: true,
+    },
+    // Automatically instrument Vercel cron monitors
+    automaticVercelMonitors: true,
+  },
+});

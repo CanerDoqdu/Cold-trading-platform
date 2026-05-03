@@ -42,7 +42,6 @@ export interface SoftDeletable {
 
 export function applySoftDelete<T extends Document>(schema: Schema<T>): void {
   // Add deletedAt field if not already present
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (schema as any).add({
     deletedAt: { type: Date, default: null },
   });
