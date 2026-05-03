@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { NFTData } from "@/types/coin";
 
 const options = {

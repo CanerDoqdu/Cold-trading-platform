@@ -42,7 +42,6 @@ export async function POST(request: NextRequest) {
   // https://${BASE_URL}/reset-password?token=${rawToken}
   // For now, log to console in development
   if (process.env.NODE_ENV === 'development') {
-    // eslint-disable-next-line no-console
     console.log(`[DEV] Password reset token for ${email}: ${rawToken}`);
   }
 

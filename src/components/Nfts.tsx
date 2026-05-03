@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 export interface NftInfo {
   name: string;
   image_url: string;

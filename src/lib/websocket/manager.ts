@@ -77,7 +77,6 @@ export class BinanceWSManager {
     sampleRate: 10,
     onDrop: (n) => {
       if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
         console.warn(`[WS] Backpressure: dropped ${n} messages`);
       }
     },
@@ -274,7 +273,6 @@ export class BinanceWSManager {
     const delay = Math.min(this.backoffMs + jitter, MAX_BACKOFF_MS);
 
     if (process.env.NODE_ENV === 'development') {
-      // eslint-disable-next-line no-console
       console.log(`[WS] Reconnecting in ${Math.round(delay)}ms (attempt ${this.reconnectAttempt})`);
     }
 
@@ -296,7 +294,6 @@ export class BinanceWSManager {
         // If no message arrives within PONG_TIMEOUT_MS, reconnect.
         this.pongTimer = setTimeout(() => {
           if (process.env.NODE_ENV === 'development') {
-            // eslint-disable-next-line no-console
             console.warn('[WS] Pong timeout — reconnecting');
           }
           this.disconnect();

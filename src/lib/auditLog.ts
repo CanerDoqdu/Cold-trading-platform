@@ -29,7 +29,6 @@ export async function audit(entry: AuditEntry): Promise<void> {
     });
   } catch (err) {
     // Log to stdout/stderr so infra monitoring catches it
-    // eslint-disable-next-line no-console
     console.error('[AuditLog] Failed to write audit entry:', err);
   }
 }

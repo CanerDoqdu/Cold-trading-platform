@@ -46,7 +46,6 @@ export async function POST(request) {
 
     // TODO: PR12 — send verification email with token
     if (process.env.NODE_ENV === "development") {
-      // eslint-disable-next-line no-console
       console.log(`[DEV] Email verify token for ${email}: ${rawVerifyToken}`);
     }
 

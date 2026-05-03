@@ -336,7 +336,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // eslint-disable-next-line no-console
     console.error('[Orders API] Transaction failed:', err);
     return NextResponse.json(
       {

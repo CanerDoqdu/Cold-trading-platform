@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const API_KEY = process.env.OPENSEA_API_KEY;
 
 export const getCollectionItems = async (collectionName: string) => {

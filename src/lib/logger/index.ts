@@ -132,20 +132,16 @@ class Logger {
     // Use appropriate console method so log aggregators can pick up severity
     switch (level) {
       case 'debug':
-        // eslint-disable-next-line no-console
         console.debug(line);
         break;
       case 'info':
-        // eslint-disable-next-line no-console
         console.info(line);
         break;
       case 'warn':
-        // eslint-disable-next-line no-console
         console.warn(line);
         break;
       case 'error':
       case 'fatal':
-        // eslint-disable-next-line no-console
         console.error(line);
         break;
     }
