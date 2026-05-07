@@ -1,4 +1,3 @@
-import axios from "axios";
 import cache from "memory-cache";
 import { getAccessToken } from "@/components/redditapi/redditToken";
 
@@ -37,20 +36,23 @@ export async function getRedditData() {
     };
   
     try {
-      const response = await axios.get(REDDIT_URL, { headers });
-      const posts = response.data.data.children.map((post: any) => ({
+      const response = await fetch(REDDIT_URL, { headers });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        console.error("Error fetching Reddit data:", errorBody || response.statusText);
+        throw new Error("Reddit API request failed");
+      }
+
+      const data = await response.json();
+      const posts = data.data.children.map((post: any) => ({
         title: post.data.title,
         url: post.data.url,
       }));
   
       return posts;
     } catch (error) {
-      const errAny = error as Record<string, unknown>;
-      if (errAny['response']) {
-        console.error("Error fetching Reddit data:", (errAny['response'] as Record<string, unknown>)['data']);
-      } else {
-        console.error("Error fetching Reddit data:", error instanceof Error ? error.message : String(error));
-      }
+      console.error("Error fetching Reddit data:", error instanceof Error ? error.message : String(error));
       throw new Error("Reddit API request failed");
     }
   }

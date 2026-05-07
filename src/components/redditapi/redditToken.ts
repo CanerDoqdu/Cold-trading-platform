@@ -1,33 +1,41 @@
-import axios from "axios";
-
-// Manually setting the values instead of using process.env
-const CLIENT_ID = "k7RKJ1BeD01CThFm7kMr3A"; // Replace with your Reddit client ID
-const CLIENT_SECRET = "1CW6Aw0Ywajlupf7Z40PMesa4lNmAQ"; // Replace with your Reddit client secret
+const CLIENT_ID = process.env.REDDIT_CLIENT_ID;
+const CLIENT_SECRET = process.env.REDDIT_CLIENT_SECRET;
+const USER_AGENT = process.env.USER_AGENT || 'CryptoInfoFetcher/1.0';
 const REDDIT_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";
 
 // Function to fetch the Reddit access token
 export async function getAccessToken(): Promise<string | null> {
+  if (!CLIENT_ID || !CLIENT_SECRET) {
+    console.error('Reddit API credentials are not configured.');
+    return null;
+  }
+
   // Creating the Basic Auth header by base64 encoding the CLIENT_ID and CLIENT_SECRET
   const authHeader = `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString("base64")}`;
 
   try {
-    // Sending POST request with the correct headers and body for the client_credentials flow
-    const response = await axios.post(REDDIT_TOKEN_URL, "grant_type=client_credentials", {
+    const response = await fetch(REDDIT_TOKEN_URL, {
+      method: 'POST',
       headers: {
-        "Authorization": authHeader, // Using the Basic Authentication header
-        "User-Agent": "CryptoInfoFetcher/1.0 by Acrobatic_Fee_5514",
+        "Authorization": authHeader,
+        "User-Agent": USER_AGENT,
         "Content-Type": "application/x-www-form-urlencoded"
-      }
+      },
+      body: 'grant_type=client_credentials',
     });
 
-    
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('Error obtaining access token:', errorBody || response.statusText);
+      return null;
+    }
+
+    const data = await response.json();
 
     // Return the access token from the response
-    return response.data.access_token;
+    return data.access_token || null;
   } catch (error) {
-    // Handle error if token retrieval fails
-    const errAny = error as Record<string, unknown>;
-    console.error("Error obtaining access token:", errAny['response'] ? (errAny['response'] as Record<string, unknown>)['data'] : (error instanceof Error ? error.message : String(error)));
+    console.error("Error obtaining access token:", error instanceof Error ? error.message : String(error));
     return null;
   }
 }

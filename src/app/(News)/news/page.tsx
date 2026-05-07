@@ -25,6 +25,20 @@ interface NewsArticle {
 const NEWS_URL =
   "https://min-api.cryptocompare.com/data/v2/news/?feeds=cryptocompare,cointelegraph,coindesk&extraParams=YourSite";
 
+const fallbackArticles: NewsArticle[] = [
+  {
+    id: 'fallback-market-brief',
+    title: 'Crypto market news is temporarily unavailable',
+    url: '/',
+    body: 'The external news provider did not return article data. Please check the CryptoCompare API key configured for this deployment.',
+    imageUrl: '/images/WhitemodeLogo.png',
+    publishedOn: Math.floor(Date.now() / 1000),
+    sourceName: 'COLD',
+    sourceImg: '',
+    categories: 'platform',
+  },
+];
+
 async function getNews(): Promise<NewsArticle[]> {
   const API_KEY = process.env.CRYPTOCOMPARE;
   
@@ -43,7 +57,8 @@ async function getNews(): Promise<NewsArticle[]> {
   });
 
   if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    console.warn(`CryptoCompare news request failed with status ${response.status}`);
+    return fallbackArticles;
   }
 
   const data = await response.json();
@@ -60,9 +75,12 @@ async function getNews(): Promise<NewsArticle[]> {
       sourceImg: news.source_info?.img || '',
       categories: news.categories || '',
     }));
-  } else {
-    throw new Error("Invalid data format");
   }
+
+  console.warn(
+    `CryptoCompare news returned no article array: ${data?.Message || 'unknown response'}`,
+  );
+  return fallbackArticles;
 }
 
 function formatTimeAgo(timestamp: number): string {

@@ -1,5 +1,4 @@
 import { useRef, useCallback, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { safeFetch, type SafeFetchOptions, type SafeResponse } from '@/lib/safeFetch';
 
 /**
@@ -34,7 +33,7 @@ export function useIdempotentSubmit<T = unknown>() {
       inflightRef.current = true;
       setSubmitting(true);
 
-      const idempotencyKey = uuidv4();
+      const idempotencyKey = crypto.randomUUID();
 
       try {
         const headers = new Headers(opts.headers as HeadersInit);

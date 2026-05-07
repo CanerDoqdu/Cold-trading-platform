@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import ClientProviders from "@/components/ClientProviders";
 import { SWRProvider } from "@/components/SWRProvider";
 import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 
 export const metadata: Metadata = {
   title: {
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
     description: 'Trade cryptocurrencies, track markets, and manage your portfolio.',
     images: [
       {
-        url: '/images/og-image.png',
+        url: '/images/WhitemodeLogo.png',
         width: 1200,
         height: 630,
         alt: 'COLD - Crypto Trading Platform',
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'COLD - Crypto Trading Platform',
     description: 'Trade cryptocurrencies, track markets, and manage your portfolio.',
-    images: ['/images/og-image.png'],
+    images: ['/images/WhitemodeLogo.png'],
     creator: '@coldcrypto',
   },
   robots: {
@@ -75,11 +76,13 @@ export const viewport: Viewport = {
 
 // This is the ROOT layout - applies to ALL pages automatically
 // No need to add providers to each route group!
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
+
   return (
     <html lang="en" className={`${titillium_Web.variable}`} suppressHydrationWarning>
       <head>
@@ -93,6 +96,7 @@ export default function RootLayout({
         
         {/* Prevent theme flash - runs before React hydrates */}
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `
               (function() {

@@ -6,8 +6,6 @@
  *   if (!ok) showToast(data.error.message);
  */
 
-import { v4 as uuidv4 } from 'uuid';
-
 /* ── types ── */
 export interface SafeResult<T> {
   ok: true;
@@ -73,7 +71,7 @@ export async function safeFetch<T = unknown>(
     ...init
   } = opts;
 
-  const requestId = uuidv4();
+  const requestId = crypto.randomUUID();
 
   const headers = new Headers(init.headers);
   headers.set('X-Request-ID', requestId);

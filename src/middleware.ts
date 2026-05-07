@@ -20,8 +20,8 @@ function buildCSP(nonce: string): string {
     `script-src 'self' 'nonce-${nonce}' https://s3.tradingview.com https://accounts.google.com https://apis.google.com`,
     `style-src 'self' 'unsafe-inline' https://accounts.google.com`,
     `img-src 'self' data: https:`,
-    `connect-src 'self' wss://stream.binance.com https://api.coingecko.com https://pro-api.coingecko.com https://api.opensea.io https://openrouter.ai https://accounts.google.com`,
-    `frame-src https://s.tradingview.com https://accounts.google.com`,
+    `connect-src 'self' wss://stream.binance.com wss://streamer.cryptocompare.com https://api.coingecko.com https://pro-api.coingecko.com https://api.opensea.io https://min-api.cryptocompare.com https://openrouter.ai https://accounts.google.com`,
+    `frame-src https://s.tradingview.com https://www.tradingview-widget.com https://accounts.google.com`,
     `font-src 'self'`,
     `object-src 'none'`,
     `base-uri 'self'`,
@@ -191,7 +191,14 @@ export default async function middleware(req: NextRequest) {
   }
 
   // ── Page routes ─────────────────────
-  const response = NextResponse.next();
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set('x-nonce', nonce);
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 
   // Security + tracing headers on every page response
   setSecurityHeaders(response, nonce);
