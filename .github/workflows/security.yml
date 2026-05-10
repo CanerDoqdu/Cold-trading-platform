@@ -1,8 +1,6 @@
 name: Security Scans
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '0 8 * * 1' # Weekly Monday 8am
