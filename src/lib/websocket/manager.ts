@@ -34,7 +34,7 @@ import { LastValueCache } from './buffer';
 
 // ── Constants ─────────────────────────────────────────────
 
-const BINANCE_WS_BASE = 'wss://stream.binance.com:9443/stream';
+const BINANCE_WS_BASE = 'wss://stream.binance.com/stream';
 
 /** Reconnection backoff */
 const INITIAL_BACKOFF_MS = 1_000;
