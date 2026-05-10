@@ -71,6 +71,7 @@ async function getNews(): Promise<NewsArticle[]> {
   };
 
   if (API_KEY) {
+    headers["authorization"] = `Apikey ${API_KEY}`;
     headers["api_key"] = API_KEY;
   }
 
