@@ -40,6 +40,42 @@ interface ChartDataType {
   dates: string[];
 }
 
+const normalizeCoinSlug = (value: string) =>
+  decodeURIComponent(value).trim().toLowerCase();
+
+const normalizeCoinNameSlug = (value: string) =>
+  normalizeCoinSlug(value).replace(/\s+/g, '-');
+
+const matchesCoinSlug = (coin: MarketCoin, slug: string) => {
+  const normalizedName = normalizeCoinNameSlug(coin.name);
+
+  return [
+    normalizeCoinSlug(coin.id),
+    normalizeCoinSlug(coin.symbol),
+    normalizeCoinSlug(coin.name),
+    normalizedName,
+  ].includes(slug);
+};
+
+const findSearchMatchId = (searchData: any, slug: string) => {
+  const coins = Array.isArray(searchData?.coins) ? searchData.coins : [];
+
+  const matchedCoin = coins.find((searchCoin: any) => {
+    const candidates = [
+      searchCoin?.id,
+      searchCoin?.symbol,
+      searchCoin?.name,
+      searchCoin?.name ? normalizeCoinNameSlug(searchCoin.name) : null,
+    ]
+      .filter(Boolean)
+      .map((value: string) => normalizeCoinSlug(value));
+
+    return candidates.includes(slug);
+  });
+
+  return matchedCoin?.id ?? coins[0]?.id ?? null;
+};
+
 const formatPrice = (price: number) => {
   if (!price && price !== 0) return 'N/A';
   if (price >= 1000) return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -58,6 +94,7 @@ const formatLarge = (num: number) => {
 };
 
 export default function CoinDetailPageAdvanced({ coinId }: { coinId: string }) {
+  const normalizedCoinId = normalizeCoinSlug(coinId);
   const { state } = UseAuthContext();
   const { user } = state;
   const { createAlert } = usePriceAlerts();
@@ -137,8 +174,35 @@ export default function CoinDetailPageAdvanced({ coinId }: { coinId: string }) {
           return;
         }
 
-        setAllCoins(data);
-        const foundCoin = data.find((c: MarketCoin) => c.id === coinId);
+        let nextAllCoins = data;
+        let foundCoin = data.find((c: MarketCoin) => matchesCoinSlug(c, normalizedCoinId));
+
+        if (!foundCoin) {
+          const searchData = await cachedFetch(
+            `/api/coingecko/search?query=${encodeURIComponent(normalizedCoinId)}`,
+            { signal: abortControllerRef.current.signal },
+            600000
+          );
+
+          const matchedId = findSearchMatchId(searchData, normalizedCoinId);
+
+          if (matchedId) {
+            const matchedMarketData = await cachedFetch(
+              `/api/coingecko/markets?vs_currency=usd&ids=${encodeURIComponent(matchedId)}&sparkline=false&price_change_percentage=7d,30d`,
+              { signal: abortControllerRef.current.signal },
+              600000
+            );
+
+            if (Array.isArray(matchedMarketData) && matchedMarketData[0]) {
+              foundCoin = matchedMarketData[0];
+              nextAllCoins = data.some((c: MarketCoin) => c.id === foundCoin?.id)
+                ? data
+                : [foundCoin, ...data];
+            }
+          }
+        }
+
+        setAllCoins(nextAllCoins);
         
         if (!foundCoin) {
           setError(true);
@@ -160,13 +224,15 @@ export default function CoinDetailPageAdvanced({ coinId }: { coinId: string }) {
       }
     };
 
+    fetchCoinData();
+
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
       abortControllerRef.current = new AbortController();
     };
-  }, [coinId]);
+  }, [coinId, normalizedCoinId]);
 
   // Load chart when time range changes
   useEffect(() => {

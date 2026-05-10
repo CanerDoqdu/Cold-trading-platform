@@ -10,24 +10,37 @@ const Avatar = memo(({
   src, 
   alt, 
   size, 
-  className 
+  className,
+  eager = false,
 }: { 
   src: string; 
   alt: string; 
   size: number; 
   className?: string;
-}) => (
-  <Image 
-    src={src} 
-    alt={alt} 
-    width={size}
-    height={size}
-    className={className || "w-full h-full object-cover"}
-    loading="lazy"
-    quality={60}
-    sizes={`${size}px`}
-  />
-));
+  eager?: boolean;
+}) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div className="relative h-full w-full overflow-hidden rounded-full bg-slate-200 dark:bg-gray-800">
+      {!isLoaded && (
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-slate-200 via-slate-100 to-slate-200 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800" />
+      )}
+      <Image 
+        src={src} 
+        alt={alt} 
+        width={size}
+        height={size}
+        className={`${className || "w-full h-full object-cover"} transition-opacity duration-500 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+        loading={eager ? "eager" : "lazy"}
+        quality={60}
+        sizes={`${size}px`}
+        unoptimized
+        onLoad={() => setIsLoaded(true)}
+      />
+    </div>
+  );
+});
 Avatar.displayName = 'Avatar';
 
 // Loading skeleton for the section
@@ -131,7 +144,7 @@ const ClaimYourSpotSection = () => {
         }
       },
       { 
-        rootMargin: '200px', // Start loading 200px before visible
+        rootMargin: '600px', // Start loading well before the section scrolls into view
         threshold: 0.1 
       }
     );
@@ -257,7 +270,7 @@ const ClaimYourSpotSection = () => {
               <div className="absolute inset-0 bg-emerald-500/10 rounded-full blur-3xl" />
               
               {/* Outer Ring Border */}
-              <div className="absolute inset-0 border border-gray-700/30 rounded-full" />
+              <div className="absolute inset-0 border border-gray-200/90 dark:border-gray-700/30 rounded-full" />
               
               {/* Outer Ring - Rotating Container */}
               <div className={`absolute inset-0 orbit-outer ${!imagesLoaded ? 'paused' : ''}`}>
@@ -275,11 +288,12 @@ const ClaimYourSpotSection = () => {
                         top: `calc(50% + ${y}px)`,
                       }}
                     >
-                      <div className={`w-14 h-14 lg:w-[72px] lg:h-[72px] -translate-x-1/2 -translate-y-1/2 counter-rotate ${!imagesLoaded ? 'paused' : ''} rounded-full overflow-hidden border-2 border-white/80 shadow-xl shadow-black/50 bg-gray-900`}>
+                      <div className={`w-14 h-14 lg:w-[72px] lg:h-[72px] -translate-x-1/2 -translate-y-1/2 counter-rotate ${!imagesLoaded ? 'paused' : ''} rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/80 shadow-xl shadow-emerald-900/10 dark:shadow-black/50 bg-white/95 dark:bg-gray-900`}>
                         <Avatar 
                           src={src} 
                           alt={`Community member ${i + 1}`} 
                           size={72}
+                          eager={imagesLoaded}
                         />
                       </div>
                     </div>
@@ -288,7 +302,7 @@ const ClaimYourSpotSection = () => {
               </div>
               
               {/* Middle Ring Border */}
-              <div className="absolute inset-[26%] border border-gray-700/40 rounded-full" />
+              <div className="absolute inset-[26%] border border-gray-200/90 dark:border-gray-700/40 rounded-full" />
               
               {/* Middle Ring - Rotating Container (opposite direction) */}
               <div className={`absolute inset-0 orbit-inner ${!imagesLoaded ? 'paused' : ''}`}>
@@ -306,11 +320,12 @@ const ClaimYourSpotSection = () => {
                         top: `calc(50% + ${y}px)`,
                       }}
                     >
-                      <div className={`w-12 h-12 lg:w-16 lg:h-16 -translate-x-1/2 -translate-y-1/2 counter-rotate-reverse ${!imagesLoaded ? 'paused' : ''} rounded-full overflow-hidden border-2 border-white/80 shadow-xl shadow-black/50 bg-gray-900`}>
+                      <div className={`w-12 h-12 lg:w-16 lg:h-16 -translate-x-1/2 -translate-y-1/2 counter-rotate-reverse ${!imagesLoaded ? 'paused' : ''} rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/80 shadow-xl shadow-emerald-900/10 dark:shadow-black/50 bg-white/95 dark:bg-gray-900`}>
                         <Avatar 
                           src={src} 
                           alt={`Community member ${i + 9}`} 
                           size={64}
+                          eager={imagesLoaded}
                         />
                       </div>
                     </div>
@@ -319,29 +334,30 @@ const ClaimYourSpotSection = () => {
               </div>
               
               {/* Inner Ring Border */}
-              <div className="absolute inset-[40%] border border-emerald-500/30 rounded-full" />
+              <div className="absolute inset-[40%] border border-emerald-400/40 dark:border-emerald-500/30 rounded-full" />
               
               {/* Center - Main CTA */}
-              <div className="absolute inset-[43%] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-full border border-emerald-500/50 shadow-2xl shadow-emerald-500/20 flex flex-col items-center justify-center">
+              <div className="absolute inset-[43%] bg-gradient-to-br from-white via-emerald-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-full border border-emerald-300/70 dark:border-emerald-500/50 shadow-2xl shadow-emerald-500/10 dark:shadow-emerald-500/20 flex flex-col items-center justify-center">
                 <div className="text-center p-3">
                   <div className="flex -space-x-2 justify-center mb-2">
                     {centerAvatars.map((src, i) => (
                       <div
                         key={i}
-                        className="w-7 h-7 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-white/80 bg-gray-800 shadow-md"
+                        className="w-7 h-7 lg:w-8 lg:h-8 rounded-full overflow-hidden border-2 border-gray-200 dark:border-white/80 bg-white dark:bg-gray-800 shadow-md"
                       >
                         <Avatar 
                           src={src} 
                           alt="" 
                           size={32}
+                          eager={imagesLoaded}
                         />
                       </div>
                     ))}
-                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-gray-800 border-2 border-white/80 flex items-center justify-center text-[9px] lg:text-[10px] text-gray-400 font-medium shadow-md">
+                    <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-full bg-emerald-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-white/80 flex items-center justify-center text-[9px] lg:text-[10px] text-emerald-700 dark:text-gray-400 font-medium shadow-md">
                       +2M
                     </div>
                   </div>
-                  <p className="text-white font-semibold text-xs lg:text-sm">Join Them</p>
+                  <p className="text-gray-900 dark:text-white font-semibold text-xs lg:text-sm">Join Them</p>
                 </div>
               </div>
               

@@ -30,6 +30,42 @@ interface MarketCoin {
   price_change_percentage_30d_in_currency?: number;
 }
 
+const normalizeCoinSlug = (value: string) =>
+  decodeURIComponent(value).trim().toLowerCase();
+
+const normalizeCoinNameSlug = (value: string) =>
+  normalizeCoinSlug(value).replace(/\s+/g, '-');
+
+const matchesCoinSlug = (coin: MarketCoin, slug: string) => {
+  const normalizedName = normalizeCoinNameSlug(coin.name);
+
+  return [
+    normalizeCoinSlug(coin.id),
+    normalizeCoinSlug(coin.symbol),
+    normalizeCoinSlug(coin.name),
+    normalizedName,
+  ].includes(slug);
+};
+
+const findSearchMatchId = (searchData: any, slug: string) => {
+  const coins = Array.isArray(searchData?.coins) ? searchData.coins : [];
+
+  const matchedCoin = coins.find((searchCoin: any) => {
+    const candidates = [
+      searchCoin?.id,
+      searchCoin?.symbol,
+      searchCoin?.name,
+      searchCoin?.name ? normalizeCoinNameSlug(searchCoin.name) : null,
+    ]
+      .filter(Boolean)
+      .map((value: string) => normalizeCoinSlug(value));
+
+    return candidates.includes(slug);
+  });
+
+  return matchedCoin?.id ?? coins[0]?.id ?? null;
+};
+
 const formatPrice = (price: number) => {
   if (!price && price !== 0) return 'N/A';
   if (price >= 1000) return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -49,6 +85,7 @@ const formatLarge = (num: number) => {
 
 export default function CoinDetailPageSimple({ coinId }: { coinId: string }) {
   const router = useRouter();
+  const normalizedCoinId = normalizeCoinSlug(coinId);
   const { state } = UseAuthContext();
   const { user } = state;
   const { createAlert } = usePriceAlerts();
@@ -116,10 +153,35 @@ export default function CoinDetailPageSimple({ coinId }: { coinId: string }) {
           return;
         }
 
-        setAllCoins(data);
+        let nextAllCoins = data;
+        let foundCoin = data.find((c: MarketCoin) => matchesCoinSlug(c, normalizedCoinId));
 
-        // Find the specific coin
-        const foundCoin = data.find((c: MarketCoin) => c.id === coinId);
+        if (!foundCoin) {
+          const searchData = await cachedFetch(
+            `/api/coingecko/search?query=${encodeURIComponent(normalizedCoinId)}`,
+            {},
+            600000
+          );
+
+          const matchedId = findSearchMatchId(searchData, normalizedCoinId);
+
+          if (matchedId) {
+            const matchedMarketData = await cachedFetch(
+              `/api/coingecko/markets?vs_currency=usd&ids=${encodeURIComponent(matchedId)}&sparkline=false&price_change_percentage=7d,30d`,
+              {},
+              600000
+            );
+
+            if (Array.isArray(matchedMarketData) && matchedMarketData[0]) {
+              foundCoin = matchedMarketData[0];
+              nextAllCoins = data.some((c: MarketCoin) => c.id === foundCoin?.id)
+                ? data
+                : [foundCoin, ...data];
+            }
+          }
+        }
+
+        setAllCoins(nextAllCoins);
         
         if (foundCoin) {
           setCoin(foundCoin);
@@ -165,7 +227,7 @@ export default function CoinDetailPageSimple({ coinId }: { coinId: string }) {
     };
 
     fetchData();
-  }, [coinId]);
+  }, [coinId, normalizedCoinId]);
 
   if (loading) {
     return (
@@ -246,7 +308,7 @@ export default function CoinDetailPageSimple({ coinId }: { coinId: string }) {
   }
 
   // Get top 6 coins for sidebar (excluding current coin)
-  const topCoins = allCoins.filter(c => c.id !== coinId).slice(0, 6);
+  const topCoins = allCoins.filter(c => !matchesCoinSlug(c, normalizedCoinId)).slice(0, 6);
 
   return (
     <div className="min-h-screen bg-black p-6">

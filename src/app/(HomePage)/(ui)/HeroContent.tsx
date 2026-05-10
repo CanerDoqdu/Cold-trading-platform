@@ -24,9 +24,11 @@ function NftImageCard({ nft, fallback }: { nft: NftInfo; fallback: string }) {
   const [hasError, setHasError] = useState(false);
 
   // Build OpenSea URL for individual NFT
-  const nftUrl = nft.contract_address && nft.token_id 
-    ? `https://opensea.io/assets/ethereum/${nft.contract_address}/${nft.token_id}`
-    : null;
+  const nftUrl = nft.openSeaUrl || (
+    nft.contract_address && nft.token_id
+      ? `https://opensea.io/assets/ethereum/${nft.contract_address}/${nft.token_id}`
+      : null
+  );
 
   const content = (
     <div className="nft-item">
