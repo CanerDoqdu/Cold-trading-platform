@@ -1,10 +1,15 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@public/images/Group.svg";
+import logoBlack from "@public/images/Groupblack.svg";
+import { useTheme } from "@/context/ThemeContext";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { theme } = useTheme();
 
   const footerLinks = {
     products: [
@@ -83,7 +88,7 @@ const Footer = () => {
           <div className="col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <Image
-                src={logo}
+                src={theme === "light" ? logoBlack : logo}
                 alt="COLD Logo"
                 priority
                 style={{ width: "32px", height: "auto" }}

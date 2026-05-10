@@ -70,6 +70,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'assets.coingecko.com' },
       { protocol: 'https', hostname: 'coin-images.coingecko.com' },
       { protocol: 'https', hostname: 'www.cryptocompare.com' },
+      { protocol: 'https', hostname: 'images.cryptocompare.com' },
       { protocol: 'https', hostname: 'openseauserdata.com' },
       { protocol: 'https', hostname: '*.seadn.io' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },

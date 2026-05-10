@@ -46,13 +46,15 @@ async function HeroData() {
       resolveOrFallback('trending coins', fetchTrendingCoins(), []),
     ]);
 
-  // Filter out NFTs with missing or non-renderable images to avoid broken thumbnails
+  // Keep valid HTTP(S) URLs; OpenSea image URLs can include query params or extension-less paths.
   const filteredNfts = nftInfos.filter((nft) => {
     if (!nft.image_url) return false;
-    const url = nft.image_url.toLowerCase();
-    const hasValidExt = /(\.png|\.jpg|\.jpeg|\.webp)$/i.test(url);
-    const isHttp = url.startsWith("http://") || url.startsWith("https://");
-    return hasValidExt && isHttp;
+    try {
+      const parsed = new URL(nft.image_url);
+      return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+    } catch {
+      return false;
+    }
   });
 
   const nftFallbackImg =

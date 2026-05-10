@@ -20,7 +20,7 @@ function buildCSP(nonce: string): string {
     `script-src 'self' 'nonce-${nonce}' https://s3.tradingview.com https://accounts.google.com https://apis.google.com`,
     `style-src 'self' 'unsafe-inline' https://accounts.google.com`,
     `img-src 'self' data: https:`,
-    `connect-src 'self' wss://stream.binance.com wss://streamer.cryptocompare.com https://api.coingecko.com https://pro-api.coingecko.com https://api.opensea.io https://min-api.cryptocompare.com https://openrouter.ai https://accounts.google.com`,
+    `connect-src 'self' wss://stream.binance.com wss://stream.binance.com:9443 wss://streamer.cryptocompare.com https://api.coingecko.com https://pro-api.coingecko.com https://api.opensea.io https://min-api.cryptocompare.com https://openrouter.ai https://accounts.google.com`,
     `frame-src https://s.tradingview.com https://www.tradingview-widget.com https://accounts.google.com`,
     `font-src 'self'`,
     `object-src 'none'`,

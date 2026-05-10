@@ -18,10 +18,15 @@ async function RankingsContent() {
     const { data, fromCache } = await getNFTRankings(0, 20);
     return <NFTRankingsTable initialData={data} fromCache={fromCache} />;
   } catch {
+    const hasOpenSeaKey = Boolean(process.env.OPENSEA_API_KEY);
     return (
       <NFTErrorBoundary
         title="Failed to load NFT rankings"
-        message="We couldn't fetch the latest rankings. Please try again."
+        message={
+          hasOpenSeaKey
+            ? "We couldn't fetch the latest rankings. Please try again."
+            : "OpenSea API key is missing in deployment environment (OPENSEA_API_KEY)."
+        }
       />
     );
   }

@@ -39,6 +39,30 @@ const fallbackArticles: NewsArticle[] = [
   },
 ];
 
+function normalizeNewsImageUrl(value: unknown): string {
+  if (typeof value !== 'string' || value.trim().length === 0) {
+    return '/images/WhitemodeLogo.png';
+  }
+
+  if (value.startsWith('/')) {
+    return value;
+  }
+
+  try {
+    const parsed = new URL(value);
+    if (
+      parsed.protocol === 'https:' &&
+      (parsed.hostname === 'images.cryptocompare.com' || parsed.hostname === 'www.cryptocompare.com')
+    ) {
+      return value;
+    }
+  } catch {
+    return '/images/WhitemodeLogo.png';
+  }
+
+  return '/images/WhitemodeLogo.png';
+}
+
 async function getNews(): Promise<NewsArticle[]> {
   const API_KEY = process.env.CRYPTOCOMPARE;
   
@@ -65,12 +89,12 @@ async function getNews(): Promise<NewsArticle[]> {
 
   if (data && data.Data && Array.isArray(data.Data)) {
     return data.Data.map((news: any) => ({
-      id: news.id,
-      title: news.title,
-      url: news.url,
-      body: news.body,
-      imageUrl: news.imageurl,
-      publishedOn: news.published_on,
+      id: String(news?.id ?? `${Date.now()}-${Math.random()}`),
+      title: String(news?.title ?? 'Untitled news'),
+      url: String(news?.url ?? '/'),
+      body: String(news?.body ?? ''),
+      imageUrl: normalizeNewsImageUrl(news?.imageurl),
+      publishedOn: Number(news?.published_on ?? Math.floor(Date.now() / 1000)),
       sourceName: news.source_info?.name || 'Unknown',
       sourceImg: news.source_info?.img || '',
       categories: news.categories || '',
