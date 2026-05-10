@@ -6,14 +6,23 @@ export interface NftInfo {
   token_id?: string;
 }
 
-function getApiKey(): string {
+function getApiKey(): string | null {
   const key = process.env.OPENSEA_API_KEY;
-  if (!key) throw new Error("OPENSEA_API_KEY is missing!");
+  if (!key) {
+    console.warn("OPENSEA_API_KEY is not set - NFT data will be unavailable");
+    return null;
+  }
   return key;
 }
 
 export const fetchNftInfo = async (): Promise<NftInfo[]> => {
   const apiKey = getApiKey();
+  
+  // If no API key, return empty array instead of throwing
+  if (!apiKey) {
+    return [];
+  }
+
   const options: RequestInit = {
     method: "GET",
     headers: {
@@ -29,7 +38,8 @@ export const fetchNftInfo = async (): Promise<NftInfo[]> => {
       options,
     );
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      console.warn(`OpenSea API returned status ${response.status}`);
+      return [];
     }
 
     const data = await response.json();
@@ -54,11 +64,11 @@ export const fetchNftInfo = async (): Promise<NftInfo[]> => {
 
       return allNfts.slice(0, 20);
     } else {
-      console.error("Expected data structure is missing:", data);
+      console.warn("Expected OpenSea data structure is missing:", data);
       return [];
     }
   } catch (error: any) {
-    console.error("Error fetching NFT info:", error?.message || error);
+    console.warn("Error fetching NFT info from OpenSea:", error?.message || error);
     return [];
   }
 };

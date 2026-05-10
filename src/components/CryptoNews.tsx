@@ -36,45 +36,45 @@ function normalizeImageUrl(value: unknown): string {
 
   return '/images/WhitemodeLogo.png';
 }
-const NEWS_URL =
-  "https://min-api.cryptocompare.com/data/v2/news/?feeds=cryptocompare,cointelegraph,coindesk&extraParams=YourSite";
-const API_KEY = process.env.CRYPTOCOMPARE;
+
+// Using CoinDesk News API - public endpoint, no authentication required
+const COINDESK_NEWS_URL = "https://api.coindesk.com/v1/news";
 
 const getNews = unstable_cache(
   async (): Promise<NewsArticle[]> => {
-    const headers: Record<string, string> = {
-      accept: "application/json",
-    };
+    try {
+      const response = await fetch(COINDESK_NEWS_URL, {
+        method: "GET",
+        headers: {
+          accept: "application/json",
+        },
+      });
 
-    if (API_KEY) {
-      headers["api_key"] = API_KEY;
-    }
+      if (!response.ok) {
+        console.warn(`CoinDesk API returned status ${response.status}`);
+        return FALLBACK_NEWS;
+      }
 
-    const options = {
-      method: "GET",
-      headers,
-    };
+      const data = await response.json();
 
-    const response = await fetch(NEWS_URL, options);
-    if (!response.ok) {
-      return FALLBACK_NEWS;
-    }
-
-    const data = await response.json();
-
-    // Ensure the data structure is valid
-    if (data && data.Data && Array.isArray(data.Data)) {
-      return data.Data.slice(0, 3).map((news: any) => ({
-        id: String(news?.id ?? crypto.randomUUID()),
-        title: String(news?.title ?? 'Untitled news'),
-        url: String(news?.url ?? '/news'),
-        body: String(news?.body ?? ''),
-        imageUrl: normalizeImageUrl(news?.imageurl),
-        publishedOn: Number(news?.published_on ?? Math.floor(Date.now() / 1000)),
-        sourceName: String(news?.source_info?.name ?? 'Unknown'),
-        sourceImg: String(news?.source_info?.img ?? ''),
-      }));
-    } else {
+      // CoinDesk response structure: { data: [ { title, description, url, image: { source }, published_at, source } ] }
+      if (data && Array.isArray(data)) {
+        return data.slice(0, 3).map((article: any) => ({
+          id: String(article?.id ?? article?.url ?? crypto.randomUUID()),
+          title: String(article?.title ?? 'Untitled news'),
+          url: String(article?.url ?? '/news'),
+          body: String(article?.description ?? article?.body ?? ''),
+          imageUrl: normalizeImageUrl(article?.image?.source || article?.imageUrl),
+          publishedOn: article?.published_at ? Math.floor(new Date(article.published_at).getTime() / 1000) : Math.floor(Date.now() / 1000),
+          sourceName: String(article?.source ?? 'CoinDesk'),
+          sourceImg: '',
+        }));
+      } else {
+        console.warn("Unexpected CoinDesk response structure", data);
+        return FALLBACK_NEWS;
+      }
+    } catch (error) {
+      console.error("Error fetching news from CoinDesk:", error);
       return FALLBACK_NEWS;
     }
   },
