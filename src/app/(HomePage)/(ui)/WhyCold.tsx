@@ -105,7 +105,6 @@ const WhyCold = () => {
                   height={120}
                   className="transition-transform duration-300 group-hover:scale-110"
                 />
-                {/* Floating coin overlays */}
                 <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 animate-coin-float-1 shadow-lg shadow-emerald-500/30" />
                 <div className="absolute top-6 left-1 w-3 h-3 rounded-full bg-gradient-to-br from-emerald-300 to-emerald-500 animate-coin-float-2 shadow-lg shadow-emerald-500/30" />
                 <div className="absolute bottom-4 right-0 w-3.5 h-3.5 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-700 animate-coin-float-3 shadow-lg shadow-emerald-500/30" />
