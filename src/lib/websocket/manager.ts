@@ -34,7 +34,10 @@ import { LastValueCache } from './buffer';
 
 // ── Constants ─────────────────────────────────────────────
 
-const BINANCE_WS_BASE = 'wss://stream.binance.com/stream';
+const BINANCE_WS_BASES = [
+  'wss://stream.binance.com/stream',
+  'wss://data-stream.binance.vision/stream',
+];
 
 /** Reconnection backoff */
 const INITIAL_BACKOFF_MS = 1_000;
@@ -64,6 +67,7 @@ export class BinanceWSManager {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private backoffMs = INITIAL_BACKOFF_MS;
   private reconnectAttempt = 0;
+  private endpointIndex = 0;
 
   // Heartbeat
   private pingTimer: ReturnType<typeof setInterval> | null = null;
@@ -189,7 +193,8 @@ export class BinanceWSManager {
       return;
     }
 
-    const url = `${BINANCE_WS_BASE}?streams=${streams.join('/')}`;
+    const wsBase = BINANCE_WS_BASES[this.endpointIndex % BINANCE_WS_BASES.length];
+    const url = `${wsBase}?streams=${streams.join('/')}`;
     this.setStatus('connecting');
 
     try {
@@ -269,6 +274,7 @@ export class BinanceWSManager {
     if (this.reconnectTimer) return;
 
     this.reconnectAttempt++;
+    this.endpointIndex = (this.endpointIndex + 1) % BINANCE_WS_BASES.length;
     const jitter = Math.random() * 500;
     const delay = Math.min(this.backoffMs + jitter, MAX_BACKOFF_MS);
 
