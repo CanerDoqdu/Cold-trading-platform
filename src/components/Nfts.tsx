@@ -47,7 +47,13 @@ export const fetchNftInfo = async (): Promise<NftInfo[]> => {
     if (data && Array.isArray(data.collections)) {
       const allNfts = data.collections.map((collection: Record<string, unknown>) => {
         const slug = String(collection.slug || collection.collection || "");
-        const imageUrl = String(collection.image_url || collection.image || "");
+        const imageUrl = String(
+          collection.image_url ||
+          collection.image ||
+          collection.banner_image_url ||
+          collection.featured_image_url ||
+          ""
+        );
 
         return {
           name: String(collection.name || "Unnamed"),
