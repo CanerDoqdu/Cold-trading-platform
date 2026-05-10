@@ -24,6 +24,7 @@ interface NewsArticle {
 
 const NEWS_URL =
   "https://min-api.cryptocompare.com/data/v2/news/?feeds=cryptocompare,cointelegraph,coindesk&extraParams=YourSite";
+const COINDESK_RSS_URL = 'https://www.coindesk.com/arc/outboundfeeds/rss/';
 
 const fallbackArticles: NewsArticle[] = [
   {
@@ -63,6 +64,47 @@ function normalizeNewsImageUrl(value: unknown): string {
   return '/images/WhitemodeLogo.png';
 }
 
+async function fetchRssNews(limit = 24): Promise<NewsArticle[]> {
+  try {
+    const response = await fetch(COINDESK_RSS_URL, {
+      method: 'GET',
+      headers: { accept: 'application/xml,text/xml' },
+      next: { revalidate: 1800 },
+    });
+
+    if (!response.ok) return [];
+
+    const xml = await response.text();
+    const items = xml.match(/<item>[\s\S]*?<\/item>/g) ?? [];
+
+    return items.slice(0, limit).map((item, index) => {
+      const title = item.match(/<title><!\[CDATA\[(.*?)\]\]><\/title>/)?.[1]
+        ?? item.match(/<title>(.*?)<\/title>/)?.[1]
+        ?? 'Untitled news';
+      const url = item.match(/<link>(.*?)<\/link>/)?.[1] ?? '/news';
+      const body = item.match(/<description><!\[CDATA\[(.*?)\]\]><\/description>/)?.[1]
+        ?? item.match(/<description>(.*?)<\/description>/)?.[1]
+        ?? '';
+      const image = item.match(/<media:content[^>]*url="([^"]+)"/)?.[1] ?? '/images/WhitemodeLogo.png';
+      const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1];
+
+      return {
+        id: `rss-${index}-${url}`,
+        title: String(title).trim(),
+        url: String(url).trim(),
+        body: String(body).replace(/<[^>]+>/g, '').trim(),
+        imageUrl: normalizeNewsImageUrl(image),
+        publishedOn: pubDate ? Math.floor(new Date(pubDate).getTime() / 1000) : Math.floor(Date.now() / 1000),
+        sourceName: 'CoinDesk',
+        sourceImg: '',
+        categories: 'news',
+      };
+    });
+  } catch {
+    return [];
+  }
+}
+
 async function getNews(): Promise<NewsArticle[]> {
   const API_KEY = process.env.CRYPTOCOMPARE;
   
@@ -83,7 +125,8 @@ async function getNews(): Promise<NewsArticle[]> {
 
   if (!response.ok) {
     console.warn(`CryptoCompare news request failed with status ${response.status}`);
-    return fallbackArticles;
+    const rssArticles = await fetchRssNews(24);
+    return rssArticles.length > 0 ? rssArticles : fallbackArticles;
   }
 
   const data = await response.json();
@@ -105,7 +148,8 @@ async function getNews(): Promise<NewsArticle[]> {
   console.warn(
     `CryptoCompare news returned no article array: ${data?.Message || 'unknown response'}`,
   );
-  return fallbackArticles;
+  const rssArticles = await fetchRssNews(24);
+  return rssArticles.length > 0 ? rssArticles : fallbackArticles;
 }
 
 function formatTimeAgo(timestamp: number): string {
