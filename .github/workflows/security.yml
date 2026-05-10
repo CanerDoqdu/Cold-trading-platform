@@ -3,7 +3,7 @@ name: Security Scans
 on:
   push:
     branches: [main]
-  pull_request:
+  workflow_dispatch:
   schedule:
     - cron: '0 8 * * 1' # Weekly Monday 8am
 
