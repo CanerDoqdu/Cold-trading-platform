@@ -8,6 +8,8 @@ import { SWRProvider } from "@/components/SWRProvider";
 import type { Metadata, Viewport } from 'next';
 import { headers } from 'next/headers';
 
+const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://crypto-henna-beta.vercel.app';
+
 export const metadata: Metadata = {
   title: {
     default: 'COLD - Crypto Trading Platform',
@@ -18,22 +20,22 @@ export const metadata: Metadata = {
   authors: [{ name: 'COLD Team' }],
   creator: 'COLD',
   publisher: 'COLD',
-  metadataBase: new URL('https://crypto-henna-beta.vercel.app'),
+  metadataBase: new URL(SITE_URL),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://crypto-henna-beta.vercel.app',
+    url: SITE_URL,
     siteName: 'COLD',
     title: 'COLD - Crypto Trading Platform',
     description: 'Trade cryptocurrencies, track markets, and manage your portfolio.',
     images: [
       {
-        url: 'https://crypto-henna-beta.vercel.app/images/WhitemodeLogo.png',
-        width: 1200,
-        height: 630,
+        url: '/images/xkickoff.png',
+        width: 686,
+        height: 386,
         alt: 'COLD - Crypto Trading Platform',
       },
     ],
@@ -42,7 +44,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'COLD - Crypto Trading Platform',
     description: 'Trade cryptocurrencies, track markets, and manage your portfolio.',
-    images: ['https://crypto-henna-beta.vercel.app/images/WhitemodeLogo.png'],
+    images: ['/images/xkickoff.png'],
     creator: '@coldcrypto',
   },
   robots: {

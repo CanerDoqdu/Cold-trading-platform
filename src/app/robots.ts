@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = 'https://cold.io';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://crypto-henna-beta.vercel.app';
   
   return {
     rules: [
@@ -17,6 +17,11 @@ export default function robots(): MetadataRoute.Robots {
       },
       {
         userAgent: 'Googlebot',
+        allow: '/',
+        disallow: ['/api/', '/profile/'],
+      },
+      {
+        userAgent: 'LinkedInBot',
         allow: '/',
         disallow: ['/api/', '/profile/'],
       },
