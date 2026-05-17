@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     description: 'Trade cryptocurrencies, track markets, and manage your portfolio.',
     images: [
       {
-        url: '/images/WhitemodeLogo.png',
+        url: 'https://crypto-henna-beta.vercel.app/images/WhitemodeLogo.png',
         width: 1200,
         height: 630,
         alt: 'COLD - Crypto Trading Platform',
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'COLD - Crypto Trading Platform',
     description: 'Trade cryptocurrencies, track markets, and manage your portfolio.',
-    images: ['/images/WhitemodeLogo.png'],
+    images: ['https://crypto-henna-beta.vercel.app/images/WhitemodeLogo.png'],
     creator: '@coldcrypto',
   },
   robots: {
